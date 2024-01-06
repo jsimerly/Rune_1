@@ -1,0 +1,30 @@
+from abc import ABC, abstractmethod
+from typing import Callable
+import pygame as pg
+
+class AbstractClickableObject(ABC):
+    @abstractmethod
+    def on_click(self) -> Callable or None:
+        """Method to be executed on click."""
+        pass
+
+class ClickableRectObj(AbstractClickableObject):
+    def __init__(self) -> None:
+        self._rect = None
+
+    @property
+    def rect(self):
+        return self._rect
+
+    @rect.setter
+    def rect(self, value):
+        if not isinstance(value, pg.Rect):
+            raise ValueError("rect must be a pg.Rect instance")
+        self._rect = value
+
+    def on_click(self) -> Callable or None:
+        # Implementation for on_click method
+        pass
+
+
+
