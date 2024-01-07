@@ -58,5 +58,7 @@ class GameTile(Hex, AbstractClickableObject):
         self.character = None
 
     def on_click(self):
-        pass
+        print(self)
+    
+    
 

@@ -1,8 +1,7 @@
-from ui.spawning_icon import CharacterSpawningIcon
+from game.ui.spawning_icon import CharacterSpawningIcon
+from .abstact_phase_manager import AbstactPhaseManager
 
-
-# Later attach to team to handle many characters.
-class SpawnHandler:
+class SpawnHandler(AbstactPhaseManager):
     def __init__(self, char_instance, spawn_image, pixel_pos, screen) -> None:
         self.character = char_instance
         self.button = CharacterSpawningIcon(spawn_image, pixel_pos, screen, char_instance=char_instance)

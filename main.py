@@ -4,7 +4,9 @@ from map.game_map import GameMap
 from game.brock_purdy import GameManager
 from character.characters.crud.crud import Crud
 from map.loadouts.map_1 import map_1
-from game.spawning.spawning import SpawnHandler
+from game.phases.spawn_handler import SpawnHandler
+from game.game_phase import GamePhaseManager
+
 
 pg.init()
 
@@ -16,11 +18,26 @@ game_map = GameMap(map=map_1, screen=screen)
 #eventually attach to a team:
 
 crud = Crud(screen=screen)
-spawning_handler = SpawnHandler(crud, crud.sprite.image, (110,110), screen)
 
-game_manager = GameManager()
+
+spawning_handler = SpawnHandler(crud, crud.sprite.image, (110,110), screen)
+game_phase_manager = GamePhaseManager(screen=screen)
+game_phase_manager.register_phase_manager(spawning_handler)
+
+    # spawn_handler=spawning_handler,
+    # move_handler=move_handler,
+    # ability_handler=ability_handler,
+    # processing_handler=processing_handler,
+
+#need to make a game manager builder obj
+game_manager = GameManager(game_phase_manager=game_phase_manager, game_map=game_map)
+
 game_manager.register_ui_click_event(spawning_handler.button, spawning_handler.button.on_click)
+game_manager.register_ui_click_event(game_phase_manager.next_phase_button, game_phase_manager.next_phase_button.on_click)
+game_manager.register_ui_click_event(game_phase_manager.prev_phase_button, game_phase_manager.prev_phase_button.on_click)
+
 game_manager.set_game_map(game_map)
+
 spawning_handler.draw()
 game_map.draw()
 

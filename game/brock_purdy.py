@@ -2,15 +2,16 @@ from .game_events import OnClickEventManager
 from game.clickable_obj import AbstractClickableObject
 from typing import List
 from map.game_map import GameMap, GameTile
-
+from .game_phase import GamePhase, GamePhaseManager
 
 class GameManager:
-    def __init__(self) -> None:
+    def __init__(self, game_phase_manager: GamePhaseManager, game_map:GameMap) -> None:
         self.ui_click_events = OnClickEventManager()
         self.ui_objects: List[AbstractClickableObject] = []
         self.next_click_function = None
+        self.game_phase_manager: GamePhaseManager = game_phase_manager
 
-        self.game_map: GameMap = None
+        self.game_map: GameMap = game_map
 
     def set_game_map(self, game_map: GameMap):
         self.game_map = game_map
@@ -44,6 +45,10 @@ class GameManager:
             ''' If we are already in the middle of a clicking chain for an in game action we'll handle that. If not this is the first click and we can handle that now.'''
             if self.next_click_function:
                 self.next_click_function = self.next_click_function(clicked_obj)
+
+                if self.next_click_function == self.game_phase_manager.next_phase:
+                    self.game_phase_manager.next_phase()
+                    self.next_click_function = None
             else:
                 self.next_click_function = clicked_obj.on_click()
 

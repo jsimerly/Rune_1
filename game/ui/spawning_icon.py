@@ -57,7 +57,8 @@ class CharacterSpawningIcon(ClickableRectObj):
         if isinstance(passed_object, GameTile):
             if passed_object.character:
                 print('You cannot place a character on top of another character.')
-                return self.handle_placement
+                self.select()
+                return None
             else:
                 passed_object.register_character(character=self.char_instance)
                 self.disable()

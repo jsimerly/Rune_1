@@ -11,6 +11,11 @@ class AbstractClickableObject(ABC):
 class ClickableRectObj(AbstractClickableObject):
     def __init__(self) -> None:
         self._rect = None
+        self.post_init_check()
+
+    def post_init_check(self):
+        if not isinstance(self.rect, pg.Rect):
+            raise ValueError(f"{self.__class__.__name__} must initialize self.rect with a pygame.Rect")
 
     @property
     def rect(self):
@@ -22,6 +27,7 @@ class ClickableRectObj(AbstractClickableObject):
             raise ValueError("rect must be a pg.Rect instance")
         self._rect = value
 
+    @abstractmethod
     def on_click(self) -> Callable or None:
         # Implementation for on_click method
         pass
