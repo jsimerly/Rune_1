@@ -5,7 +5,7 @@ from hex import Point
 
 class GameMap:
     def __init__(self, map: MapLayout, screen):
-        self.tiles = map.generate_map(screen)
+        self.tiles = map.generate_map(screen, self)
         self.screen = screen
         self.layout = map.layout
 

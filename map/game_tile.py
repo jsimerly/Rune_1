@@ -7,6 +7,7 @@ from game.clickable_obj import AbstractClickableObject
 
 if TYPE_CHECKING:
     from character.abs_character import AbstractCharacter
+    from game_map import GameMap
 
 pg.font.init()
 
@@ -15,13 +16,13 @@ class GameTile(Hex, AbstractClickableObject):
         q:int, r:int,
         layout: Layout,
         screen,
-
+        game_map: GameMap,
         surface_color: (int, int, int),
-        has_coords:bool = False,
     ):
         super().__init__(q, r)
         self.layout = layout
         self.screen = screen
+        self.game_map = game_map
         self.is_selected = False
 
         self.coords_on = True
@@ -57,8 +58,30 @@ class GameTile(Hex, AbstractClickableObject):
     def unregister_character(self):
         self.character = None
 
-    def on_click(self):
-        print(self)
+    def on_click(self) -> Callable:
+        self.select()
+        return self.next_click
+    
+    def next_click(self, passed_obj: AbstractClickableObject) -> Optional[Callable]:
+        self.deselect()
+        self.deselect_neighbors()
+        next_function = passed_obj.on_click()
+        return next_function
+
+    def select(self):
+        self.is_selected = True
+        self.draw()
+
+    def deselect(self):
+        self.is_selected = False
+        self.draw()
+
+    def deselect_neighbors(self):
+        neighbors = self.get_all_neighors()
+        for tile in neighbors:
+            axial_coord = (tile.q, tile.r)
+            tile = self.game_map.tiles[axial_coord]
+            tile.draw()
     
     
 

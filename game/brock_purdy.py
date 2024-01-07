@@ -41,14 +41,12 @@ class GameManager:
 
     def handle_click(self, mouse_pos):
         clicked_obj = self.find_clicked_obj(mouse_pos)
+
         if clicked_obj:
             ''' If we are already in the middle of a clicking chain for an in game action we'll handle that. If not this is the first click and we can handle that now.'''
             if self.next_click_function:
                 self.next_click_function = self.next_click_function(clicked_obj)
 
-                if self.next_click_function == self.game_phase_manager.next_phase:
-                    self.game_phase_manager.next_phase()
-                    self.next_click_function = None
             else:
                 self.next_click_function = clicked_obj.on_click()
 

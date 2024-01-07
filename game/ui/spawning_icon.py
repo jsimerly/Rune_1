@@ -51,9 +51,9 @@ class CharacterSpawningIcon(ClickableRectObj):
     
     def on_click(self):
         self.select()
-        return self.handle_placement
+        return self.next_click
 
-    def handle_placement(self, passed_object):
+    def next_click(self, passed_object):
         if isinstance(passed_object, GameTile):
             if passed_object.character:
                 print('You cannot place a character on top of another character.')
