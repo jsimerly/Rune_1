@@ -107,11 +107,11 @@ class GameTile(Hex, AbstractClickableObject):
 
     def select(self):
         self.is_selected = True
-        self.draw()
+        self.draw_border(border_thickness=3)
 
     def deselect(self):
         self.is_selected = False
-        self.draw()
+        self.reset_border()
 
     def redraw_neighbors(self):
         neighbors = self.get_all_neighbor_tiles()

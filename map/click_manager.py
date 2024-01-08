@@ -29,7 +29,7 @@ class ClickManager:
             return self.initial_movement_click()
         
         self.tile.select()
-        return self.next_click()
+        return self.next_click
 
     def initial_movement_click(self):
         if self.tile.character:
@@ -38,11 +38,11 @@ class ClickManager:
                 tile.draw_border(border_color=(200, 200, 200), border_thickness=3)
                 self.prev_func_cache = movement_options
 
-            self.tile.select()
+            self.tile.deselect()
             return self.second_movement_click
         
         self.tile.select()
-        return None
+        return self.next_click
         
     def second_movement_click(self, passed_object: AbstractClickableObject):
         self.tile.game_map.redraw_tile_borders(self.prev_func_cache)
