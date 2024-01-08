@@ -1,10 +1,5 @@
 from enum import Enum
-from game.ui.spawning_icon import CharacterSpawningIcon
-from game.ui.phase_buttons import NextPhaseButton, PrevPhaseButton, PhaseButton
-from game.phases.spawn_handler import SpawnHandler
-from game.phases.move_handler import MoveHandler
-from game.phases.end_of_turn_handler import EndOfTurnHandler
-from game.phases.ability_handler import AbilityHandler
+from game.ui.phase_buttons import  PhaseButton
 from game.phases.abstact_phase_manager import AbstactPhaseManager
 import pygame as pg
 from settings import BGCOLOR
@@ -22,13 +17,6 @@ class GamePhaseManager:
         self.current_phase = GamePhase.SPAWNING
         self.turn_n = 0
 
-        self.handlers = {
-            SpawnHandler: None,
-            MoveHandler: None,
-            AbilityHandler: None,
-            EndOfTurnHandler: None,
-        }
-
         self.next_phase_button = PhaseButton(
             screen=screen, pixel_pos=(190, 900),
             text='Next', color=(255, 255, 255), border_color=(100, 100, 100),
@@ -45,9 +33,6 @@ class GamePhaseManager:
         self.ability_handler = None
         self.processing_handler = None
         self.draw()
-
-    def register_phase_manager(self, phase_manager):
-        self.handlers[type(phase_manager)] = phase_manager
 
     def set_phase(self, phase: AbstactPhaseManager):
         self.current_phase = phase

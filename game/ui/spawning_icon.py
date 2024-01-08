@@ -5,6 +5,7 @@ from settings import BGCOLOR
 from game.clickable_obj import ClickableRectObj
 from exceptions import PlayerError
 from map.game_map import GameTile
+
 if TYPE_CHECKING:
     from character.abs_character import AbstractCharacter
 

@@ -1,4 +1,5 @@
 from components.sprite import SpriteComponent
+from components.movement import MovementComponent
 import pygame as pg
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -6,12 +7,18 @@ if TYPE_CHECKING:
     from map.game_tile import GameTile
 
 class AbstractCharacter(ABC):
-    def __init__(self, screen):
+    def __init__(self, screen, game_map):
+        self.current_tile = None
         self.sprite: SpriteComponent = None
+        self.movement: MovementComponent = None
         self.screen = screen
+        self.game_map = game_map
 
     def set_sprite_comp(self, comp: SpriteComponent):
         self.sprite = comp
+
+    def set_movement_comp(self, comp: MovementComponent):
+        self.movement = comp
 
     def open_image(self, image_path) -> pg.image:
         return pg.image.load(image_path).convert_alpha()

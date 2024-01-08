@@ -17,12 +17,12 @@ clock = pg.time.Clock()
 game_map = GameMap(map=map_1, screen=screen)
 #eventually attach to a team:
 
-crud = Crud(screen=screen)
+crud = Crud(screen=screen, game_map=game_map)
 
 
 spawning_handler = SpawnHandler(crud, crud.sprite.image, (110,110), screen)
 game_phase_manager = GamePhaseManager(screen=screen)
-game_phase_manager.register_phase_manager(spawning_handler)
+spawning_handler.draw()
 
     # spawn_handler=spawning_handler,
     # move_handler=move_handler,

@@ -20,7 +20,8 @@ shape_params = {
 
 special_tiles = {
     Tree: [(2,0), (1,1), (2,-1)],
-    Brush: [(0,2)]
+    # Brush: [(0,2)],
+    RoughTerrian: [(0,2)]
 }
 
 map_1 = MapLayout(

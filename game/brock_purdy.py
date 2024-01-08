@@ -12,6 +12,8 @@ class GameManager:
         self.game_phase_manager: GamePhaseManager = game_phase_manager
 
         self.game_map: GameMap = game_map
+        for tile in self.game_map.tiles.values():
+            tile.set_game_phase(self.game_phase_manager)
 
     def set_game_map(self, game_map: GameMap):
         self.game_map = game_map

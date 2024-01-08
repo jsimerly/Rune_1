@@ -64,6 +64,13 @@ class Hex:
         
         return NotImplemented
     
+    def __hash__(self) -> (int, int):
+        return hash((self.q, self.r))
+    
+    @property
+    def axial(self):
+        return (self.q, self.r)
+    
     def magnitude(self, other=None) -> int:
         ''' We divide by two because we're using a 3D grid system with a plane through it at x + y + z = 0.
         Typically, in a 3D system, we would calculate the length of this vector using the distance from 0, 0, 0.
