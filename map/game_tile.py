@@ -6,7 +6,8 @@ import pygame as pg
 from game.clickable_obj import AbstractClickableObject
 from game.game_phase import GamePhase
 from components.map_interaction import MapInteractionComponent
-
+from .click_manager import ClickManager
+import time
 if TYPE_CHECKING:
     from character.abs_character import AbstractCharacter
     from game_map import GameMap
@@ -50,16 +51,17 @@ class GameTile(Hex, AbstractClickableObject):
         )
 
         self.character: AbstractCharacter = None
-        self.prev_func_cache = None
+        self.click_manager = ClickManager(self)
 
     def set_game_phase(self, game_phase_manager: GamePhaseManager):
-        self.game_manager_manager = game_phase_manager
+        self.game_manager = game_phase_manager
     
     def draw(self, border_color=LIGHT_GREY, border_thickness=1):
         point = self.layout.hex_to_pixel(self)
         verticies = self.layout.get_hex_verticies(point)
         pg.draw.polygon(self.screen, self.color, verticies)
 
+        #not using draw border so we don't hvae to recalculate the vertices and avoid DIing the info into draw border for reusablility.
         outline_size = 4 if self.is_selected else border_thickness
         outline_color = (220,220,220) if self.is_selected else border_color
         pg.draw.polygon(self.screen, outline_color, verticies, outline_size)
@@ -76,6 +78,19 @@ class GameTile(Hex, AbstractClickableObject):
 
             self.screen.blit(text_surface, text_pos)  
 
+    def draw_border(self, border_color=LIGHT_GREY, border_thickness=1):
+        point = self.layout.hex_to_pixel(self)
+        verticies = self.layout.get_hex_verticies(point)
+
+        outline_color = (220,220,220) if self.is_selected else border_color
+        pg.draw.polygon(self.screen, outline_color, verticies, border_thickness)
+
+    def reset_border(self):
+        point = self.layout.hex_to_pixel(self)
+        inner_verticies = self.layout.get_hex_verticies(point)
+        pg.draw.polygon(self.screen, self.color, inner_verticies, 4) #4 is the max thickness we'll have as a border
+        self.draw_border()
+
     def get_center_pixel(self) -> (int, int):  
         return self.layout.hex_to_pixel(self)
 
@@ -88,39 +103,7 @@ class GameTile(Hex, AbstractClickableObject):
         self.character = None
 
     def on_click(self) -> Callable:
-        current_phase = self.game_manager_manager.current_phase
-        if self.character and current_phase == GamePhase.MOVE_QUEUEING:
-            movement_options = self.character.movement.find_possible_tiles()
-            for tile in movement_options:
-                tile.draw(border_color=(200, 200, 200), border_thickness=3)
-            
-            self.prev_func_cache = movement_options
-            return self.handle_click_movement
-        
-        self.select()
-        return self.next_click
-
-    def handle_click_movement(self, passed_object):
-        #clear the selection path
-        self.game_map.redraw_tiles(self.prev_func_cache)
-
-        if isinstance(passed_object, type(self)):
-            if passed_object in self.prev_func_cache:
-                movement_path = self.character.movement.astar(passed_object)
-                self.game_map.draw_movement_path(movement_path)
-                
-            else:
-                print('Cannot move there')
-
-        self.prev_func_cache = None
-        return None
-    
-    
-    def next_click(self, passed_obj: AbstractClickableObject) -> Optional[Callable]:
-        self.deselect()
-        self.redraw_neighbors()
-        next_function = passed_obj.on_click()
-        return next_function
+        return self.click_manager.on_click()
 
     def select(self):
         self.is_selected = True
@@ -134,6 +117,11 @@ class GameTile(Hex, AbstractClickableObject):
         neighbors = self.get_all_neighbor_tiles()
         for tile in neighbors:
             tile.draw()
+    
+    def redraw_neighbors_borders(self):
+        neighbors = self.get_all_neighbor_tiles()
+        for tile in neighbors:
+            tile.reset_border()
 
     def get_neighbor_tile(self, i) -> GameTile:
         hex = self.neighbor(i)

@@ -2,6 +2,9 @@ from __future__ import annotations
 from .abstact_component import AbstactComponent
 from typing import TYPE_CHECKING, List, Set, Optional, Dict
 from map.game_map import GameMap  
+import pygame as pg
+import time
+
 if TYPE_CHECKING:
     from character.abs_character import AbstractCharacter
     from map.game_tile import GameTile
@@ -27,21 +30,36 @@ class MovementComponent(AbstactComponent):
         self.range = 5
         self.queued_movement: List[GameTile] = []
 
-    def move_character_to(self, tile: GameTile):
-        travel_path = self.astar(tile)
+    def move(self, travel_path: List[GameTile]):
+        #moved A star out so we don't have to re perform.
         self.queued_movement = travel_path
         self.draw_queued_movement()
 
-
     def draw_queued_movement(self):
         self.game_map.draw_movement_path(self.queued_movement)
+        self.character.sprite.draw_movement_queue(self.queued_movement[0], self.queued_movement[-1])
+        self.draw_movement_path(self.queued_movement)
 
+    def draw_movement_path(self, path: List[GameTile]):
+        center_pixels = []
+        for tile in path:
+            pixel_coord = self.game_map.layout.hex_to_pixel(tile)
+            center_pixels.append(pixel_coord)
+
+        if len(center_pixels) > 0:
+            surface = pg.Surface(self.game_map.screen.get_size(), pg.SRCALPHA)
+            color = (221, 227, 220, 150)
+            pg.draw.lines(surface, color, False, center_pixels, 3)
+            self.game_map.screen.blit(surface, (0,0))
+        
 
     def find_possible_tiles(self):
         possible = self.hex_reachable()
         return possible
+
     
     #needs updated to handle rough terrain
+
     def hex_reachable(self) -> Set[GameTile]:
         start_tile = self.character.current_tile
         max_move = self.range
@@ -100,6 +118,7 @@ class MovementComponent(AbstactComponent):
                 while current:
                     path.append(current.tile)
                     current = current.parent
+
                 return path[::-1] # reversing the list so we have start values in front
             
             children: List[Node] = []

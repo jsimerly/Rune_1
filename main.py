@@ -53,6 +53,10 @@ while is_running:
 
     pg.display.flip()
     clock.tick(FPS)
+    clock_time = clock.get_time()
+    if clock_time > 100:
+        print(clock_time)
+
 
 
 pg.quit()

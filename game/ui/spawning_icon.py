@@ -60,10 +60,14 @@ class CharacterSpawningIcon(ClickableRectObj):
                 print('You cannot place a character on top of another character.')
                 self.select()
                 return None
-            else:
+            elif passed_object.map_interaction.can_end_on:
                 passed_object.register_character(character=self.char_instance)
                 self.disable()
                 return None
+            else:
+                print("You cannot place that character in a tree.")
+                return None
+                
         
         if self == passed_object:
             self.select()

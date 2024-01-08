@@ -35,6 +35,10 @@ class GameMap:
         for tile in tiles:
             tile.redraw_neighbors()
 
+    def redraw_tile_borders(self, tiles:List[GameTile]):
+        for tile in tiles:
+            tile.reset_border()
+
     # These event methods are called the Game Manage (brock_purdy.py)
     def animate_turn(self):
         pass
