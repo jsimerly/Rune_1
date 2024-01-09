@@ -18,7 +18,6 @@ class CharacterSpawningIcon(ClickableRectObj):
         self.screen = screen
         self.is_selected = False
         self.is_disabled = False
-        self.pos = pixel_pos
         self.char_instance = char_instance
 
         self.image = pg.transform.scale(image, self.NORMAL_SIZE)
@@ -26,8 +25,12 @@ class CharacterSpawningIcon(ClickableRectObj):
         self.disabled_image = self.image.copy()
         self.disabled_image.set_alpha(self.NOT_SELECT_ALPHA)
 
+        self.set_pos(pixel_pos)
+
+    def set_pos(self, pixel_pos):
+        self.pos=pixel_pos
         self.rect = self.image.get_rect(center=pixel_pos)
-        self.selected_rect= self.selected_image.get_rect(center=pixel_pos)
+        self.selected_rect = self.selected_image.get_rect(center=pixel_pos)
     
     def draw(self):
         if self.is_disabled:

@@ -19,7 +19,6 @@ game_map = GameMap(map=map_1, screen=screen)
 
 crud = Crud(screen=screen, game_map=game_map)
 
-
 spawning_handler = SpawnHandler(crud, crud.sprite.image, (110,110), screen)
 game_phase_manager = GamePhaseManager(screen=screen)
 spawning_handler.draw()
@@ -37,8 +36,7 @@ spawning_handler.draw()
 game_map.draw()
 
 mouse_down_start_pos = None
-is_dragging = False
-drag_threshold = 20
+drag_threshold = 40
 
 is_running = True
 while is_running:
@@ -56,6 +54,8 @@ while is_running:
                 game_manager.handle_drag_finish(mouse_down_start_pos, mouse_up_pos)
             else:
                 game_manager.handle_click(mouse_up_pos)
+
+            mouse_down_start_pos = None
                 
         if mouse_down_start_pos and not game_manager.is_dragging:
             mouse_pos = pg.mouse.get_pos()
@@ -63,7 +63,7 @@ while is_running:
             dy = mouse_pos[1] - mouse_down_start_pos[1]
             distance_moved = (dx**2 + dy**2)**0.5
 
-            if distance_moved < drag_threshold:
+            if distance_moved > drag_threshold:
                 game_manager.handle_drag_start(mouse_down_start_pos)
 
         if game_manager.is_dragging:

@@ -10,3 +10,6 @@ class SpawnHandler(AbstactPhaseManager):
     def draw(self):
         #loop through teams characters buttons and draw
         self.button.draw()
+
+    def move_pos(self):
+        self.button.pos
