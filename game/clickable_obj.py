@@ -33,4 +33,17 @@ class ClickableRectObj(AbstractClickableObject):
         pass
 
 
+class AbstactDraggableObj(ABC):
+    @abstractmethod
+    def on_drag_start(self):
+        pass
+
+    @abstractmethod
+    def on_drag_update(self):
+        pass
+
+    @abstractmethod
+    def on_drag_finish(self):
+        pass
+
 

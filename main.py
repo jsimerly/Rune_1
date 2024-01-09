@@ -6,6 +6,7 @@ from character.characters.crud.crud import Crud
 from map.loadouts.map_1 import map_1
 from game.phases.spawn_handler import SpawnHandler
 from game.game_phase import GamePhaseManager
+from team.team import Team
 
 
 pg.init()
@@ -15,28 +16,29 @@ screen.fill(BGCOLOR)
 clock = pg.time.Clock()
 
 game_map = GameMap(map=map_1, screen=screen)
-#eventually attach to a team:
 
 crud = Crud(screen=screen, game_map=game_map)
+crud2 = Crud(screen=screen, game_map=game_map)
+crud3 = Crud(screen=screen, game_map=game_map)
 
-spawning_handler = SpawnHandler(crud, crud.sprite.image, (110,110), screen)
-game_phase_manager = GamePhaseManager(screen=screen)
-spawning_handler.draw()
+team_1 = Team(team_id=1, screen=screen)
+team_1.add_character(crud)
+team_1.add_character(crud2)
+team_1.add_character(crud3)
+print(len(team_1.characters))
+
 
 #need to make a game manager builder obj
-game_manager = GameManager(game_phase_manager=game_phase_manager, game_map=game_map)
-
-game_manager.register_ui_click_event(spawning_handler.button, spawning_handler.button.on_click)
-game_manager.register_ui_click_event(game_phase_manager.next_phase_button, game_phase_manager.next_phase_button.on_click)
-game_manager.register_ui_click_event(game_phase_manager.prev_phase_button, game_phase_manager.prev_phase_button.on_click)
+game_manager = GameManager(
+    game_phase_manager=team_1.game_phase_manager,
+    game_map=game_map)
+game_manager.register_team_1(team_1)
 
 game_manager.set_game_map(game_map)
-
-spawning_handler.draw()
 game_map.draw()
 
 mouse_down_start_pos = None
-drag_threshold = 40
+drag_threshold = 60
 
 is_running = True
 while is_running:

@@ -2,18 +2,25 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Set, Dict
 from character.abs_character import AbstractCharacter
 from game.phases.spawn_handler import SpawnHandler
+from game.game_phase import GamePhase, GamePhaseManager
 
 class Team:
-    def __init__(self, team_id):
+    def __init__(self, team_id, screen):
         self.team_id = team_id
         self.color: (int, int, int) = (0,0,0)
+        self.max_team_size:int = 3
+        self.screen = screen
 
         self.characters: Set[AbstractCharacter] = set()
         self.spawn_handlers: Dict[AbstractCharacter, SpawnHandler] = {}
+        self.game_phase_manager: GamePhaseManager = GamePhaseManager(screen=screen)
         self.teleporters = []
         self.base = None
 
     def add_character(self, character: AbstractCharacter):
+        if len(self.characters) >= self.max_team_size:
+            print(f'Team at max size of {self.max_team_size}.')
+            return
         self.characters.add(character)
         self.add_spawn_handler(character)
 
@@ -36,7 +43,7 @@ class Team:
 
     def get_spawn_icon_pos(self):
         n_prev_characters = len(self.characters)
-        y = 110 + (n_prev_characters * 200)
+        y = n_prev_characters * 200
         return (110, y)
 
     def set_main_base(self, base):

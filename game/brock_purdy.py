@@ -3,13 +3,19 @@ from game.clickable_obj import AbstractClickableObject
 from typing import List
 from map.game_map import GameMap, GameTile
 from .game_phase import GamePhase, GamePhaseManager
+from team.team import Team
 
 class GameManager:
+    '''
+        This will eventually turn into the client side handler so we're only building out a single team's capabilities. It will have to connect to a server to resolve async turns.
+    '''
     def __init__(self, game_phase_manager: GamePhaseManager, game_map:GameMap) -> None:
         self.ui_click_events = OnClickEventManager()
         self.ui_objects: List[AbstractClickableObject] = []
         self.next_click_function = None
         self.game_phase_manager: GamePhaseManager = game_phase_manager
+        
+        self.team_1: Team = None
 
         self.game_map: GameMap = game_map
         for tile in self.game_map.tiles.values():
@@ -20,9 +26,19 @@ class GameManager:
     def set_game_map(self, game_map: GameMap):
         self.game_map = game_map
 
-    def register_ui_click_event(self, obj: AbstractClickableObject, event):
+    def register_team_1(self, team: Team):
+        self.team_1 = team
+        for spawn_handler in team.spawn_handlers.values():
+           spawn_button = spawn_handler.button
+           self.register_ui_click_event(spawn_button)
+
+        self.register_ui_click_event(team.game_phase_manager.next_phase_button)
+        self.register_ui_click_event(team.game_phase_manager.prev_phase_button)
+
+
+    def register_ui_click_event(self, obj: AbstractClickableObject):
         self.ui_objects.append(obj)
-        self.ui_click_events.register_event(obj=obj, fn=event)
+        self.ui_click_events.register_event(obj=obj, fn=obj.on_click)
 
     def unregister_ui_click_event(self, obj):
         self.ui_objects.remove(obj)
