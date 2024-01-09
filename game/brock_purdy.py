@@ -15,6 +15,8 @@ class GameManager:
         for tile in self.game_map.tiles.values():
             tile.set_game_phase(self.game_phase_manager)
 
+        self.is_dragging: bool = False
+
     def set_game_map(self, game_map: GameMap):
         self.game_map = game_map
 
@@ -51,6 +53,17 @@ class GameManager:
 
             else:
                 self.next_click_function = clicked_obj.on_click()
+
+    def handle_drag_start(self, mouse_down_pos):
+        self.is_dragging = True
+        print('start dragging')
+
+    def handle_drag_update(self, mouse_pos):
+        print(mouse_pos)
+
+    def handle_drag_finish(self, mouse_down_pos, mouse_up_pos):
+        self.is_dragging = False
+        print('finish dragging')
 
 
     
