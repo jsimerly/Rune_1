@@ -46,7 +46,9 @@ class ClickManager:
         
     def second_movement_click(self, passed_object: AbstractClickableObject):
         self.tile.game_map.redraw_tile_borders(self.prev_func_cache)
-        if isinstance(passed_object, type(self.tile)):
+        print(self.tile.is_gametile_type(passed_object))
+        print(type(passed_object))
+        if self.tile.is_gametile_type(passed_object):
             if passed_object in self.prev_func_cache:
                 if passed_object == self.tile.character.current_tile:
                     self.tile.deselect()

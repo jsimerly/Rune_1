@@ -101,6 +101,10 @@ class GameTile(Hex, AbstractClickableObject):
 
     def on_click(self) -> Callable:
         return self.click_manager.on_click()
+    
+    #helper function for click_manager
+    def is_gametile_type(self, obj) -> bool:
+        return isinstance(obj, GameTile)
 
     def select(self):
         self.is_selected = True
