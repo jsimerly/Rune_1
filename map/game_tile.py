@@ -38,7 +38,7 @@ class GameTile(Hex, AbstractClickableObject):
         self.is_selected = False
         self.game_phase_manager = None
 
-        self.coords_on = True
+        self.coords_on = False
         self.color = surface_color
         self.map_interaction = MapInteractionComponent(
             is_passable=is_passable,
@@ -65,9 +65,6 @@ class GameTile(Hex, AbstractClickableObject):
         outline_size = 4 if self.is_selected else border_thickness
         outline_color = (220,220,220) if self.is_selected else border_color
         pg.draw.polygon(self.screen, outline_color, verticies, outline_size)
-
-        if self.character:
-            self.character.sprite.draw()
 
         if self.coords_on:
             pg.font.init()
@@ -97,7 +94,7 @@ class GameTile(Hex, AbstractClickableObject):
     def register_character(self, character: AbstractCharacter):
         self.character = character
         self.character.current_tile = self
-        self.character.spawn_to_pixel_pos(self.get_center_pixel())
+        self.character.spawn_to_pixel_pos(self)
 
     def unregister_character(self):
         self.character = None

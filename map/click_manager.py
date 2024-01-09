@@ -50,14 +50,15 @@ class ClickManager:
             if passed_object in self.prev_func_cache:
                 if passed_object == self.tile.character.current_tile:
                     self.tile.deselect()
-                    print('Deselected.')
+                    self.tile.character.movement.clear_move()
+                    
                     return None
                 movement_path = self.tile.character.movement.astar(passed_object)
-                self.tile.game_map.draw_movement_path(movement_path)
                 self.tile.character.movement.move(movement_path)
                 
             else:
                 print('Cannot move there')
+                return None
 
         self.prev_func_cache = None
         return None     

@@ -1,3 +1,4 @@
+from __future__ import annotations
 from components.sprite import SpriteComponent
 from components.movement import MovementComponent
 import pygame as pg
@@ -23,8 +24,8 @@ class AbstractCharacter(ABC):
     def open_image(self, image_path) -> pg.image:
         return pg.image.load(image_path).convert_alpha()
     
-    def spawn_to_pixel_pos(self, pixel_pos:(int,int)):
-        self.sprite.spawn_to_pixel(pixel_pos)
+    def spawn_to_pixel_pos(self, tile:GameTile):
+        self.sprite.spawn_to_pixel(tile)
         
 
 
