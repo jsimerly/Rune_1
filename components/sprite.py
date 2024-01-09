@@ -47,7 +47,6 @@ class SpriteComponent(AbstactComponent):
         self.screen.blit(self.ghost_image, top_left_pixel)
 
     def draw_movement_queue(self, from_tile: GameTile, to_tile: GameTile):
-        start_time = time.time()
         self.ghost_pixel_pos = from_tile.get_center_pixel()
         self.pixel_pos = to_tile.get_center_pixel()
 
@@ -55,8 +54,6 @@ class SpriteComponent(AbstactComponent):
         to_tile.draw()
         self.draw_ghost()
         self.draw()
-        end_time = time.time()
-        print(f'draw_movement_time: {end_time-start_time}')
 
     def draw_movement_dequeue(self, from_tile: GameTile, to_tile:GameTile):
         self.pixel_pos = self.ghost_pixel_pos

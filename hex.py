@@ -111,7 +111,7 @@ class Hex:
         raise ValueError("target_hex must be a Hex object.")
     
     #if this isn't working as intended, it may be due to exact values and we need a nudge
-    def hex_line_to(self, target_hex) -> List[Hex]:
+    def hex_line_to(self, target_hex:Hex) -> List[Hex]:
         N = self.distance_to(target_hex)
         hexes = []
         for i in range(N):

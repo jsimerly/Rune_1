@@ -3,7 +3,7 @@ from .abstact_component import AbstactComponent
 from typing import TYPE_CHECKING, List, Set, Optional, Dict
 from map.game_map import GameMap  
 import pygame as pg
-import time
+from utils import time_it
 
 if TYPE_CHECKING:
     from character.abs_character import AbstractCharacter
@@ -48,7 +48,7 @@ class MovementComponent(AbstactComponent):
 
         if len(center_pixels) > 0:
             surface = pg.Surface(self.game_map.screen.get_size(), pg.SRCALPHA)
-            color = (221, 227, 220, 150)
+            color = (221, 227, 0, 50)
             pg.draw.lines(surface, color, False, center_pixels, 3)
             self.game_map.screen.blit(surface, (0,0))
         
@@ -89,6 +89,7 @@ class MovementComponent(AbstactComponent):
 
         return visited
 
+    @time_it
     def astar(self, target_tile: GameTile) -> Optional[List[GameTile]]:
         start_node = Node(None, self.character.current_tile)
         start_node.g, start_node.h, start_node.f = 0, 0, 0
@@ -141,7 +142,7 @@ class MovementComponent(AbstactComponent):
                 #to handle is_slowing we'll add 2 instead of 1
                 g_mod = current_node.tile.map_interaction.movement_cost
                 child.g = current_node.g + g_mod
-                child.h = self.manhattan_heuristic(child.tile, target_tile)
+                child.h = self.distance_heuristic(child.tile, target_tile)
                 child.f = child.g + child.h
 
                 for open_node in open_list:
@@ -152,11 +153,10 @@ class MovementComponent(AbstactComponent):
 
         return None
 
-    def manhattan_heuristic(self, start_tile: GameTile, end_tile: GameTile):
-        dq = end_tile.q - start_tile.q
-        dr = end_tile.r - start_tile.r
+    def distance_heuristic(self, current_tile: GameTile, target_tile: GameTile):
+        distance = current_tile.distance_to(target_tile)
 
-        return abs(dq + dr)
+        return distance
                 
 
 
