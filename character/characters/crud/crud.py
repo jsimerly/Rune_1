@@ -12,6 +12,7 @@ class Crud(AbstractCharacter):
         move_comp = MovementComponent(character=self, game_map=game_map)
         self.set_sprite_comp(sprite_comp)
         self.set_movement_comp(move_comp)
+        self.set_color((186, 17, 17))
 
 
 

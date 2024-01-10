@@ -35,13 +35,15 @@ class ClickManager:
 
     def initial_movement_click(self):
         if self.tile.character:
-            return self._handle_initial_movement(self.tile.character)
+            char_holder = self.tile.character
+            self.tile.character.movement.clear_move()
+            return self._handle_initial_movement(char_holder)
         
+
         if self.tile.ghost_character:
             self.tile.ghost_character.movement.clear_move()
             return self._handle_initial_movement(self.tile.ghost_character)
                    
-        
         self.tile.select()
         return self.next_click
     
@@ -52,7 +54,7 @@ class ClickManager:
                 self.prev_func_cache = movement_options
 
             self.tile.deselect()
-            return self.second_movement_click
+            return character.current_tile.click_manager.second_movement_click
 
     def second_movement_click(self, passed_object: AbstractClickableObject):
         if self.tile.is_gametile_type(passed_object):

@@ -1,6 +1,6 @@
 from .game_tile import GameTile
 from .loadouts.map_layout import MapLayout
-from typing import List, Set
+from typing import List, Set, Tuple
 import pygame as pg
 from utils import time_it
 
@@ -34,7 +34,7 @@ class RerenderComponent:
         self.full_tiles: Set[GameTile] = set()
         self.borders: Set[GameTile] = set()
         self.selection: Set[GameTile] = set()
-        self.movement: List[List[GameTile]] = []
+        self.movement: List[Tuple[List[GameTile], (int,int,int)]] = []
         self.abilities:  List[GameTile] = []
 
     def run_all(self):
@@ -69,9 +69,9 @@ class RerenderComponent:
 
     def render_movement(self):
         for move_queue in self.movement:
-            self.draw_movement_path(move_queue)
+            self.draw_movement_path(move_queue[0], move_queue[1])
 
-    def draw_movement_path(self, path: List[GameTile]):
+    def draw_movement_path(self, path: List[GameTile], color:(int,int,int)):
         center_pixels = []
         for tile in path:
             pixel_coord = self.game_map.layout.hex_to_pixel(tile)
@@ -79,7 +79,7 @@ class RerenderComponent:
 
         if len(center_pixels) > 0:
             surface = pg.Surface(self.game_map.screen.get_size(), pg.SRCALPHA)
-            color = (221, 227, 200, 150)
+            color = (color[0], color[1], color[2], 50)
             pg.draw.lines(surface, color, False, center_pixels, 3)
             self.game_map.screen.blit(surface, (0,0))
             
@@ -88,28 +88,34 @@ class RerenderComponent:
         pass
             
     def add_full_tiles(self, game_tiles: List[GameTile]):
-        self.full_tiles.update(game_tiles)
+        if game_tiles:
+            self.full_tiles.update(game_tiles)
 
     def remove_full_tile(self, game_tile: GameTile):
         self.full_tiles.discard(game_tile)
 
     def add_selection(self, game_tile: List[GameTile]):
-        self.selection.add(game_tile)
+        if game_tile:
+            self.selection.add(game_tile)
 
     def remove_selection(self, game_tile: GameTile):
         self.selection.discard(game_tile)
 
     def add_borders(self, game_tiles: List[GameTile]):
-        self.borders.update(game_tiles)
+        if game_tiles:
+            self.borders.update(game_tiles)
 
     def remove_border(self, game_tile: GameTile):
         self.borders.discard(game_tile)
 
-    def add_movement(self, game_tiles: List[GameTile]):
-        self.movement.append(game_tiles)
+    def add_movement(self, game_tiles: List[GameTile], color:(int,int)=(200, 0, 200)):
+        if game_tiles and color:
+            self.add_full_tiles(game_tiles) #to prevent repeat transparent color.
+            self.movement.append((game_tiles, color))
 
     def remove_movement(self, game_tiles: List[GameTile]):
-        for i, movement_queue in enumerate(self.movement):
+        for i, movement_tuple in enumerate(self.movement):
+            movement_queue = movement_tuple[0]
             if game_tiles[0] == movement_queue[0] and game_tiles[-1] == movement_queue[-1]:
                 self.movement.pop(i)
 

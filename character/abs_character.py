@@ -9,12 +9,13 @@ if TYPE_CHECKING:
     from team.team import Team
 class AbstractCharacter(ABC):
     def __init__(self, screen, game_map):
-        self.current_tile = None
+        self.current_tile: GameTile = None
         self.team = None
         self.sprite: SpriteComponent = None
         self.movement: MovementComponent = None
         self.screen = screen
         self.game_map = game_map
+        self.color = None
 
     def set_team(self, team:Team):
         self.team = team
@@ -24,6 +25,9 @@ class AbstractCharacter(ABC):
 
     def set_movement_comp(self, comp: MovementComponent):
         self.movement = comp
+
+    def set_color(self, color: (int,int,int)):
+        self.color = color
 
     def open_image(self, image_path) -> pg.image:
         return pg.image.load(image_path).convert_alpha()

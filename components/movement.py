@@ -2,7 +2,6 @@ from __future__ import annotations
 from .abstact_component import AbstactComponent
 from typing import TYPE_CHECKING, List, Set, Optional, Dict
 from map.game_map import GameMap  
-import pygame as pg
 from utils import time_it
 
 if TYPE_CHECKING:
@@ -42,23 +41,28 @@ class MovementComponent(AbstactComponent):
         end_tile.character = self.character
 
         #rendering
-        for char in end_tile.character.team.characters:
+        self.team_movement_render()
+        self.game_map.render.add_full_tiles([start_tile, end_tile])
+
+
+    #this will include this characters
+    def team_movement_render(self):
+        for char in self.character.team.characters:
             move_queue = char.movement.queued_movement
             if move_queue:
-                self.game_map.render.add_movement(move_queue)
-
-        self.game_map.render.add_full_tiles([start_tile, end_tile])
-        self.game_map.render.add_movement(travel_path)
+                self.game_map.render.add_movement(move_queue, char.color)
         
         
     def clear_move(self):
         self.game_map.render.add_full_tiles(self.queued_movement)
         self.reset_char_tile()
         self.queued_movement = None
+        self.team_movement_render()
 
     def reset_char_tile(self):
-        self.queued_movement[0].character = self.character
-        self.queued_movement[-1].character = None
+        if self.queued_movement:
+            self.queued_movement[0].character = self.character
+            self.queued_movement[-1].character = None
         
     def find_possible_tiles(self):
         possible = self.hex_reachable()
