@@ -4,7 +4,6 @@ from typing import Callable, Optional, List, TYPE_CHECKING, Set
 from settings import LIGHT_GREY
 import pygame as pg
 from game.clickable_obj import AbstractClickableObject, ContinueClickAction
-from game.game_phase import GamePhase
 from components.map_interaction import MapInteractionComponent
 import time
 if TYPE_CHECKING:
@@ -23,23 +22,15 @@ class ClickManager:
         self.tile = parent_tile
 
     def on_click(self) -> Callable:
-        return self.router()
-    
-    def router(self):
-        current_phase = self.tile.game_manager.current_phase
-        if current_phase == GamePhase.MOVE_QUEUEING:
-            return self.initial_movement_click()
+        if self.tile.character: #will soon handle abilities too
+            if self.tile.character.movement.queued_movement:
+                print('handle ability')
+                return self.next_click
+            else:
+                char_holder = self.tile.character
+                self.tile.character.movement.clear_move()
+                return self._handle_initial_movement(char_holder)
         
-        self.tile.select()
-        return self.next_click
-
-    def initial_movement_click(self):
-        if self.tile.character:
-            char_holder = self.tile.character
-            self.tile.character.movement.clear_move()
-            return self._handle_initial_movement(char_holder)
-        
-
         if self.tile.ghost_character:
             self.tile.ghost_character.movement.clear_move()
             return self._handle_initial_movement(self.tile.ghost_character)
@@ -54,9 +45,9 @@ class ClickManager:
                 self.prev_func_cache = movement_options
 
             self.tile.deselect()
-            return character.current_tile.click_manager.second_movement_click
+            return character.current_tile.click_manager.second_click
 
-    def second_movement_click(self, passed_object: AbstractClickableObject):
+    def second_click(self, passed_object: AbstractClickableObject):
         if self.tile.is_gametile_type(passed_object):
             if passed_object in self.prev_func_cache: #verify movement in range
 

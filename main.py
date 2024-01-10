@@ -4,8 +4,6 @@ from map.game_map import GameMap
 from game.brock_purdy import GameManager
 from character.characters.crud.crud import Crud
 from map.loadouts.map_1 import map_1
-from game.phases.spawn_handler import SpawnHandler
-from game.game_phase import GamePhaseManager
 from team.team import Team
 
 
@@ -29,9 +27,7 @@ print(len(team_1.characters))
 
 
 #need to make a game manager builder obj
-game_manager = GameManager(
-    game_phase_manager=team_1.game_phase_manager,
-    game_map=game_map)
+game_manager = GameManager(game_map=game_map)
 game_manager.register_team_1(team_1)
 
 game_manager.set_game_map(game_map)

@@ -4,7 +4,6 @@ from typing import Callable, Optional, List, TYPE_CHECKING
 from settings import LIGHT_GREY
 import pygame as pg
 from game.clickable_obj import AbstractClickableObject
-from game.game_phase import GamePhase
 from components.map_interaction import MapInteractionComponent
 from .click_manager import ClickManager
 from abc import ABC, abstractmethod
@@ -38,7 +37,6 @@ class GameTile(Hex, AbstractClickableObject):
         self.layout = layout
         self.screen = screen
         self.game_map = game_map
-        self.game_phase_manager = None
 
         self.coords_on = False
         self.color = surface_color
@@ -90,8 +88,6 @@ class GameTile(Hex, AbstractClickableObject):
     def unregister_selection(self):
         self.game_map.render.remove_selection(self)
 
-    def set_game_phase(self, game_phase_manager: GamePhaseManager):
-        self.game_manager = game_phase_manager
     
     ''' Drawing
         This section is for actually rendering the tile and it's objects on onto the canvas.
