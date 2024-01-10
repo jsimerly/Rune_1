@@ -19,11 +19,11 @@ class ClickManager:
     def __init__(self, parent_tile: GameTile):
         self.prev_func_cache = None
         self.in_click_chain = False
-        self.tile = parent_tile
+        self.tile: GameTile = parent_tile
 
     def on_click(self) -> Callable:
         if self.tile.character: #will soon handle abilities too
-            if self.tile.character.movement.queued_movement:
+            if not self.tile.character.movement.queue.is_empty:
                 print('handle ability')
                 return self.next_click
             else:
@@ -50,23 +50,19 @@ class ClickManager:
     def second_click(self, passed_object: AbstractClickableObject):
         if self.tile.is_gametile_type(passed_object):
             if passed_object in self.prev_func_cache: #verify movement in range
+                could_complete = self.tile.character.movement.click_move(passed_object)
 
-                movement_path = self.tile.character.movement.astar(passed_object)
-                if movement_path[-1].character:
-                    print('Cannot move where another ontop of another character.')
-                    return ContinueClickAction
-                
-                for tile in self.prev_func_cache:
-                    tile.remove_option()
-
-                if passed_object == self.tile.character.current_tile:
+                if could_complete:
                     self.tile.deselect()
-                    self.tile.character.movement.clear_move()
-                    
+                    for tile in self.prev_func_cache:
+                        tile.remove_option()
+                        
                     return None
-                
-                self.tile.character.movement.move(movement_path)
-                return None
+
+                could_complete = self.tile.character.movement.click_move(passed_object)
+                if not could_complete:
+                    return ContinueClickAction
+            
             else:
                 update_tiles: Set[GameTile] = set()
                 for tile in self.prev_func_cache:
@@ -89,5 +85,41 @@ class ClickManager:
         return next_function
     
 
+    '''
+        Dragging
+    '''
+    def on_drag_start(self) -> Optional[Callable]:
+        if self.tile.character and self.tile.character.movement.queued_movement:
+            print('return move drag')
+            return
+
+        if self.tile.character:
+            print('return a spawn update')
+            return
+        
+        if self.tile.ghost_character:
+            print("return a spawn update")
+            return 
+        
+        for char in 0:
+            print(char)
+
+    
+        
+                
+        #add ability drag
+
+    def drag_spawn_update(self):
+        pass
+    
+    def drag_move_update(self):
+        pass
+
+    def drag_ability_update(self):
+        pass
+
+    def on_drag_finish(self) -> Optional[Callable]:
+        pass
+    
 
     

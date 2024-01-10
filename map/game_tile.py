@@ -3,7 +3,7 @@ from hex import Hex, Layout
 from typing import Callable, Optional, List, TYPE_CHECKING
 from settings import LIGHT_GREY
 import pygame as pg
-from game.clickable_obj import AbstractClickableObject
+from game.clickable_obj import AbstractClickableObject, AbstactDraggableObj
 from components.map_interaction import MapInteractionComponent
 from .click_manager import ClickManager
 from abc import ABC, abstractmethod
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 pg.font.init()
 
-class GameTile(Hex, AbstractClickableObject):
+class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
     def __init__(self, 
         q:int, r:int,
         layout: Layout,
@@ -185,12 +185,25 @@ class GameTile(Hex, AbstractClickableObject):
         self.character = None
         self.register_full_render()
 
-    def on_click(self) -> Callable:
+    '''
+        Clicking
+    '''
+
+    def on_click(self) -> Optional[Callable]:
         return self.click_manager.on_click()
     
     #helper function for click_manager
     def is_gametile_type(self, obj) -> bool:
         return isinstance(obj, GameTile)
+    
+    def on_drag_start(self) -> Optional[Callable]:
+        return self.click_manager.on_drag_start()
+
+    def on_drag_update(self) -> Optional[Callable]:
+        return self.click_manager.on_drag_update()
+
+    def on_drag_finish(self) -> Optional[Callable]:
+        return self.click_manager.on_drag_finish()
 
     '''Property Methods
         Use these to manage the state of the tiles. This helps with both gameplay and rendering.

@@ -1,6 +1,7 @@
 from .game_events import OnClickEventManager
-from game.clickable_obj import AbstractClickableObject, ContinueClickAction
-from typing import List
+from game.clickable_obj import AbstractClickableObject, ContinueClickAction, AbstactDraggableObj
+from character.abs_character import AbstractCharacter
+from typing import List, Dict
 from map.game_map import GameMap, GameTile
 from team.team import Team
 
@@ -15,10 +16,12 @@ class GameManager:
         self.next_click_function = None
 
         self.team: Team = None
+        self.movement_queue: Dict[AbstractCharacter, List[GameTile]] = {}
+        self.ability_queue:  Dict[AbstractCharacter, List[GameTile]]= {}
 
         self.game_map: GameMap = game_map
 
-
+        self.drag_update_func = None
         self.is_dragging: bool = False
 
     def set_game_map(self, game_map: GameMap):
@@ -74,16 +77,14 @@ class GameManager:
         start_obj = self.find_clicked_obj(mouse_down_pos)
 
         if start_obj:
-            if isinstance(start_obj, GameTile):
-                if start_obj.character:
-                    print('character dragging start to change path')
+            if isinstance(start_obj, AbstactDraggableObj):
+                start_obj.on_drag_start()
 
                 for char in self.team.characters:
                     if char.movement.queued_movement:
                         for tile in char.movement.queued_movement:
                             if start_obj == tile:
                                 print('Start adjusting this path')      
-
                       
 
     def handle_drag_update(self, mouse_pos):

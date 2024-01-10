@@ -1,6 +1,6 @@
 from __future__ import annotations
 from .abstact_component import AbstactComponent
-from typing import TYPE_CHECKING, List, Set, Optional, Dict
+from typing import TYPE_CHECKING, Any, List, Set, Optional, Dict
 from map.game_map import GameMap  
 from utils import time_it
 
@@ -8,18 +8,51 @@ if TYPE_CHECKING:
     from character.abs_character import AbstractCharacter
     from map.game_tile import GameTile
 
+    
+class MovementQueue:
+    def __init__(self):
+        self.queue: Optional[List[GameTile]] = []
 
-class Node():
-    def __init__(self, parent=None, tile: GameTile=None):
-        self.parent = parent
-        self.tile = tile
+    def __call__(self) -> Optional[List[GameTile]]:
+        return self.queue
 
-        self.g = 0
-        self.h = 0
-        self.f = 0
+    @property
+    def is_empty(self) -> bool:
+        return len(self.queue) == 0
 
-    def __eq__(self, other: GameTile) -> bool:
-        return self.tile == other.tile
+    @property
+    def start_tile(self) -> GameTile:
+        if not self.is_empty:
+            return self.queue[0]
+        
+    @property
+    def end_tile(self) -> GameTile:
+        if not self.is_empty:
+            return self.queue[-1]
+        
+    def add_tile(self, tile:GameTile):
+        self.queue.append(tile)
+
+    def remove_tile(self, tile:GameTile):
+        self.queue.remove(tile)
+
+    def remove_end_tile(self):
+        self.queue.pop()
+        
+    def set_queue(self, tiles: List[GameTile]):
+        self.queue = tiles
+
+    def set_queue_to(self, start_tile: GameTile, end_tile: GameTile) -> bool:
+        potential_queue = astar(start_tile, end_tile)
+        if potential_queue[-1].character:
+            print('Cannot move ontop of another character')
+            return False
+        
+        self.queue = potential_queue
+        return True
+
+    def reset_queue(self):
+        self.queue = []
 
 class MovementComponent(AbstactComponent):
     def __init__(self, character: AbstractCharacter, game_map: GameMap) -> None:
@@ -27,42 +60,46 @@ class MovementComponent(AbstactComponent):
         self.character = character
         self.game_map = game_map
         self.range = 5
-        self.queued_movement: List[GameTile] = None
+        self.queue: MovementQueue = MovementQueue()
 
-    def move(self, travel_path: List[GameTile]):
-        #moved A star out so we don't have to re perform.
+    def click_move(self, tile:GameTile) -> bool:
+        could_complete = self.queue.set_queue_to(self.character.current_tile, tile)
+        if could_complete:
+            self.move_character_object()
+            return True
+        return False
+
+    def drag_move(self, tile:GameTile):
+        if tile != self.queue.end_tile:
+            self.queue.add_tile(tile)
+        else:
+            self.queue.remove_end_tile()
+        self.move_character_object()
+
+    def move_character_object(self):
+        self.queue.end_tile.character = self.character
+        self.queue.start_tile.character = None
+        self.queue.start_tile.ghost_character = self.character
         
-        self.queued_movement = travel_path #needs to be after draw_queued_movement
-        start_tile = travel_path[0]
-        end_tile = travel_path[-1]
-
-        start_tile.character = None
-        start_tile.ghost_character = self.character
-        end_tile.character = self.character
-
-        #rendering
+        self.queue.start_tile.register_full_render()
+        self.queue.end_tile.register_full_render()
         self.team_movement_render()
-        self.game_map.render.add_full_tiles([start_tile, end_tile])
 
+    def clear_move(self):
+        if not self.queue.is_empty:
+            self.queue.end_tile.character = None
+            self.queue.start_tile.character = self.character
+        self.queue.reset_queue()
+
+        self.team_movement_render()
 
     #this will include this characters
     def team_movement_render(self):
         for char in self.character.team.characters:
-            move_queue = char.movement.queued_movement
-            if move_queue:
-                self.game_map.render.add_movement(move_queue, char.color)
-        
-        
-    def clear_move(self):
-        self.game_map.render.add_full_tiles(self.queued_movement)
-        self.reset_char_tile()
-        self.queued_movement = None
-        self.team_movement_render()
+            if not char.movement.queue.is_empty:
+                self.game_map.render.add_movement(char.movement.queue(), char.color)
 
-    def reset_char_tile(self):
-        if self.queued_movement:
-            self.queued_movement[0].character = self.character
-            self.queued_movement[-1].character = None
+        self.game_map.render.add_full_tiles(self.queue())
         
     def find_possible_tiles(self):
         possible = self.hex_reachable()
@@ -98,78 +135,88 @@ class MovementComponent(AbstactComponent):
                                 movement_range[neighbor_tile] = remaining_move
                             fringes[k].append(neighbor_tile)
 
-        return visited
+        return visited                
 
-    def astar(self, target_tile: GameTile) -> Optional[List[GameTile]]:
-        start_node = Node(None, self.character.current_tile)
-        start_node.g, start_node.h, start_node.f = 0, 0, 0
-        end_node = Node(None, target_tile)
-        end_node.g, end_node.h, end_node.f = 0, 0 ,0
+class Node:
+    def __init__(self, parent=None, tile: GameTile=None):
+        self.parent = parent
+        self.tile = tile
 
-        open_list: List[Node] = []
-        closed_list: List[Node] = []
+        self.g = 0
+        self.h = 0
+        self.f = 0
 
-        open_list.append(start_node)
+    def __eq__(self, other: GameTile) -> bool:
+        return self.tile == other.tile
 
-        while len(open_list) > 0:
-            current_node: Node = open_list[0]
-            current_index = 0
 
-            for index, node in enumerate(open_list):
-                if node.f < current_node.f:
-                    current_node = node
-                    current_index = index
+def astar(start_tile: GameTile, target_tile: GameTile) -> Optional[List[GameTile]]:
+    start_node = Node(None, start_tile)
+    start_node.g, start_node.h, start_node.f = 0, 0, 0
+    end_node = Node(None, target_tile)
+    end_node.g, end_node.h, end_node.f = 0, 0 ,0
 
-            open_list.pop(current_index)
-            closed_list.append(current_node)
+    open_list: List[Node] = []
+    closed_list: List[Node] = []
 
-            if current_node == end_node:
-                path = []
-                current = current_node
-                while current:
-                    path.append(current.tile)
-                    current = current.parent
+    open_list.append(start_node)
 
-                return path[::-1] # reversing the list so we have start values in front
+    while len(open_list) > 0:
+        current_node: Node = open_list[0]
+        current_index = 0
+
+        for index, node in enumerate(open_list):
+            if node.f < current_node.f:
+                current_node = node
+                current_index = index
+
+        open_list.pop(current_index)
+        closed_list.append(current_node)
+
+        if current_node == end_node:
+            path = []
+            current = current_node
+            while current:
+                path.append(current.tile)
+                current = current.parent
+
+            return path[::-1] # reversing the list so we have start values in front
+        
+        children: List[Node] = []
+        neighbors = current_node.tile.get_all_neighbor_tiles()
+        for neighbor_tile in neighbors:
+            #skip this tile if we can't pass through it.
+            if not neighbor_tile.map_interaction.is_passable:
+                continue
+
+            #create new node
+            new_node = Node(parent=current_node, tile=neighbor_tile) 
+            children.append(new_node)
+
+
+        for child in children:
+            for closed_child in closed_list:
+                if child == closed_child:
+                    continue
             
-            children: List[Node] = []
-            neighbors = current_node.tile.get_all_neighbor_tiles()
-            for neighbor_tile in neighbors:
-                #skip this tile if we can't pass through it.
-                if not neighbor_tile.map_interaction.is_passable:
+            #to handle is_slowing we'll add 2 instead of 1
+            g_mod = current_node.tile.map_interaction.movement_cost
+            child.g = current_node.g + g_mod
+            child.h = distance_heuristic(child.tile, target_tile)
+            child.f = child.g + child.h
+
+            for open_node in open_list:
+                if child == open_node and child.g > open_node.g:
                     continue
 
-                #create new node
-                new_node = Node(parent=current_node, tile=neighbor_tile) 
-                children.append(new_node)
+            open_list.append(child)
 
+    return []
 
-            for child in children:
-                for closed_child in closed_list:
-                    if child == closed_child:
-                        continue
-                
-                #to handle is_slowing we'll add 2 instead of 1
-                g_mod = current_node.tile.map_interaction.movement_cost
-                child.g = current_node.g + g_mod
-                child.h = self.distance_heuristic(child.tile, target_tile)
-                child.f = child.g + child.h
+def distance_heuristic(current_tile: GameTile, target_tile: GameTile):
+    distance = current_tile.distance_to(target_tile)
 
-                for open_node in open_list:
-                    if child == open_node and child.g > open_node.g:
-                        continue
-
-                open_list.append(child)
-
-        return None
-
-    def distance_heuristic(self, current_tile: GameTile, target_tile: GameTile):
-        distance = current_tile.distance_to(target_tile)
-
-        return distance
-                
-
-
+    return distance
 
 
                 
