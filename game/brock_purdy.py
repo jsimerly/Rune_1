@@ -14,7 +14,7 @@ class GameManager:
         self.ui_objects: List[AbstractClickableObject] = []
         self.next_click_function = None
 
-        self.team_1: Team = None
+        self.team: Team = None
 
         self.game_map: GameMap = game_map
 
@@ -24,8 +24,8 @@ class GameManager:
     def set_game_map(self, game_map: GameMap):
         self.game_map = game_map
 
-    def register_team_1(self, team: Team):
-        self.team_1 = team
+    def register_team(self, team: Team):
+        self.team = team
         for spawn_handler in team.spawn_handlers.values():
            spawn_button = spawn_handler.button
            self.register_ui_click_event(spawn_button)
@@ -71,7 +71,20 @@ class GameManager:
 
     def handle_drag_start(self, mouse_down_pos):
         self.is_dragging = True
-        print('start dragging')
+        start_obj = self.find_clicked_obj(mouse_down_pos)
+
+        if start_obj:
+            if isinstance(start_obj, GameTile):
+                if start_obj.character:
+                    print('character dragging start to change path')
+
+                for char in self.team.characters:
+                    if char.movement.queued_movement:
+                        for tile in char.movement.queued_movement:
+                            if start_obj == tile:
+                                print('Start adjusting this path')      
+
+                      
 
     def handle_drag_update(self, mouse_pos):
         print(mouse_pos)

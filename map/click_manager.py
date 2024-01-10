@@ -87,3 +87,7 @@ class ClickManager:
         self.tile.register_neighor_border_render()
         next_function = passed_obj.on_click()
         return next_function
+    
+
+
+    

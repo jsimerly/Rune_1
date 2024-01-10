@@ -23,18 +23,16 @@ team_1 = Team(team_id=1, screen=screen)
 team_1.add_character(crud)
 team_1.add_character(crud2)
 team_1.add_character(crud3)
-print(len(team_1.characters))
-
 
 #need to make a game manager builder obj
 game_manager = GameManager(game_map=game_map)
-game_manager.register_team_1(team_1)
+game_manager.register_team(team_1)
 
 game_manager.set_game_map(game_map)
 game_map.draw()
 
 mouse_down_start_pos = None
-drag_threshold = 60
+drag_threshold = 50
 
 is_running = True
 while is_running:
