@@ -7,7 +7,10 @@ from game.clickable_obj import AbstractClickableObject
 from game.game_phase import GamePhase
 from components.map_interaction import MapInteractionComponent
 from .click_manager import ClickManager
-import time
+from abc import ABC, abstractmethod
+from math import radians, cos, sin
+from utils import time_it
+
 if TYPE_CHECKING:
     from character.abs_character import AbstractCharacter
     from game_map import GameMap
@@ -35,7 +38,6 @@ class GameTile(Hex, AbstractClickableObject):
         self.layout = layout
         self.screen = screen
         self.game_map = game_map
-        self.is_selected = False
         self.game_phase_manager = None
 
         self.coords_on = False
@@ -50,23 +52,60 @@ class GameTile(Hex, AbstractClickableObject):
             walkthrough_effects=walkthrough_effects
         )
 
+        self.is_selected = False
+        self.is_option = False
+
         self.character: AbstractCharacter = None
+        self.ghost_character: AbstractCharacter = None
         self.click_manager = ClickManager(self)
+
+    ''' Render Registers
+        This is used to add and remove things that need to be rerenders on the next cycle. This is handled by the GameMap instance attached to every time.
+    '''
+    def register_full_render(self):
+        self.game_map.render.add_full_tiles([self])
+
+    def register_border_render(self):
+        self.game_map.render.add_borders([self])
+
+    def register_selection_render(self):
+        self.game_map.render.add_selection(self)
+
+    def register_neighor_full_render(self):
+        neighbors = self.get_all_neighbor_tiles()
+        for tile in neighbors:
+            tile.register_full_render()
+
+    def register_neighor_border_render(self):
+        neighbors = self.get_all_neighbor_tiles()
+        for tile in neighbors:
+            tile.register_border_render()
+
+    def unregister_full_tile(self):
+        self.game_map.render.remove_full_tile(self)
+
+    def unregister_border(self):
+        self.game_map.render.remove_border(self)
+
+    def unregister_selection(self):
+        self.game_map.render.remove_selection(self)
 
     def set_game_phase(self, game_phase_manager: GamePhaseManager):
         self.game_manager = game_phase_manager
     
-    def draw(self, border_color=LIGHT_GREY, border_thickness=1):
-        point = self.layout.hex_to_pixel(self)
-        verticies = self.layout.get_hex_verticies(point)
-        pg.draw.polygon(self.screen, self.color, verticies)
-
-        #not using draw border so we don't hvae to recalculate the vertices and avoid DIing the info into draw border for reusablility.
-        outline_size = 4 if self.is_selected else border_thickness
-        outline_color = (220,220,220) if self.is_selected else border_color
-        pg.draw.polygon(self.screen, outline_color, verticies, outline_size)
+    ''' Drawing
+        This section is for actually rendering the tile and it's objects on onto the canvas.
+    '''
+    def draw(self):
+        self.draw_background()
+        self.draw_border()
+        if self.character:
+            self.draw_character()
+        if self.ghost_character:
+            self.draw_ghost()
 
         if self.coords_on:
+            point = self.center_pixel
             pg.font.init()
             font = pg.font.SysFont('Arial', 12)
             coord_text = f'{self.q}, {self.r}'
@@ -74,30 +113,81 @@ class GameTile(Hex, AbstractClickableObject):
             text_pos = (point[0] - text_surface.get_width() // 2, point[1] - text_surface.get_height() // 2)
 
             self.screen.blit(text_surface, text_pos)  
+    
+    def draw_background(self):
+        verticies = self.verticies
+        pg.draw.polygon(self.screen, self.color, verticies)
 
-    def draw_border(self, border_color=LIGHT_GREY, border_thickness=1):
-        point = self.layout.hex_to_pixel(self)
-        verticies = self.layout.get_hex_verticies(point)
+    def draw_border(self):
+        outline_size = 1
+        outline_color = LIGHT_GREY
+        if self.is_option:
+            outline_size = 3
+            outline_color = (200, 200, 200)
 
-        outline_color = (220,220,220) if self.is_selected else border_color
-        pg.draw.polygon(self.screen, outline_color, verticies, border_thickness)
+        if self.is_selected:
+            outline_size = 4
+            outline_color = (220, 220, 220)
 
-    def reset_border(self):
-        point = self.layout.hex_to_pixel(self)
-        inner_verticies = self.layout.get_hex_verticies(point)
-        pg.draw.polygon(self.screen, self.color, inner_verticies, 4) #4 is the max thickness we'll have as a border
-        self.draw_border()
+        pg.draw.polygon(self.screen, self.color, self.verticies, 4) #used to reset previous border
+        pg.draw.polygon(self.screen, outline_color, self.verticies ,outline_size)
 
-    def get_center_pixel(self) -> (int, int):  
+    def fill_outline(self):
+        pass
+        
+    def draw_character(self):
+        if self.character:
+            pixel_pos = self.center_pixel
+            self.character.sprite.draw(pixel_pos)
+
+    def draw_ghost(self):
+        if self.ghost_character:
+            pixel_pos = self.center_pixel
+            self.ghost_character.sprite.draw_ghost(pixel_pos)
+
+    #consider pre processing this if it's taking too much time
+    def inner_verticies(self):
+        center = self.center_pixel
+        verticies = []
+        for corner in range(6):
+            offset = self.offset_inner_vert(corner)
+            x, y = (center[0] + offset[0], center[1] + offset[1])
+            x = int(round(x, 0))
+            y = int(round(y, 0))
+            verticies.append((x, y))
+
+        return verticies
+
+    def offset_inner_vert(self, corner:int):
+        angle = 60 * corner + 60
+        rad = radians(angle)
+        y = (self.layout.size[0] - 1) * cos(rad)
+        x = (self.layout.size[1] - 1) * sin(rad)
+
+        x += self.layout.skew * y
+        return (x, y)
+
+    @property  
+    def center_pixel(self) -> (int, int):  
         return self.layout.hex_to_pixel(self)
+    
+    @property
+    def verticies(self) -> (int, int):
+        center = self.layout.hex_to_pixel(self)
+        return self.layout.get_hex_verticies(center)
+    
+    ''' Character
+        This section is used to manager characters.
+    '''
 
-    def register_character(self, character: AbstractCharacter):
+    def add_character(self, character: AbstractCharacter):
         self.character = character
         self.character.current_tile = self
-        self.character.spawn_to_pixel_pos(self)
+        self.register_full_render()
 
-    def unregister_character(self):
+    def remove_character(self):
         self.character = None
+        self.register_full_render()
 
     def on_click(self) -> Callable:
         return self.click_manager.on_click()
@@ -106,24 +196,26 @@ class GameTile(Hex, AbstractClickableObject):
     def is_gametile_type(self, obj) -> bool:
         return isinstance(obj, GameTile)
 
+    '''Property Methods
+        Use these to manage the state of the tiles. This helps with both gameplay and rendering.
+    '''
     def select(self):
         self.is_selected = True
-        self.draw_border(border_thickness=3)
+        self.register_selection_render()
 
     def deselect(self):
         self.is_selected = False
-        self.reset_border()
+        self.unregister_selection()
+        self.register_selection_render()
 
-    def redraw_neighbors(self):
-        neighbors = self.get_all_neighbor_tiles()
-        for tile in neighbors:
-            tile.draw()
+    def set_option(self):
+        self.is_option = True
+        self.register_border_render()
+
+    def remove_option(self):
+        self.is_option = False
+        self.register_border_render()
     
-    def redraw_neighbors_borders(self):
-        neighbors = self.get_all_neighbor_tiles()
-        for tile in neighbors:
-            tile.reset_border()
-
     def get_neighbor_tile(self, i) -> GameTile:
         hex = self.neighbor(i)
         if hex.axial in self.game_map.tiles:
@@ -140,4 +232,5 @@ class GameTile(Hex, AbstractClickableObject):
     
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} Object: {self.q}, {self.r}'
+
 

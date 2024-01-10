@@ -70,10 +70,9 @@ while is_running:
 
         if game_manager.is_dragging:
             game_manager.handle_drag_update(pg.mouse.get_pos())
-        
 
-                    
 
+    game_map.render.run_all()
     pg.display.flip()
     clock.tick(FPS)
     clock_time = clock.get_time()

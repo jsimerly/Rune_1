@@ -1,9 +1,10 @@
 from .game_events import OnClickEventManager
-from game.clickable_obj import AbstractClickableObject
+from game.clickable_obj import AbstractClickableObject, ContinueClickAction
 from typing import List
 from map.game_map import GameMap, GameTile
 from .game_phase import GamePhase, GamePhaseManager
 from team.team import Team
+
 
 class GameManager:
     '''
@@ -65,7 +66,12 @@ class GameManager:
         if clicked_obj:
             ''' If we are already in the middle of a clicking chain for an in game action we'll handle that. If not this is the first click and we can handle that now.'''
             if self.next_click_function:
-                self.next_click_function = self.next_click_function(clicked_obj)
+                next_click_function = self.next_click_function(clicked_obj)
+
+                if next_click_function == ContinueClickAction: #check if we should stay on the same action or move to the next.
+                    return
+                
+                self.next_click_function = next_click_function
 
             else:
                 self.next_click_function = clicked_obj.on_click()

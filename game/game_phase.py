@@ -6,15 +6,14 @@ from settings import BGCOLOR
 
 
 class GamePhase(Enum):
-    SPAWNING = 1
-    MOVE_QUEUEING = 2
-    ABILITY_QUEUEING = 3
-    TURN_ENDED = 4
+    MOVE_QUEUEING = 1
+    ABILITY_QUEUEING = 2
+    TURN_ENDED = 3
 
 class GamePhaseManager:
     def __init__(self, screen):
         self.screen = screen
-        self.current_phase = GamePhase.SPAWNING
+        self.current_phase = GamePhase.MOVE_QUEUEING
         self.turn_n = 0
 
         self.next_phase_button = PhaseButton(
@@ -43,15 +42,14 @@ class GamePhaseManager:
         self.set_phase(next_phase)
 
     def prev_phase(self):
-        next_phase = GamePhase((self.current_phase.value % len(GamePhase)) + 1)
-        self.set_phase(next_phase)
+        prev_phase = GamePhase((self.current_phase.value + 1) % len(GamePhase) + 1)
+        self.set_phase(prev_phase)
 
     def is_phase(self, phase: GamePhase):
         return self.current_phase == phase
     
     def draw_current_phase_text(self):
         text_map = {
-            GamePhase.SPAWNING: 'Spawning',
             GamePhase.MOVE_QUEUEING: 'Movement',
             GamePhase.ABILITY_QUEUEING: 'Abilities',
             GamePhase.TURN_ENDED: 'Waiting on Other Player'

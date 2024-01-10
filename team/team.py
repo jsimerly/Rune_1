@@ -21,7 +21,9 @@ class Team:
         if len(self.characters) >= self.max_team_size:
             print(f'Team at max size of {self.max_team_size}.')
             return
+        
         self.characters.add(character)
+        character.set_team(self)
         self.add_spawn_handler(character)
 
     def remove_character(self, character:AbstractCharacter):

@@ -262,8 +262,10 @@ class Layout:
         verticies = []
         for corner in range(6):
             offset = self.get_corner_offset(corner)
-            vertex = (p[0] + offset[0], p[1] + offset[1])
-            verticies.append(vertex)
+            x, y = (p[0] + offset[0], p[1] + offset[1])
+            x = int(round(x, 0))
+            y = int(round(y, 0))
+            verticies.append((x, y))
         return verticies
     
     def parallelogram(self, width: Tuple[int, int], height: Tuple[int,int], shape:str) -> List[Hex]:

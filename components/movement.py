@@ -32,45 +32,34 @@ class MovementComponent(AbstactComponent):
 
     def move(self, travel_path: List[GameTile]):
         #moved A star out so we don't have to re perform.
-        self.draw_queued_movement(travel_path)
+        
         self.queued_movement = travel_path #needs to be after draw_queued_movement
+        start_tile = travel_path[0]
+        end_tile = travel_path[-1]
 
+        start_tile.character = None
+        start_tile.ghost_character = self.character
+        end_tile.character = self.character
+
+        #rendering
+        for char in end_tile.character.team.characters:
+            move_queue = char.movement.queued_movement
+            if move_queue:
+                self.game_map.render.add_movement(move_queue)
+
+        self.game_map.render.add_full_tiles([start_tile, end_tile])
+        self.game_map.render.add_movement(travel_path)
+        
+        
     def clear_move(self):
-        self.undraw_path()
-        self.character.sprite.draw_movement_queue(None)
+        self.game_map.render.add_full_tiles(self.queued_movement)
+        self.reset_char_tile()
         self.queued_movement = None
 
-    def set_char_tile(self, tile:GameTile):
-        tile.character = self.character
-
     def reset_char_tile(self):
-        self.queued_movement[-1].character = self.character
-        self.queued_movement[0].character = None
+        self.queued_movement[0].character = self.character
+        self.queued_movement[-1].character = None
         
-    def draw_queued_movement(self, travel_path):
-        if self.queued_movement:
-            self.undraw_path()
-
-        self.character.sprite.draw_movement_queue(travel_path)
-        self.draw_movement_path(travel_path)
-
-
-    def draw_movement_path(self, path: List[GameTile]):
-        center_pixels = []
-        for tile in path:
-            pixel_coord = self.game_map.layout.hex_to_pixel(tile)
-            center_pixels.append(pixel_coord)
-
-        if len(center_pixels) > 0:
-            surface = pg.Surface(self.game_map.screen.get_size(), pg.SRCALPHA)
-            color = (221, 227, 200, 150)
-            pg.draw.lines(surface, color, False, center_pixels, 3)
-            self.game_map.screen.blit(surface, (0,0))
-
-    def undraw_path(self):
-        for tile in self.queued_movement:
-            tile.draw()
-
     def find_possible_tiles(self):
         possible = self.hex_reachable()
         return possible
@@ -107,7 +96,6 @@ class MovementComponent(AbstactComponent):
 
         return visited
 
-    @time_it
     def astar(self, target_tile: GameTile) -> Optional[List[GameTile]]:
         start_node = Node(None, self.character.current_tile)
         start_node.g, start_node.h, start_node.f = 0, 0, 0

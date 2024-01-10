@@ -8,7 +8,7 @@ class Crud(AbstractCharacter):
         super().__init__(screen, game_map)
         image = self.open_image('character/characters/crud/gui/crud.png')
         
-        sprite_comp = SpriteComponent(image, self.screen)
+        sprite_comp = SpriteComponent(image, self.screen, self)
         move_comp = MovementComponent(character=self, game_map=game_map)
         self.set_sprite_comp(sprite_comp)
         self.set_movement_comp(move_comp)

@@ -6,7 +6,7 @@ from map.loadouts.map_layout import MapLayout
 
 orientation=orientation_pointy
 size = Point(36, 36)
-origin = Point(SCREEN_WIDTH//2, SCREEN_HEIGHT//2)
+origin = Point(1000, SCREEN_HEIGHT//2)
 
 layout = Layout(
     orientation=orientation,

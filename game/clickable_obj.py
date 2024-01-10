@@ -45,5 +45,5 @@ class AbstactDraggableObj(ABC):
     @abstractmethod
     def on_drag_finish(self):
         pass
-
-
+class ContinueClickAction:
+    pass

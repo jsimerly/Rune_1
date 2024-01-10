@@ -64,13 +64,16 @@ class CharacterSpawningIcon(ClickableRectObj):
                 self.select()
                 return None
             elif passed_object.map_interaction.can_end_on:
-                passed_object.register_character(character=self.char_instance)
+                passed_object.add_character(character=self.char_instance)
                 self.disable()
                 return None
             else:
-                print("You cannot place that character in a tree.")
+                print("You cannot place that character on that tile.")
                 return None
                 
+        if isinstance(passed_object, type(self)):
+            self.select()
+            return passed_object.on_click()
         
         if self == passed_object:
             self.select()
