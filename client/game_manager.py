@@ -1,11 +1,13 @@
-from ui.buttons.button import ButtonManager, Button
-from clickable_obj import Clickable, Draggable, ContinueAction
+from __future__ import annotations
+from .ui.buttons.button import ButtonManager, Button
+from .clickable_obj import Clickable, Draggable, ContinueAction
 from character.abs_character import AbstractCharacter
-from typing import List, Dict, Callable, TYPE_CHECKING, Optional
-from client.click_states.action_state import IdleState, ActionState, DragAction, ClickAction
+from typing import List, Dict, Callable, TYPE_CHECKING, Optional, Tuple
+from client.action_state.action_state import IdleState, ActionState, MouseInput, ActionContext
 import pygame as pg
-from surfaces import Surfaces
+from client.surfaces import GameSurfaces
 from client.ui.buttons.button import ButtonManager
+from client.ui.buttons.spawn_button import SpawnButton
 if TYPE_CHECKING:
     from map.loadouts.map_layout import MapLayout
 
@@ -16,10 +18,13 @@ class GameManager:
     '''
     def __init__(self, map: MapLayout, screen: pg.Surface):
         self.button_manager = ButtonManager() #event manager for buttons
-        self.surfaces = Surfaces(screen=screen)
+        self.surfaces = GameSurfaces(screen=screen)
         self.layout = map.layout
 
         self.tiles = map.generate_map(self.surfaces.tile_surface)
+        for tile in self.tiles.values():
+            tile.draw()
+
         self.characters: List[AbstractCharacter] = []
         self.buildings = []
         self.enemy_characters: List[AbstractCharacter] = []
@@ -29,11 +34,10 @@ class GameManager:
         self.leveling_shards = []
         self.altars = []
 
-        self.is_dragging = False
-        self.action_state = IdleState()
+        self.action_context = ActionContext()
+        self.action_state = IdleState(self)
 
     '''Register Events'''
-    
     def register_button(self, button: Button):
         self.button_manager.register(button)
 
@@ -43,6 +47,12 @@ class GameManager:
     '''Game Objects Attributes'''
     def add_character(self, character: AbstractCharacter):
         self.characters.append(character)
+        spawn_button = SpawnButton(
+            surface=self.surfaces.ui_surface,
+            character=character,
+            pixel_pos=(100, (250*(len(self.characters)-1)) + 100)
+        )
+        self.register_button(spawn_button)
 
     def add_building(self, building):
         self.buildings.append(building)
@@ -66,8 +76,8 @@ class GameManager:
             del self.enemy_buildings[building]
 
     '''Action State'''
-    def find_interactable_obj(self, mouse_pos) -> Clickable:
-        for obj in self.button_manager.buttons:
+    def find_interactable_obj(self, mouse_pos: MouseInput) -> Clickable:
+        for obj in self.button_manager.buttons.keys():
             if obj.rect.collidepoint(mouse_pos):
                 return obj
             
@@ -79,22 +89,19 @@ class GameManager:
             return self.tiles[(q,r)]
         except KeyError:
             return None
-        
-    def on_click(self, mouse_pos):
-        obj = self.find_interactable_obj(mouse_pos)
-        if self.is_dragging:
-            self.input(DragAction(obj))
-        else:
-            self.input(ClickAction(obj))
 
     def set_state(self, state: ActionState):
-        self.action_state = state
+        self.action_state.on_exit()
+        self.action_state = state(self)
+        self.action_state.on_enter()
 
-    def input(self):
-        self.action_state.input()
+    def input(self, mouse_input: MouseInput):
+        next_state = self.action_state.input(mouse_input)
+        if next_state:
+            self.set_state(next_state)
 
-    def update(self):
-        self.action_state.update()
+    def update(self, mouse_pos: Tuple[int, int]):
+        self.action_state.update(mouse_pos)
                 
 
 

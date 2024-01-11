@@ -24,7 +24,7 @@ class Button(ABC):
 
 class ButtonManager:
     def __init__(self):
-        self.buttons: Dict[Any, List[Callable]]
+        self.buttons: Dict[Button, List[Callable]] = {}
         self.selected_obj = None
 
     def register(self, button:Button):

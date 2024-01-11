@@ -1,16 +1,16 @@
-from singleton import Singleton
+from .singleton import Singleton
 import pygame as pg
 
-class Surfaces(metaclass=Singleton):
+class GameSurfaces(metaclass=Singleton):
     def __init__(self, screen: pg.Surface) -> None:
         self.screen = screen
-        self.tile_surface = pg.Surface(screen.get_size(), (0,0))
-        self.border_surface = pg.Surface(screen.get_size(), (0,0))
-        self.selection_surface = pg.Surface(screen.get_size(), (0,0))
-        self.movement_surface = pg.Surface(screen.get_size(), (0,0))
-        self.character_surface = pg.Surface(screen.get_size(), (0,0))
-        self.ability_surface = pg.Surface(screen.get_size(), (0,0))
-        self.ui_surface = pg.Surface(screen.get_size(), (0,0))
+        self.tile_surface = pg.Surface(screen.get_size(), pg.SRCALPHA)
+        self.border_surface = pg.Surface(screen.get_size(), pg.SRCALPHA)
+        self.selection_surface = pg.Surface(screen.get_size(), pg.SRCALPHA)
+        self.movement_surface = pg.Surface(screen.get_size(), pg.SRCALPHA)
+        self.character_surface = pg.Surface(screen.get_size(), pg.SRCALPHA)
+        self.ability_surface = pg.Surface(screen.get_size(), pg.SRCALPHA)
+        self.ui_surface = pg.Surface(screen.get_size(), pg.SRCALPHA)
 
     def render(self):
         self.screen.blit(self.tile_surface, (0,0))

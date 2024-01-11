@@ -10,9 +10,8 @@ class SpriteComponent(AbstactComponent):
     NORMAL_SIZE = (60,60)
     GHOST_ALPHA = 100
 
-    def __init__(self, image: pg.image, screen, entity):
-        self.entity = entity
-        self.screen = screen
+    def __init__(self, image: pg.image, surface: pg.Surface):
+        self.surface = surface
 
         self.image = pg.transform.scale(image, self.NORMAL_SIZE)
         self.ghost_image = self.image.copy()
@@ -27,8 +26,8 @@ class SpriteComponent(AbstactComponent):
 
     def draw(self, pixel_pos: (int, int)):
         top_left_pixel = self.get_topleft_pos(pixel_pos)
-        self.screen.blit(self.image, top_left_pixel)
+        self.surface.blit(self.image, top_left_pixel)
 
     def draw_ghost(self, pixel_pos: (int, int)):
         top_left_pixel = self.get_topleft_pos(pixel_pos)
-        self.screen.blit(self.ghost_image, top_left_pixel)
+        self.surface.blit(self.ghost_image, top_left_pixel)

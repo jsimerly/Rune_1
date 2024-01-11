@@ -21,8 +21,8 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
     def __init__(self, 
         q:int, r:int,
         layout: Layout,
-        screen,
-        game_map: GameMap,
+        surface: pg.Surface,
+        #add border and selection surface
 
         surface_color: (int, int, int),
         is_passable, 
@@ -35,8 +35,7 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
     ):
         super().__init__(q, r)
         self.layout = layout
-        self.screen = screen
-        self.game_map = game_map
+        self.surface = surface
 
         self.coords_on = True
         self.color = surface_color
@@ -60,33 +59,7 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
     ''' Render Registers
         This is used to add and remove things that need to be rerenders on the next cycle. This is handled by the GameMap instance attached to every time.
     '''
-    def register_full_render(self):
-        self.game_map.render.add_full_tiles([self])
 
-    def register_border_render(self):
-        self.game_map.render.add_borders([self])
-
-    def register_selection_render(self):
-        self.game_map.render.add_selection(self)
-
-    def register_neighor_full_render(self):
-        neighbors = self.get_all_neighbor_tiles()
-        for tile in neighbors:
-            tile.register_full_render()
-
-    def register_neighor_border_render(self):
-        neighbors = self.get_all_neighbor_tiles()
-        for tile in neighbors:
-            tile.register_border_render()
-
-    def unregister_full_tile(self):
-        self.game_map.render.remove_full_tile(self)
-
-    def unregister_border(self):
-        self.game_map.render.remove_border(self)
-
-    def unregister_selection(self):
-        self.game_map.render.remove_selection(self)
 
     
     ''' Drawing
@@ -108,11 +81,11 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
             text_surface = font.render(coord_text, True, (255, 255, 255))
             text_pos = (point[0] - text_surface.get_width() // 2, point[1] - text_surface.get_height() // 2)
 
-            self.screen.blit(text_surface, text_pos)  
+            self.surface.blit(text_surface, text_pos)  
     
     def draw_background(self):
         verticies = self.verticies
-        pg.draw.polygon(self.screen, self.color, verticies)
+        pg.draw.polygon(self.surface, self.color, verticies)
 
     def draw_border(self):
         outline_size = 1
@@ -125,8 +98,8 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
             outline_size = 4
             outline_color = (220, 220, 220)
 
-        pg.draw.polygon(self.screen, self.color, self.verticies, 4) #used to reset previous border
-        pg.draw.polygon(self.screen, outline_color, self.verticies ,outline_size)
+        pg.draw.polygon(self.surface, self.color, self.verticies, 4) #used to reset previous border
+        pg.draw.polygon(self.surface, outline_color, self.verticies ,outline_size)
 
     def fill_outline(self):
         pass

@@ -4,18 +4,34 @@ from components.movement import MovementComponent
 import pygame as pg
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
+from enum import Enum
 if TYPE_CHECKING:
     from map.game_tile import GameTile
     from team.team import Team
+
+
+class LifeState(Enum):
+    AWAITING_SPAWN = 1
+    ALIVE = 2
+    DEAD = 3
 class AbstractCharacter(ABC):
-    def __init__(self, screen, game_map):
+    def __init__(self, surface):
         self.team: Team = None
+        self.current_tile: GameTile = None
+
         self.sprite: SpriteComponent = None
         self.movement: MovementComponent = None
-        self.screen = screen
-        self.game_map = game_map
+        self.surface = surface
         self.color = None
 
+        self.life_states = LifeState
+        self.life_state = self.life_states.AWAITING_SPAWN
+
+    def remove_from_tile(self):
+        self.current_tile.draw()
+        self.current_tile = None
+        
+    
     def set_team(self, team:Team):
         self.team = team
 

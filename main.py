@@ -1,11 +1,11 @@
 import pygame as pg
 from settings import *
 from map.game_map import GameMap
-from game.brock_purdy import GameManager
+from client.game_manager import GameManager
+from client.action_state.action_state import Click, DragStart, DragEnd
 from character.characters.crud.crud import Crud
 from map.loadouts.map_1 import map_1
 from team.team import Team
-
 
 pg.init()
 
@@ -13,26 +13,19 @@ screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pg.SRCALPHA)
 screen.fill(BGCOLOR)
 clock = pg.time.Clock()
 
-game_map = GameMap(map=map_1, screen=screen)
-
-crud = Crud(screen=screen, game_map=game_map)
-crud2 = Crud(screen=screen, game_map=game_map)
-crud3 = Crud(screen=screen, game_map=game_map)
-
-team_1 = Team(team_id=1, screen=screen)
-team_1.add_character(crud)
-team_1.add_character(crud2)
-team_1.add_character(crud3)
-
-#need to make a game manager builder obj
-game_manager = GameManager(game_map=game_map)
-game_manager.register_team(team_1)
-
-game_manager.set_game_map(game_map)
-game_map.draw()
+game_manager = GameManager(map_1, screen)
+crud = Crud(game_manager.surfaces.character_surface)
+game_manager.add_character(crud)
 
 mouse_down_start_pos = None
+is_dragging = False
 drag_threshold = 50
+
+def drag_threshold_reached(mouse_pos):
+    dx = mouse_pos[0] - mouse_down_start_pos[0]
+    dy = mouse_pos[1] - mouse_down_start_pos[1]
+    distance = (dx**2 + dy**2)**0.5
+    return distance > drag_threshold
 
 is_running = True
 while is_running:
@@ -40,33 +33,28 @@ while is_running:
         if event.type == pg.QUIT:
             is_running = False
 
+        mouse_pos = pg.mouse.get_pos()
         if event.type == pg.MOUSEBUTTONDOWN:
             if not mouse_down_start_pos:
-                mouse_down_start_pos = pg.mouse.get_pos()
+                mouse_down_start_pos = mouse_pos
             
         if event.type == pg.MOUSEBUTTONUP:
-            mouse_up_pos = pg.mouse.get_pos()
-            if game_manager.is_dragging:
-                game_manager.handle_drag_finish(mouse_down_start_pos, mouse_up_pos)
+            if is_dragging:
+                game_manager.input(DragEnd(mouse_pos))
             else:
-                game_manager.handle_click(mouse_up_pos)
+                game_manager.input(Click(mouse_pos))
 
             mouse_down_start_pos = None
-                
-        if mouse_down_start_pos and not game_manager.is_dragging:
-            mouse_pos = pg.mouse.get_pos()
-            dx = mouse_pos[0] - mouse_down_start_pos[0]
-            dy = mouse_pos[1] - mouse_down_start_pos[1]
-            distance_moved = (dx**2 + dy**2)**0.5
+            is_dragging = False
 
-            if distance_moved > drag_threshold:
-                game_manager.handle_drag_start(mouse_down_start_pos)
+        if mouse_down_start_pos and not is_dragging:
+            if drag_threshold_reached(mouse_pos):
+                game_manager.input(DragStart(mouse_pos))
+                is_dragging = True
 
-        if game_manager.is_dragging:
-            game_manager.handle_drag_update(pg.mouse.get_pos())
+        game_manager.update(mouse_pos)
+        game_manager.surfaces.render()
 
-
-    game_map.render.run_all()
     pg.display.flip()
     clock.tick(FPS)
     clock_time = clock.get_time()
