@@ -4,6 +4,7 @@ from map.game_map import GameMap
 from client.game_manager import GameManager
 from client.action_state.action_state import Click, DragStart, DragEnd
 from character.characters.crud.crud import Crud
+from character.characters.emilie.emilie import Emilie
 from map.loadouts.map_1 import map_1
 from team.team import Team
 
@@ -15,7 +16,9 @@ clock = pg.time.Clock()
 
 game_manager = GameManager(map_1, screen)
 crud = Crud(game_manager.surfaces.character_surface)
+emilie = Emilie(game_manager.surfaces.character_surface)
 game_manager.add_character(crud)
+game_manager.add_character(emilie)
 
 mouse_down_start_pos = None
 is_dragging = False

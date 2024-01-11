@@ -55,10 +55,9 @@ class MovementQueue:
         self.queue = []
 
 class MovementComponent(AbstactComponent):
-    def __init__(self, character: AbstractCharacter, game_map: GameMap) -> None:
+    def __init__(self, character: AbstractCharacter) -> None:
         super().__init__()
         self.character = character
-        self.game_map = game_map
         self.range = 5
         self.queue: MovementQueue = MovementQueue()
 

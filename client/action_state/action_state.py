@@ -86,9 +86,6 @@ class IdleState(ActionState):
                 return None
             
             if isinstance(obj, SpawnButton):
-                if obj.character.current_tile:
-                    obj.character.remove_from_tile()
-
                 self.context.character = obj.character
                 self.context.ui_obj = obj
                 obj.on_click()
@@ -138,21 +135,26 @@ class SpawningState_Click(ActionState):
         
         if isinstance(input, Click):
             if isinstance(obj, GameTile):
-                #check if we can spawn here
-                obj.add_character(self.context.character)
-                obj.character.sprite.draw(obj.center_pixel)
-                self.context.ui_obj.on_click()
-
-                return IdleState
+                placed = self._spawn_character(obj)
+                if placed:
+                    return IdleState
+                return None
             
             if isinstance(obj, SpawnButton):
-                obj.on_click()
-                if obj != self.game_manager.action_context.ui_obj:
-                    self.context.ui_obj.on_click()
-
+                self.context.ui_obj.deselect()
+                if obj == self.context.ui_obj:
+                    return IdleState
+                
                 self.context.ui_obj = obj
+                self.context.character = obj.character
                 return SpawningState_Click
-
+            
+        if isinstance(input, DragEnd):
+            if isinstance(obj, GameTile):
+                placed = self._spawn_character(obj)
+                if placed:
+                    return IdleState
+                return None
 
     def update(self, mouse_pos) -> ActionState:
         ...
@@ -161,9 +163,28 @@ class SpawningState_Click(ActionState):
         character = self.context.character
         if not character and not isinstance(character, AbstractCharacter):
             raise ValueError('There was is no character assigned to this button. Please check the action_context to make sure a character is assigned.')
-        
         self.character = character
+
+        if self.character.current_tile:
+            self.character.remove_from_tile()
+
+        self.context.ui_obj.select()
         
+    def on_exit(self):
+        ...
+
+    def _spawn_character(self, obj: GameTile) -> bool:
+        if obj.character:
+            print("Cannot place a character ontop of another character.")
+            return False
+        obj.add_character(self.context.character)
+        obj.character.sprite.draw(obj.center_pixel)
+        self.context.ui_obj.deselect()
+        return True
+        
+
+class CharacterSelectedState(ActionState):
+    pass
 
 class MovementState_Click(ActionState):
     pass

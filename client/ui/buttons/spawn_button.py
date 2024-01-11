@@ -41,9 +41,14 @@ class SpawnButton(Button):
         self.draw()
 
     def set_state(self, state):
-
         self.state = state
         self.draw()
+
+    def select(self):
+        self.set_state(self.states.SELECTED)
+
+    def deselect(self):
+        self.set_state(self.states.UNSELECTED)
 
     def disable(self):
         self.set_state(self.states.DISABLED) 
