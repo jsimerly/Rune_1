@@ -38,7 +38,7 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
         self.screen = screen
         self.game_map = game_map
 
-        self.coords_on = False
+        self.coords_on = True
         self.color = surface_color
         self.map_interaction = MapInteractionComponent(
             is_passable=is_passable,
@@ -176,15 +176,20 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
         This section is used to manager characters.
     '''
 
-    def add_character(self, character: AbstractCharacter):
+    def add_character(self, character: AbstractCharacter) -> AbstractCharacter:
         self.character = character
         self.character.current_tile = self
         self.register_full_render()
+        return self.character
 
     def remove_character(self):
         self.character = None
         self.register_full_render()
 
+    def character_spawn_to_(self, tile:GameTile) -> AbstractCharacter:
+        char_pointer = tile.add_character(self.character)
+        self.remove_character()
+        return char_pointer
     '''
         Clicking
     '''

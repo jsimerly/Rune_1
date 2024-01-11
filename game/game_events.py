@@ -6,7 +6,7 @@ class EventManager:
         self.selected_obj = None
 
     def register_event(self, obj, fn: Callable):
-        if obj  in self.events:
+        if obj in self.events:
             self.events[obj].append(fn)
         else:
             self.events[obj] = fn

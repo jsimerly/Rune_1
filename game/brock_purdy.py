@@ -1,7 +1,7 @@
 from .game_events import OnClickEventManager
 from game.clickable_obj import AbstractClickableObject, ContinueClickAction, AbstactDraggableObj
 from character.abs_character import AbstractCharacter
-from typing import List, Dict
+from typing import List, Dict, Callable
 from map.game_map import GameMap, GameTile
 from team.team import Team
 
@@ -13,15 +13,14 @@ class GameManager:
     def __init__(self, game_map:GameMap) -> None:
         self.ui_click_events = OnClickEventManager()
         self.ui_objects: List[AbstractClickableObject] = []
-        self.next_click_function = None
 
         self.team: Team = None
-        self.movement_queue: Dict[AbstractCharacter, List[GameTile]] = {}
-        self.ability_queue:  Dict[AbstractCharacter, List[GameTile]]= {}
-
         self.game_map: GameMap = game_map
 
+        self.next_click_function: Callable = None
         self.drag_update_func = None
+        self.func_cache = None
+        
         self.is_dragging: bool = False
 
     def set_game_map(self, game_map: GameMap):
@@ -78,21 +77,34 @@ class GameManager:
 
         if start_obj:
             if isinstance(start_obj, AbstactDraggableObj):
-                start_obj.on_drag_start()
+                self.drag_update_func, self.func_cache = start_obj.on_drag_start()
 
-                for char in self.team.characters:
-                    if char.movement.queued_movement:
-                        for tile in char.movement.queued_movement:
-                            if start_obj == tile:
-                                print('Start adjusting this path')      
+                if not self.drag_update_func: 
+                    for char in self.team.characters:
+                        if not char.movement.queue.is_empty:
+                            for tile in char.movement.queue():
+                                if start_obj == tile:
+                                    print('Start adjusting this path')      
                       
 
-    def handle_drag_update(self, mouse_pos):
-        print(mouse_pos)
+    def handle_drag_update(self, mouse_pos):    
+        self.drag_update_func = self.drag_update_func(mouse_pos, self.func_cache)
+        return 
+            
 
     def handle_drag_finish(self, mouse_down_pos, mouse_up_pos):
         self.is_dragging = False
+        self.drag_update_func = None
+        self.func_cache = None
         print('finish dragging')
 
+    '''
+        UI Clicks
+    '''
+    
+    '''
+        Tile Clicks
+    '''
+    
 
     

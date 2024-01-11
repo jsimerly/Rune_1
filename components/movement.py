@@ -62,8 +62,8 @@ class MovementComponent(AbstactComponent):
         self.range = 5
         self.queue: MovementQueue = MovementQueue()
 
-    def click_move(self, tile:GameTile) -> bool:
-        could_complete = self.queue.set_queue_to(self.character.current_tile, tile)
+    def click_move(self, start_tile: GameTile, end_tile:GameTile) -> bool:
+        could_complete = self.queue.set_queue_to(start_tile, end_tile)
         if could_complete:
             self.move_character_object()
             return True
@@ -108,8 +108,7 @@ class MovementComponent(AbstactComponent):
     
     #needs updated to handle rough terrain
 
-    def hex_reachable(self) -> Set[GameTile]:
-        start_tile = self.character.current_tile
+    def hex_reachable(self, start_tile: GameTile) -> Set[GameTile]:
         max_move = self.range
 
         visited: Set[GameTile] = set()

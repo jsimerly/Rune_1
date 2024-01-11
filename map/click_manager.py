@@ -3,7 +3,7 @@ from hex import Hex, Layout
 from typing import Callable, Optional, List, TYPE_CHECKING, Set
 from settings import LIGHT_GREY
 import pygame as pg
-from game.clickable_obj import AbstractClickableObject, ContinueClickAction
+from game.clickable_obj import AbstractClickableObject, ContinueClickAction, AbstactDraggableObj
 from components.map_interaction import MapInteractionComponent
 import time
 if TYPE_CHECKING:
@@ -56,7 +56,7 @@ class ClickManager:
                     self.tile.deselect()
                     for tile in self.prev_func_cache:
                         tile.remove_option()
-                        
+
                     return None
 
                 could_complete = self.tile.character.movement.click_move(passed_object)
@@ -89,34 +89,32 @@ class ClickManager:
         Dragging
     '''
     def on_drag_start(self) -> Optional[Callable]:
-        if self.tile.character and self.tile.character.movement.queued_movement:
-            print('return move drag')
-            return
+        if self.tile.character and self.tile.character.movement.queue():
+            return self.drag_move_update, self.tile.character
 
         if self.tile.character:
-            print('return a spawn update')
-            return
+            return self.drag_spawn_update, self.tile.character
         
         if self.tile.ghost_character:
-            print("return a spawn update")
-            return 
+            return self.drag_spawn_update, self.tile.character
         
-        for char in 0:
-            print(char)
+        return None, None
 
-    
-        
-                
-        #add ability drag
+    def drag_spawn_update(self, mouse_pos, character: AbstractCharacter):
+        character.current_tile.character = None
+        character.sprite.draw(mouse_pos)
+            
+        return self.drag_spawn_update
 
-    def drag_spawn_update(self):
-        pass
-    
     def drag_move_update(self):
         pass
 
     def drag_ability_update(self):
         pass
+
+    def drag_spawn_finish(self, final_tile: GameTile, character: AbstractCharacter,):
+        character.current_tile.remove_character()
+        final_tile.add_character(character)
 
     def on_drag_finish(self) -> Optional[Callable]:
         pass

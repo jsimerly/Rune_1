@@ -9,7 +9,6 @@ if TYPE_CHECKING:
     from team.team import Team
 class AbstractCharacter(ABC):
     def __init__(self, screen, game_map):
-        self.current_tile: GameTile = None
         self.team: Team = None
         self.sprite: SpriteComponent = None
         self.movement: MovementComponent = None
