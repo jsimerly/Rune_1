@@ -19,8 +19,8 @@ class SpawnButton(Button):
         self.states = State
         self.state = State.UNSELECTED
 
-        self.selected_image = pg.transform.scale(self.character.sprite.image.copy() , (200,200))
-        self.image = pg.transform.scale(self.character.sprite.image.copy() , (150,150))
+        self.selected_image = pg.transform.scale(self.character.sprite.standard_image.copy() , (200,200))
+        self.image = pg.transform.scale(self.character.sprite.standard_image.copy() , (150,150))
         self.disabled_image = self.image.copy()
         self.disabled_image.set_alpha(100)
 

@@ -60,12 +60,19 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
         This is used to add and remove things that need to be rerenders on the next cycle. This is handled by the GameMap instance attached to every time.
     '''
 
+    '''Character'''
+    def add_character(self, character: AbstractCharacter):
+        self.character = character
+        character.current_tile = self
+
+    def remove_character(self):
+        self.character = None
 
     
     ''' Drawing
         This section is for actually rendering the tile and it's objects on onto the canvas.
     '''
-    def draw(self):
+    def draw(self, color=None):
         self.draw_background()
         self.draw_border()
         if self.character:
@@ -145,24 +152,6 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
         center = self.layout.hex_to_pixel(self)
         return self.layout.get_hex_verticies(center)
     
-    ''' Character
-        This section is used to manager characters.
-    '''
-
-    def add_character(self, character: AbstractCharacter) -> AbstractCharacter:
-        self.character = character
-        self.character.current_tile = self
-        self.register_full_render()
-        return self.character
-
-    def remove_character(self):
-        self.character = None
-        self.register_full_render()
-
-    def character_spawn_to_(self, tile:GameTile) -> AbstractCharacter:
-        char_pointer = tile.add_character(self.character)
-        self.remove_character()
-        return char_pointer
     '''
         Clicking
     '''

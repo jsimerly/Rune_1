@@ -20,4 +20,5 @@ class GameSurfaces(metaclass=Singleton):
         self.screen.blit(self.character_surface, (0,0))
         self.screen.blit(self.ability_surface, (0,0))
         self.screen.blit(self.ui_surface, (0,0))
+    
 

@@ -28,9 +28,10 @@ class AbstractCharacter(ABC):
         self.life_state = self.life_states.AWAITING_SPAWN
 
     def remove_from_tile(self):
-        self.current_tile.draw()
+        self.current_tile.remove_character()
         self.current_tile = None
-        
+        self.sprite.undraw()
+        print('removed??')
     
     def set_team(self, team:Team):
         self.team = team

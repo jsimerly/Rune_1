@@ -89,6 +89,7 @@ class IdleState(ActionState):
                 if obj.character.current_tile:
                     obj.character.remove_from_tile()
 
+                self.context.character = obj.character
                 self.context.ui_obj = obj
                 obj.on_click()
                 return SpawningState_Click
@@ -138,7 +139,7 @@ class SpawningState_Click(ActionState):
         if isinstance(input, Click):
             if isinstance(obj, GameTile):
                 #check if we can spawn here
-                obj.character = self.character
+                obj.add_character(self.context.character)
                 obj.character.sprite.draw(obj.center_pixel)
                 self.context.ui_obj.on_click()
 
@@ -157,7 +158,7 @@ class SpawningState_Click(ActionState):
         ...
 
     def on_enter(self):
-        character = self.context.ui_obj.character
+        character = self.context.character
         if not character and not isinstance(character, AbstractCharacter):
             raise ValueError('There was is no character assigned to this button. Please check the action_context to make sure a character is assigned.')
         
