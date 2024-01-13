@@ -3,6 +3,8 @@ from .abstact_component import AbstactComponent
 from typing import TYPE_CHECKING, Any, List, Set, Optional, Dict
 from map.game_map import GameMap  
 from utils import time_it
+from client.surfaces import GameSurfaces
+import pygame as pg
 
 if TYPE_CHECKING:
     from character.abs_character import AbstractCharacter
@@ -43,15 +45,9 @@ class MovementQueue:
         self.queue = tiles
 
     def set_queue_to(self, start_tile: GameTile, end_tile: GameTile) -> bool:
-        potential_queue = astar(start_tile, end_tile)
-        if potential_queue[-1].character:
-            print('Cannot move ontop of another character')
-            return False
-        
-        self.queue = potential_queue
-        return True
+        self.queue = astar(start_tile, end_tile)
 
-    def reset_queue(self):
+    def clear(self):
         self.queue = []
 
 class MovementComponent(AbstactComponent):
@@ -61,51 +57,63 @@ class MovementComponent(AbstactComponent):
         self.range = 5
         self.queue: MovementQueue = MovementQueue()
 
-    def click_move(self, start_tile: GameTile, end_tile:GameTile) -> bool:
-        could_complete = self.queue.set_queue_to(start_tile, end_tile)
-        if could_complete:
-            self.move_character_object()
-            return True
-        return False
+        game_surfaces = GameSurfaces()
+        self.movement_surface = game_surfaces.movement_surface
+        self.border_surface = game_surfaces.border_surface
+        self.path_surface = pg.Surface(self.movement_surface.get_size(), pg.SRCALPHA)
+        self.path_surface.set_alpha(150)
 
-    def drag_move(self, tile:GameTile):
-        if tile != self.queue.end_tile:
-            self.queue.add_tile(tile)
-        else:
-            self.queue.remove_end_tile()
-        self.move_character_object()
+        self.line_rect = None
 
-    def move_character_object(self):
-        self.queue.end_tile.character = self.character
-        self.queue.start_tile.character = None
-        self.queue.start_tile.ghost_character = self.character
-        
-        self.queue.start_tile.register_full_render()
-        self.queue.end_tile.register_full_render()
-        self.team_movement_render()
-
+    ''' Movement '''
+    def move(self, end_tile:GameTile) -> List[GameTile]:
+        start_tile = self.character.current_tile
+        self.queue.set_queue_to(start_tile, end_tile)
+        self.draw_movement()
+        return self.queue()
+    
     def clear_move(self):
-        if not self.queue.is_empty:
-            self.queue.end_tile.character = None
-            self.queue.start_tile.character = self.character
-        self.queue.reset_queue()
+        self.queue.clear()
+        self.undraw_movement()
+    
+    ''' Draw '''
+    def draw_movement(self):
+        if len(self.queue()) >= 2:
+            tile_centers = []
+            for tile in self.queue():
+                tile_centers.append(tile.center_pixel)
 
-        self.team_movement_render()
+            pg.draw.lines(
+                self.path_surface, 
+                self.character.color, 
+                False, tile_centers, 3
+            )
+            
+            self.movement_surface.blit(self.path_surface, (0,0))
 
-    #this will include this characters
-    def team_movement_render(self):
-        for char in self.character.team.characters:
-            if not char.movement.queue.is_empty:
-                self.game_map.render.add_movement(char.movement.queue(), char.color)
+    def undraw_movement(self):
+        empty = pg.Color(0,0,0,0)
+        clear_surface = pg.Surface(self.path_surface.get_size(), pg.SRCALPHA)
+        clear_surface.set_alpha(150)
+        clear_surface.fill(empty)
+        clear_surface.set_alpha(None)
 
-        self.game_map.render.add_full_tiles(self.queue())
-        
+        self.path_surface.blit(clear_surface, (0,0))
+        self.movement_surface.blit(self.path_surface, (0,0))
+
+        # empty = pg.Color(0,0,0,0)
+        # self.path_surface.fill(empty)
+        # self.path_surface.set_alpha(None)
+        # self.movement_surface.blit(self.path_surface, (0,0))
+        # self.path_surface.set_alpha(150)
+
+    def draw_reachable(self):
+        pass
+
+    ''' Algos '''
     def find_possible_tiles(self):
         possible = self.hex_reachable()
         return possible
-
-    
-    #needs updated to handle rough terrain
 
     def hex_reachable(self, start_tile: GameTile) -> Set[GameTile]:
         max_move = self.range
@@ -147,7 +155,7 @@ class Node:
     def __eq__(self, other: GameTile) -> bool:
         return self.tile == other.tile
 
-
+@time_it
 def astar(start_tile: GameTile, target_tile: GameTile) -> Optional[List[GameTile]]:
     start_node = Node(None, start_tile)
     start_node.g, start_node.h, start_node.f = 0, 0, 0
@@ -159,7 +167,9 @@ def astar(start_tile: GameTile, target_tile: GameTile) -> Optional[List[GameTile
 
     open_list.append(start_node)
 
+    hold = 0
     while len(open_list) > 0:
+        hold+=1
         current_node: Node = open_list[0]
         current_index = 0
 
@@ -179,7 +189,7 @@ def astar(start_tile: GameTile, target_tile: GameTile) -> Optional[List[GameTile
                 current = current.parent
 
             return path[::-1] # reversing the list so we have start values in front
-        
+            
         children: List[Node] = []
         neighbors = current_node.tile.get_all_neighbor_tiles()
         for neighbor_tile in neighbors:
@@ -193,6 +203,15 @@ def astar(start_tile: GameTile, target_tile: GameTile) -> Optional[List[GameTile
 
 
         for child in children:
+            skip_child = False # used to handle if we need to append or not
+            for open_node in open_list:
+                if child == open_node:
+                    skip_child = True
+                    break
+
+            if skip_child:
+                continue
+
             for closed_child in closed_list:
                 if child == closed_child:
                     continue
@@ -201,19 +220,14 @@ def astar(start_tile: GameTile, target_tile: GameTile) -> Optional[List[GameTile
             g_mod = current_node.tile.map_interaction.movement_cost
             child.g = current_node.g + g_mod
             child.h = distance_heuristic(child.tile, target_tile)
+
             child.f = child.g + child.h
-
-            for open_node in open_list:
-                if child == open_node and child.g > open_node.g:
-                    continue
-
             open_list.append(child)
 
     return []
 
 def distance_heuristic(current_tile: GameTile, target_tile: GameTile):
     distance = current_tile.distance_to(target_tile)
-
     return distance
 
 

@@ -3,19 +3,17 @@ from components.sprite import SpriteComponent
 from components.movement import MovementComponent
 import pygame as pg
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
-from enum import Enum
+from typing import TYPE_CHECKING, List
+from client.surfaces import GameSurfaces
 if TYPE_CHECKING:
     from map.game_tile import GameTile
     from team.team import Team
 
 
-class LifeState(Enum):
-    AWAITING_SPAWN = 1
-    ALIVE = 2
-    DEAD = 3
-class AbstractCharacter(ABC):
+
+class AbstractCharacter(ABC):    
     def __init__(self, surface):
+        self.game_surfaces = GameSurfaces()
         self.team: Team = None
         self.current_tile: GameTile = None
 
@@ -24,23 +22,26 @@ class AbstractCharacter(ABC):
         self.surface = surface
         self.color = None
 
-        self.life_states = LifeState
-        self.life_state = self.life_states.AWAITING_SPAWN
+    ''' Movement '''
+    def move_to_tile(self, tile: GameTile) -> List[GameTile]:
+        if not self.movement.queue.is_empty:
+            self.movement.clear_move()
+        queue = self.movement.move(tile)
+        return queue
 
     def remove_from_tile(self):
         self.current_tile.remove_character()
         self.current_tile = None
         self.sprite.undraw()
-        print('removed??')
     
     def set_team(self, team:Team):
         self.team = team
 
-    def set_sprite_comp(self, comp: SpriteComponent):
-        self.sprite = comp
+    def set_sprite_comp(self, image: pg.Surface):
+        self.sprite = SpriteComponent(image)
 
-    def set_movement_comp(self, comp: MovementComponent):
-        self.movement = comp
+    def set_movement_comp(self):
+        self.movement = MovementComponent(self)
 
     def set_color(self, color: (int,int,int)):
         self.color = color

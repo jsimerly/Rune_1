@@ -1,9 +1,8 @@
 from __future__ import annotations
 from hex import Hex, Layout
-from typing import Callable, Optional, List, TYPE_CHECKING
+from typing import Callable, Optional, List, TYPE_CHECKING, Dict, Tuple
 from settings import LIGHT_GREY
 import pygame as pg
-from game.clickable_obj import AbstractClickableObject, AbstactDraggableObj
 from components.map_interaction import MapInteractionComponent
 from .click_manager import ClickManager
 from abc import ABC, abstractmethod
@@ -17,7 +16,7 @@ if TYPE_CHECKING:
 
 pg.font.init()
 
-class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
+class GameTile(Hex):
     def __init__(self, 
         q:int, r:int,
         layout: Layout,
@@ -37,7 +36,7 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
         self.layout = layout
         self.surface = surface
 
-        self.coords_on = True
+        self.coords_on = False
         self.color = surface_color
         self.map_interaction = MapInteractionComponent(
             is_passable=is_passable,
@@ -51,19 +50,17 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
 
         self.is_selected = False
         self.is_option = False
+        self.tile_map: Dict[Tuple[int,int], GameTile] = None
 
         self.character: AbstractCharacter = None
         self.ghost_character: AbstractCharacter = None
         self.click_manager = ClickManager(self)
 
-    ''' Render Registers
-        This is used to add and remove things that need to be rerenders on the next cycle. This is handled by the GameMap instance attached to every time.
-    '''
-
     '''Character'''
     def add_character(self, character: AbstractCharacter):
         self.character = character
         character.current_tile = self
+        character.sprite.draw(self.center_pixel)
 
     def remove_character(self):
         self.character = None
@@ -81,11 +78,15 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
             self.draw_ghost()
 
         if self.coords_on:
+            coord_text = f'{self.q}, {self.r}'
+            self.draw_text(coord_text)
+         
+    
+    def draw_text(self, text):
             point = self.center_pixel
             pg.font.init()
             font = pg.font.SysFont('Arial', 12)
-            coord_text = f'{self.q}, {self.r}'
-            text_surface = font.render(coord_text, True, (255, 255, 255))
+            text_surface = font.render(text, True, (255, 255, 255))
             text_pos = (point[0] - text_surface.get_width() // 2, point[1] - text_surface.get_height() // 2)
 
             self.surface.blit(text_surface, text_pos)  
@@ -94,7 +95,7 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
         verticies = self.verticies
         pg.draw.polygon(self.surface, self.color, verticies)
 
-    def draw_border(self):
+    def draw_border(self, color=None):
         outline_size = 1
         outline_color = LIGHT_GREY
         if self.is_option:
@@ -104,6 +105,9 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
         if self.is_selected:
             outline_size = 4
             outline_color = (220, 220, 220)
+
+        if color:
+            outline_color = color
 
         pg.draw.polygon(self.surface, self.color, self.verticies, 4) #used to reset previous border
         pg.draw.polygon(self.surface, outline_color, self.verticies ,outline_size)
@@ -142,6 +146,8 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
 
         x += self.layout.skew * y
         return (x, y)
+    
+    ''' Properties '''
 
     @property  
     def center_pixel(self) -> (int, int):  
@@ -152,58 +158,34 @@ class GameTile(Hex, AbstractClickableObject, AbstactDraggableObj):
         center = self.layout.hex_to_pixel(self)
         return self.layout.get_hex_verticies(center)
     
-    '''
-        Clicking
-    '''
+    def set_tile_map(self, tile_map):
+        self.tile_map = tile_map
 
-    def on_click(self) -> Optional[Callable]:
-        return self.click_manager.on_click()
-    
-    #helper function for click_manager
-    def is_gametile_type(self, obj) -> bool:
-        return isinstance(obj, GameTile)
-    
-    def on_drag_start(self) -> Optional[Callable]:
-        return self.click_manager.on_drag_start()
-
-    def on_drag_update(self) -> Optional[Callable]:
-        return self.click_manager.on_drag_update()
-
-    def on_drag_finish(self) -> Optional[Callable]:
-        return self.click_manager.on_drag_finish()
-
-    '''Property Methods
-        Use these to manage the state of the tiles. This helps with both gameplay and rendering.
-    '''
     def select(self):
         self.is_selected = True
-        self.register_selection_render()
+
 
     def deselect(self):
         self.is_selected = False
-        self.unregister_selection()
-        self.register_selection_render()
 
     def set_option(self):
         self.is_option = True
-        self.register_border_render()
 
     def remove_option(self):
         self.is_option = False
-        self.register_border_render()
     
     def get_neighbor_tile(self, i) -> GameTile:
         hex = self.neighbor(i)
-        if hex.axial in self.game_map.tiles:
-            return self.game_map[hex.axial]
+        if hex.axial in self.tile_map:
+            return self.tile_map[hex.axial]
         return None
     
     def get_all_neighbor_tiles(self) -> List[GameTile]:
         neighbor_hex = self.get_all_neighors()
         tiles = []
         for hex in neighbor_hex:
-            if hex.axial in self.game_map.tiles:
-                tiles.append(self.game_map.tiles[hex.axial])
+            if hex.axial in self.tile_map:
+                tiles.append(self.tile_map[hex.axial])
         return tiles
     
     def __repr__(self) -> str:

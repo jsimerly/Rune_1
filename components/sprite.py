@@ -2,6 +2,7 @@ from __future__ import annotations
 from .abstact_component import AbstactComponent
 import pygame as pg
 from typing import TYPE_CHECKING, List, Optional
+from client.surfaces import GameSurfaces
 import time
 if TYPE_CHECKING:
     from map.game_tile import GameTile
@@ -10,8 +11,9 @@ class SpriteComponent(AbstactComponent):
     NORMAL_SIZE = (55,55)
     GHOST_ALPHA = 100
 
-    def __init__(self, image: pg.image, char_surface: pg.Surface):
-        self.char_surface = char_surface
+    def __init__(self, image: pg.image):
+        surfaces = GameSurfaces()
+        self.char_surface = surfaces.character_surface
         self.pixel_pos: (int,int) = None
 
         self.standard_image = pg.transform.scale(image, self.NORMAL_SIZE)
@@ -31,10 +33,17 @@ class SpriteComponent(AbstactComponent):
         self.pixel_pos = pixel_pos
         top_left_pixel = self.get_topleft_pos(pixel_pos)
         self.char_surface.blit(self.standard_image, top_left_pixel)
-        
 
-    def undraw(self, pixel_pos: (int,int)=None):
+    def draw_ghost(self, pixel_pos: (int, int)):
+        self.pixel_pos = pixel_pos
+        top_left_pixel = self.get_topleft_pos(pixel_pos)
+        self.char_surface.blit(self.ghost_image, top_left_pixel)
+        
+    def undraw(self, pixel_pos: (int, int)=None):
         pixel_pos = pixel_pos if pixel_pos else self.pixel_pos
         top_left_pixel = self.get_topleft_pos(self.pixel_pos)
         rect_to_clear = pg.Rect(top_left_pixel, self.NORMAL_SIZE)
         self.char_surface.fill(self.empty, rect_to_clear)
+
+
+        

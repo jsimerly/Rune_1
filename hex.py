@@ -23,11 +23,7 @@ class Hex:
 
     def __eq__(self, other) -> bool:
         if isinstance(other, Hex):
-            return all([
-                self.q == other.q,
-                self.r == other.r,
-                self.s == other.s
-            ])
+            return self.q == other.q and self.r == other.r
         return False
     
     def __ne__(self, other) -> bool:

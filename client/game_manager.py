@@ -1,7 +1,6 @@
 from __future__ import annotations
 from .ui.buttons.button import ButtonManager, Button
 from .clickable_obj import Clickable, Draggable, ContinueAction
-from character.abs_character import AbstractCharacter
 from typing import List, Dict, Callable, TYPE_CHECKING, Optional, Tuple
 from client.action_state.action_state import IdleState, ActionState, MouseInput, ActionContext
 import pygame as pg
@@ -10,6 +9,7 @@ from client.ui.buttons.button import ButtonManager
 from client.ui.buttons.spawn_button import SpawnButton
 if TYPE_CHECKING:
     from map.loadouts.map_layout import MapLayout
+    from character.abs_character import AbstractCharacter
 
 
 class GameManager:
@@ -23,6 +23,7 @@ class GameManager:
 
         self.tiles = map.generate_map(self.surfaces.tile_surface)
         for tile in self.tiles.values():
+            tile.set_tile_map(self.tiles)
             tile.draw()
 
         self.characters: List[AbstractCharacter] = []

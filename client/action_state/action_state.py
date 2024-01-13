@@ -82,7 +82,7 @@ class IdleState(ActionState):
                 if obj.character:
                     self.context.tile = obj
                     self.context.character = obj.character
-                    return MovementState_Click
+                    return CharacterSelectedState
                 return None
             
             if isinstance(obj, SpawnButton):
@@ -121,7 +121,6 @@ class IdleState(ActionState):
 
     def on_enter(self):
         self.game_manager.action_context.clear()
-
 
 class SpawningState_Click(ActionState):
     def __init__(self, game_manager) -> None:
@@ -178,13 +177,40 @@ class SpawningState_Click(ActionState):
             print("Cannot place a character ontop of another character.")
             return False
         obj.add_character(self.context.character)
-        obj.character.sprite.draw(obj.center_pixel)
         self.context.ui_obj.deselect()
         return True
         
 
 class CharacterSelectedState(ActionState):
-    pass
+    def __init__(self, game_manager) -> None:
+        self.game_manager: GameManager = game_manager
+        self.context = self.game_manager.action_context
+
+    def input(self, input: MouseInput) -> ActionState:
+        obj = self.game_manager.find_interactable_obj(input.pixel)
+        if not obj:
+            return IdleState
+        
+        if isinstance(input, Click):
+            if isinstance(obj, GameTile):
+                self.character.move_to_tile(obj)
+
+                return IdleState
+
+        #if an ability icon then we attack!
+
+
+    def on_enter(self):
+        if not self.context.character:
+            raise ValueError("action_context needs to have a character assigned to etner Character Selected State.")
+        
+        if not self.context.tile:
+            raise ValueError("action_context needs to have a tile assigned to enter Character Selected State.")
+        
+        self.character = self.context.character
+        self.tile = self.context.tile
+        
+    
 
 class MovementState_Click(ActionState):
     pass
