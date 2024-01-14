@@ -4,15 +4,14 @@ from typing import Callable, Optional, List, TYPE_CHECKING, Dict, Tuple
 from settings import LIGHT_GREY
 import pygame as pg
 from components.map_interaction import MapInteractionComponent
-from .click_manager import ClickManager
 from abc import ABC, abstractmethod
 from math import radians, cos, sin
 from utils import time_it
+from client.surfaces import GameSurfaces
 
 if TYPE_CHECKING:
     from character.abs_character import AbstractCharacter
-    from game_map import GameMap
-    from game.brock_purdy import GamePhaseManager
+
 
 pg.font.init()
 
@@ -33,6 +32,7 @@ class GameTile(Hex):
     ):
         super().__init__(q, r)
         self.layout = layout
+        self.surface = GameSurfaces()
 
         self.coords_on = False
         self.color = surface_color
@@ -52,7 +52,6 @@ class GameTile(Hex):
 
         self.character: AbstractCharacter = None
         self.ghost_character: AbstractCharacter = None
-        self.click_manager = ClickManager(self)
 
     '''Character'''
     def spawn_character(self, character: AbstractCharacter):
@@ -96,7 +95,7 @@ class GameTile(Hex):
         outline_size = 1
         outline_color = LIGHT_GREY
         if self.is_option:
-            outline_size = 3
+            outline_size = 2
             outline_color = (200, 200, 200)
 
         if self.is_selected:
@@ -108,15 +107,20 @@ class GameTile(Hex):
  
         pg.draw.polygon(screen, outline_color, self.verticies, outline_size)
         
-    def draw_character(self):
-        if self.character:
-            pixel_pos = self.center_pixel
-            self.character.sprite.draw(pixel_pos)
+    def move_to_border_layer(self):
+        self.surface.add_to_layer(self.surface.border_tiles, self)
+        self.surface.remove_from_layer(self.surface.standard_tiles, self)
+        self.surface.remove_from_layer(self.surface.selected_tiles, self)
 
-    def draw_ghost(self):
-        if self.ghost_character:
-            pixel_pos = self.center_pixel
-            self.ghost_character.sprite.draw_ghost(pixel_pos)
+    def move_to_selection_layer(self):
+        self.surface.add_to_layer(self.surface.selected_tiles, self)
+        self.surface.remove_from_layer(self.surface.standard_tiles, self)
+        self.surface.remove_from_layer(self.surface.border_tiles, self)
+
+    def move_to_standard_layer(self):
+        self.surface.add_to_layer(self.surface.standard_tiles, self)
+        self.surface.remove_from_layer(self.surface.selected_tiles, self)
+        self.surface.remove_from_layer(self.surface.border_tiles, self)
 
     #consider pre processing this if it's taking too much time
     def inner_verticies(self):
@@ -154,17 +158,22 @@ class GameTile(Hex):
     def set_tile_map(self, tile_map):
         self.tile_map = tile_map
 
-    def select(self):
+    def select(self): #may need to add logic to selection to handle the rendering
         self.is_selected = True
+        self.move_to_selection_layer()
 
     def deselect(self):
         self.is_selected = False
+        self.move_to_standard_layer()
 
     def set_option(self):
         self.is_option = True
+        self.move_to_border_layer()
 
     def remove_option(self):
+        print('remove')
         self.is_option = False
+        self.move_to_standard_layer()
     
     def get_neighbor_tile(self, i) -> GameTile:
         hex = self.neighbor(i)

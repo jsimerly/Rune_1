@@ -21,15 +21,17 @@ class GameSurfaces(metaclass=Singleton):
 
     def draw(self):
         self.draw_layer(self.standard_tiles)
+        print(f'std: {len(self.standard_tiles)}')
         self.draw_layer(self.border_tiles)
+        print(f'border: {len(self.border_tiles)}')
         self.draw_layer(self.selected_tiles)
+        print(f'selected: {len(self.selected_tiles)}')
         #
         self.draw_layer(self.movement)
         self.draw_layer(self.characters)
         #
         self.draw_layer(self.ui)
-
-            
+        
     def draw_layer(self, layer):
         for obj in layer:
             obj.draw(self.screen)
@@ -38,7 +40,10 @@ class GameSurfaces(metaclass=Singleton):
         layer.add(obj)
 
     def remove_from_layer(self, layer: Set, obj):
-        layer.remove(obj)
+        try:
+            layer.remove(obj)
+        except KeyError:
+            ...
     
 
     

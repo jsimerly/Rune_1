@@ -64,7 +64,7 @@ class MovementQueue:
     def draw(self, screen: pg.Surface):
         if len(self.pixels) >= 2:
             trans_surface = pg.Surface(screen.get_size(), pg.SRCALPHA)
-            pg.draw.lines(trans_surface, self.color, False, self.pixels, 6)
+            pg.draw.lines(trans_surface, self.color, False, self.pixels, 5)
             screen.blit(trans_surface, (0, 0))
 
     def handle_update(self):
@@ -92,38 +92,40 @@ class MovementComponent(AbstactComponent):
     def clear_move(self):
         self.queue.clear()    
 
-    ''' Algos '''
-    def find_possible_tiles(self):
-        possible = self.hex_reachable()
+    def find_possible_tiles(self) -> List[GameTile]:
+        possible = hex_reachable(self.character.current_tile, self.range)
         return possible
 
-    def hex_reachable(self, start_tile: GameTile) -> Set[GameTile]:
-        max_move = self.range
+''' Algos '''
 
-        visited: Set[GameTile] = set()
-        visited.add(start_tile)
-        fringes: List[List[GameTile]] = []
-        fringes.append([start_tile])
 
-        movement_range: Dict[GameTile, int] = {start_tile: max_move}
+def hex_reachable(start_tile: GameTile, max_range:int) -> Set[GameTile]:
+    max_move = max_range
 
-        for k in range(1, max_move+1):
-            fringes.append([])
-            for tile in fringes[k-1]:
-                neighbors = tile.get_all_neighbor_tiles()
-                for neighbor_tile in neighbors:
-                    if all([
-                        neighbor_tile not in visited,
-                        tile.map_interaction.is_passable
-                    ]):
-                        remaining_move = movement_range[tile] - neighbor_tile.map_interaction.movement_cost
-                        if remaining_move >= 0:
-                            if neighbor_tile.map_interaction.can_end_on:
-                                visited.add(neighbor_tile)
-                                movement_range[neighbor_tile] = remaining_move
-                            fringes[k].append(neighbor_tile)
+    visited: Set[GameTile] = set()
+    visited.add(start_tile)
+    fringes: List[List[GameTile]] = []
+    fringes.append([start_tile])
 
-        return visited                
+    movement_range: Dict[GameTile, int] = {start_tile: max_move}
+
+    for k in range(1, max_move+1):
+        fringes.append([])
+        for tile in fringes[k-1]:
+            neighbors = tile.get_all_neighbor_tiles()
+            for neighbor_tile in neighbors:
+                if all([
+                    neighbor_tile not in visited,
+                    tile.map_interaction.is_passable
+                ]):
+                    remaining_move = movement_range[tile] - neighbor_tile.map_interaction.movement_cost
+                    if remaining_move >= 0:
+                        if neighbor_tile.map_interaction.can_end_on:
+                            visited.add(neighbor_tile)
+                            movement_range[neighbor_tile] = remaining_move
+                        fringes[k].append(neighbor_tile)
+
+    return visited                
 
 class Node:
     def __init__(self, parent=None, tile: GameTile=None):

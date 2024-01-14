@@ -57,12 +57,14 @@ class ActionContext:
     def __init__(self):
         self.ui_obj: Button = None
         self.tile: GameTile = None
+        self.option_tiles: List[GameTile] = None
         self.character: AbstractCharacter = None
         self.ability = None
 
     def clear(self):
         self.ui_obj = None
         self.tile = None
+        self.option_tiles: List[GameTile] = None
         self.character = None
         self.ability = None
 
@@ -126,6 +128,7 @@ class SpawningState_Click(ActionState):
     def __init__(self, game_manager) -> None:
         self.game_manager: GameManager = game_manager
         self.context = self.game_manager.action_context
+        self.spawn_options: List[GameTile] = []
 
     def input(self, input: MouseInput) -> ActionState:
         obj = self.game_manager.find_interactable_obj(input.pixel)
@@ -185,6 +188,7 @@ class CharacterSelectedState(ActionState):
     def __init__(self, game_manager) -> None:
         self.game_manager: GameManager = game_manager
         self.context = self.game_manager.action_context
+        self.move_options: List[GameTile] = []
 
     def input(self, input: MouseInput) -> ActionState:
         obj = self.game_manager.find_interactable_obj(input.pixel)
@@ -209,8 +213,19 @@ class CharacterSelectedState(ActionState):
         
         self.character = self.context.character
         self.tile = self.context.tile
-        
+
+        #Open up ability ui
+
+        self.move_options = self.character.movement.find_possible_tiles()
+        for tile in self.move_options:
+            tile.set_option()
+        self.tile.select()
     
+    def on_exit(self):
+        for tile in self.move_options:
+            tile.remove_option()
+        self.tile.deselect()
+
 
 class MovementState_Click(ActionState):
     pass

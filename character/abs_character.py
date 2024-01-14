@@ -33,7 +33,6 @@ class AbstractCharacter(ABC):
 
     def set_color(self, color: Tuple(int,int,int)):
         self.color = color
-        print(color)
 
     def open_image(self, image_path) -> pg.image:
         return pg.image.load(image_path).convert_alpha()
