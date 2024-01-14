@@ -44,9 +44,11 @@ class AbstractCharacter(ABC):
         self.movement.move(tile)
         self.sprite.move_to_tile(tile)
         self.sprite.ghost_to_tile(self.current_tile)
-        self.current_tile = tile
+        self.current_tile.character_move_to(tile)
 
     def drag_move_start(self):
+        self.clear_move()
+        self.drag_move(self.current_tile)
         self.sprite.ghost_to_tile(self.current_tile)
 
     def drag_move(self, tile: GameTile):
@@ -57,11 +59,14 @@ class AbstractCharacter(ABC):
         self.current_tile = final_tile
 
     def clear_move(self):
-        start_tile = self.movement.clear_move()
+        start_tile, end_tile = self.movement.clear_move()
+        if end_tile:
+            end_tile.remove_character()
+
         if start_tile:
             self.current_tile = start_tile
             self.sprite.move_to_tile(start_tile)
-            self.sprite
+
 
     def remove_from_tile(self):
         self.current_tile.remove_character()

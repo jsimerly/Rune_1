@@ -56,7 +56,13 @@ class GameTile(Hex):
     '''Character'''
     def spawn_character(self, character: AbstractCharacter):
         self.character = character
+        self.ghost_character = character
         character.spawn_to(self)
+
+    def character_move_to(self, other_tile: GameTile):
+        other_tile.add_character(self.ghost_character)
+        if other_tile != self:
+            self.remove_character()
 
     def add_character(self, character: AbstractCharacter):
         self.character = character

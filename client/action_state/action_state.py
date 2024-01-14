@@ -81,11 +81,22 @@ class IdleState(ActionState):
         #Click
         if isinstance(input, Click):
             if isinstance(obj, GameTile):
-                if obj.character:
-                    self.context.tile = obj
-                    self.context.character = obj.character
-                    return CharacterSelectedState
+                self.context.tile = obj
+                self.context.character = obj.character
 
+                if obj.character and obj.ghost_character:
+                    print('both')
+                    return CharacterSelectedState
+                
+                if obj.character:
+                    print('ability selection')
+                    return None
+                
+                if obj.ghost_character:
+                    self.context.character = obj.ghost_character
+                    print('ghost')
+                    return CharacterSelectedState
+                
                 return IdleState
             
             if isinstance(obj, SpawnButton):
@@ -186,6 +197,62 @@ class SpawningState_Click(ActionState):
         return True
         
 
+class CharacterMoveSelected(ActionState):
+    def __init__(self, game_manager) -> None:
+        self.game_manager: GameManager = game_manager
+        self.context = self.game_manager.action_context
+        self.move_options: List[GameTile] = []
+
+    def input(self, input: MouseInput) -> ActionState:
+        obj = self.game_manager.find_interactable_obj(input.pixel)
+        if not obj:
+            return IdleState
+        
+        if isinstance(obj, GameTile):
+            if isinstance(input, Click):
+                self.character.move_to_tile(obj)
+                return IdleState
+            
+        if isinstance(input, DragStart):
+            self.character.drag_move_start()
+            
+        if isinstance(input, DragEnd):
+            self.character.drag_move_finish(obj)
+            return IdleState
+            #check if we finished on a tile if not clear the queue
+
+        #if an ability icon then we attack!
+            
+    def update(self, mouse_pos):
+        obj = self.game_manager.find_interactable_obj(mouse_pos)
+        if not obj:
+            return None
+        
+        if isinstance(obj, GameTile):
+            self.character.drag_move(obj)
+
+    def on_enter(self):
+        if not self.context.character:
+            raise ValueError("action_context needs to have a character assigned to etner Character Selected State.")
+        
+        if not self.context.tile:
+            raise ValueError("action_context needs to have a tile assigned to enter Character Selected State.")
+        
+        self.character = self.context.character
+        self.tile = self.context.tile
+
+        #Open up ability ui
+
+        self.move_options = self.character.movement.find_possible_tiles()
+        for tile in self.move_options:
+            tile.set_option()
+        self.tile.select()
+    
+    def on_exit(self):
+        for tile in self.move_options:
+            tile.remove_option()
+        self.tile.deselect()
+
 class CharacterSelectedState(ActionState):
     def __init__(self, game_manager) -> None:
         self.game_manager: GameManager = game_manager
@@ -203,8 +270,7 @@ class CharacterSelectedState(ActionState):
                 return IdleState
             
         if isinstance(input, DragStart):
-            self.character.clear_move()
-            self.character.drag_move(self.character.current_tile)
+            self.character.drag_move_start()
             
         if isinstance(input, DragEnd):
             self.character.drag_move_finish(obj)

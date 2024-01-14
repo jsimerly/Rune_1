@@ -96,10 +96,11 @@ class MovementComponent(AbstactComponent):
         if tile != self.queue.end_tile:
             self.queue.add_tile(tile)
     
-    def clear_move(self) -> GameTile:
+    def clear_move(self) -> Tuple[GameTile, GameTile]:
         start_tile = self.queue.start_tile
+        end_tile = self.queue.end_tile
         self.queue.clear()    
-        return start_tile
+        return start_tile, end_tile
 
     def find_possible_tiles(self) -> List[GameTile]:
         possible = hex_reachable(self.character.current_tile, self.range)
