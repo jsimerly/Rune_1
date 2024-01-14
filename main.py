@@ -55,7 +55,9 @@ while is_running:
                 game_manager.input(DragStart(mouse_pos))
                 is_dragging = True
 
-        game_manager.update(mouse_pos)
+        if is_dragging:
+            game_manager.update(mouse_pos)
+            
         game_manager.surfaces.draw()
 
     pg.display.flip()

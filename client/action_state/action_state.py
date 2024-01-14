@@ -85,7 +85,8 @@ class IdleState(ActionState):
                     self.context.tile = obj
                     self.context.character = obj.character
                     return CharacterSelectedState
-                return None
+
+                return IdleState
             
             if isinstance(obj, SpawnButton):
                 self.context.character = obj.character
@@ -98,6 +99,7 @@ class IdleState(ActionState):
             
             if isinstance(obj, EndTurnButton):
                 return TurnEndedState
+            
             
         #Drag
         if isinstance(input, DragStart):
@@ -195,14 +197,29 @@ class CharacterSelectedState(ActionState):
         if not obj:
             return IdleState
         
-        if isinstance(input, Click):
-            if isinstance(obj, GameTile):
+        if isinstance(obj, GameTile):
+            if isinstance(input, Click):
                 self.character.move_to_tile(obj)
-
                 return IdleState
+            
+        if isinstance(input, DragStart):
+            self.character.clear_move()
+            self.character.drag_move(self.character.current_tile)
+            
+        if isinstance(input, DragEnd):
+            self.character.drag_move_finish(obj)
+            return IdleState
+            #check if we finished on a tile if not clear the queue
 
         #if an ability icon then we attack!
-
+            
+    def update(self, mouse_pos):
+        obj = self.game_manager.find_interactable_obj(mouse_pos)
+        if not obj:
+            return None
+        
+        if isinstance(obj, GameTile):
+            self.character.drag_move(obj)
 
     def on_enter(self):
         if not self.context.character:
@@ -225,6 +242,9 @@ class CharacterSelectedState(ActionState):
         for tile in self.move_options:
             tile.remove_option()
         self.tile.deselect()
+
+class EmptyTileSelected(ActionState):
+    pass
 
 
 class MovementState_Click(ActionState):

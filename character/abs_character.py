@@ -40,8 +40,28 @@ class AbstractCharacter(ABC):
     ''' Movement '''
     def move_to_tile(self, tile: GameTile):
         if not self.movement.queue.is_empty:
-            self.movement.clear_move()
+            self.clear_move()
         self.movement.move(tile)
+        self.sprite.move_to_tile(tile)
+        self.sprite.ghost_to_tile(self.current_tile)
+        self.current_tile = tile
+
+    def drag_move_start(self):
+        self.sprite.ghost_to_tile(self.current_tile)
+
+    def drag_move(self, tile: GameTile):
+        self.movement.drag_move_new_tile(tile)
+        self.sprite.move_to_tile(tile)
+
+    def drag_move_finish(self, final_tile: GameTile):
+        self.current_tile = final_tile
+
+    def clear_move(self):
+        start_tile = self.movement.clear_move()
+        if start_tile:
+            self.current_tile = start_tile
+            self.sprite.move_to_tile(start_tile)
+            self.sprite
 
     def remove_from_tile(self):
         self.current_tile.remove_character()
@@ -60,5 +80,7 @@ class AbstractCharacter(ABC):
     def draw(self, screen: pg.Surface):
         self.sprite.draw(screen) # pass the tile 
         self.sprite.draw_ghost(screen) # pass the ghost tile
+
+    
 
 

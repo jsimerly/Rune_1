@@ -171,7 +171,6 @@ class GameTile(Hex):
         self.move_to_border_layer()
 
     def remove_option(self):
-        print('remove')
         self.is_option = False
         self.move_to_standard_layer()
     

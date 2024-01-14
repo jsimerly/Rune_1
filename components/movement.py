@@ -80,7 +80,6 @@ class MovementComponent(AbstactComponent):
         super().__init__()
         self.character = character
         self.range = 5
-        print(character.color)
         self.queue: MovementQueue = MovementQueue(character.color)
 
     ''' Movement '''
@@ -89,8 +88,18 @@ class MovementComponent(AbstactComponent):
         self.queue.set_queue_to(start_tile, end_tile)
         return self.queue()
     
-    def clear_move(self):
+    def drag_move_new_tile(self, tile:GameTile):
+        if len(self.queue()) >= 2:
+            if tile == self.queue()[-2]:
+                self.queue.remove_end_tile()
+
+        if tile != self.queue.end_tile:
+            self.queue.add_tile(tile)
+    
+    def clear_move(self) -> GameTile:
+        start_tile = self.queue.start_tile
         self.queue.clear()    
+        return start_tile
 
     def find_possible_tiles(self) -> List[GameTile]:
         possible = hex_reachable(self.character.current_tile, self.range)

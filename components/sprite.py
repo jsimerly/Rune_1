@@ -20,6 +20,8 @@ class SpriteComponent(AbstactComponent):
         self.ghost_image.set_alpha(self.GHOST_ALPHA)
         self.empty = pg.Color(0,0,0,0)
 
+        self.dead_image = None # used for when they die
+
 
     def get_topleft_pos(self, tile_center_pixel: (int,int)) -> (int, int):
         x, y = tile_center_pixel
@@ -28,13 +30,27 @@ class SpriteComponent(AbstactComponent):
         y -= self. NORMAL_SIZE[1] // 2
         return ((x,y))
     
+    def move_to_tile(self, tile: GameTile):
+        pixel_pos = self.get_topleft_pos(tile.center_pixel)
+        self.pixel_pos = pixel_pos
+
+    def ghost_to_tile(self, tile: GameTile):
+        pixel_pos = self.get_topleft_pos(tile.center_pixel)
+        self.ghost_pos = pixel_pos
+    
     def move_to_pixel(self, center_pixel_pos: (int,int)):
         pixel_pos = self.get_topleft_pos(center_pixel_pos)
         self.pixel_pos = pixel_pos
 
-    def move_ghost_to_pixel(self, center_pixel_pos: (int, int)):
+    def ghost_to_pixel(self, center_pixel_pos: (int, int)):
         pixel_pos = self.get_topleft_pos(center_pixel_pos)
         self.ghost_pos = pixel_pos
+
+    def remove_sprite(self):
+        self.pixel_pos = None
+
+    def remove_ghost(self):
+        self.ghost_pos = None
 
     def draw(self, screen: pg.Surface):
         if self.pixel_pos:
