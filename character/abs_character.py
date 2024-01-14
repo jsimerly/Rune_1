@@ -7,13 +7,9 @@ from typing import TYPE_CHECKING, List, Tuple
 from client.surfaces import GameSurfaces
 if TYPE_CHECKING:
     from map.game_tile import GameTile
-    from team.team import Team
-
-
 
 class AbstractCharacter(ABC):    
     def __init__(self):
-        self.team: Team = None
         self.current_tile: GameTile = None
 
         self.sprite: SpriteComponent = None
@@ -22,8 +18,6 @@ class AbstractCharacter(ABC):
         self.surfaces = GameSurfaces()
 
     '''Set Up'''
-    def set_team(self, team:Team):
-        self.team = team
 
     def set_sprite_comp(self, image: pg.Surface):
         self.sprite = SpriteComponent(image)
@@ -41,7 +35,7 @@ class AbstractCharacter(ABC):
     def move_to_tile(self, tile: GameTile):
         if not self.movement.queue.is_empty:
             self.clear_move()
-        self.movement.move(tile)
+        self.movement.move(self.current_tile, tile)
         self.sprite.move_to_tile(tile)
         self.sprite.ghost_to_tile(self.current_tile)
         self.current_tile.character_move_to(tile)
@@ -67,7 +61,6 @@ class AbstractCharacter(ABC):
             self.current_tile = start_tile
             self.sprite.move_to_tile(start_tile)
 
-
     def remove_from_tile(self):
         self.current_tile.remove_character()
         self.current_tile = None
@@ -83,8 +76,8 @@ class AbstractCharacter(ABC):
 
     '''Drawing'''
     def draw(self, screen: pg.Surface):
-        self.sprite.draw(screen) # pass the tile 
-        self.sprite.draw_ghost(screen) # pass the ghost tile
+        self.sprite.draw(screen)
+        self.sprite.draw_ghost(screen)
 
     
 

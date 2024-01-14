@@ -1,12 +1,10 @@
 import pygame as pg
 from settings import *
-from map.game_map import GameMap
 from client.game_manager import GameManager
 from client.action_state.action_state import Click, DragStart, DragEnd
 from character.characters.crud.crud import Crud
 from character.characters.emilie.emilie import Emilie
 from map.loadouts.map_1 import map_1
-from team.team import Team
 
 pg.init()
 

@@ -1,7 +1,6 @@
 from __future__ import annotations
 from .abstact_component import AbstactComponent
 from typing import TYPE_CHECKING, Any, List, Set, Optional, Dict, Tuple
-from map.game_map import GameMap  
 from utils import time_it
 from client.surfaces import GameSurfaces
 import pygame as pg
@@ -83,8 +82,7 @@ class MovementComponent(AbstactComponent):
         self.queue: MovementQueue = MovementQueue(character.color)
 
     ''' Movement '''
-    def move(self, end_tile:GameTile) -> List[GameTile]:
-        start_tile = self.character.current_tile
+    def move(self, start_tile: GameTile, end_tile:GameTile) -> List[GameTile]:
         self.queue.set_queue_to(start_tile, end_tile)
         return self.queue()
     
@@ -102,8 +100,8 @@ class MovementComponent(AbstactComponent):
         self.queue.clear()    
         return start_tile, end_tile
 
-    def find_possible_tiles(self) -> List[GameTile]:
-        possible = hex_reachable(self.character.current_tile, self.range)
+    def find_possible_tiles(self, from_tile: GameTile) -> List[GameTile]:
+        possible = hex_reachable(from_tile, self.range)
         return possible
 
 ''' Algos '''

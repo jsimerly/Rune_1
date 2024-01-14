@@ -82,19 +82,17 @@ class IdleState(ActionState):
         if isinstance(input, Click):
             if isinstance(obj, GameTile):
                 self.context.tile = obj
-                self.context.character = obj.character
+                self.context.character = obj.ghost_character
 
                 if obj.character and obj.ghost_character:
-                    print('both')
                     return CharacterSelectedState
                 
                 if obj.character:
+                    self.context.character = obj.character
                     print('ability selection')
                     return None
                 
                 if obj.ghost_character:
-                    self.context.character = obj.ghost_character
-                    print('ghost')
                     return CharacterSelectedState
                 
                 return IdleState
@@ -195,7 +193,6 @@ class SpawningState_Click(ActionState):
         obj.spawn_character(self.context.character)
         self.context.ui_obj.deselect()
         return True
-        
 
 class CharacterMoveSelected(ActionState):
     def __init__(self, game_manager) -> None:
@@ -243,7 +240,7 @@ class CharacterMoveSelected(ActionState):
 
         #Open up ability ui
 
-        self.move_options = self.character.movement.find_possible_tiles()
+        self.move_options = self.character.movement.find_possible_tiles(self.tile)
         for tile in self.move_options:
             tile.set_option()
         self.tile.select()
@@ -299,7 +296,7 @@ class CharacterSelectedState(ActionState):
 
         #Open up ability ui
 
-        self.move_options = self.character.movement.find_possible_tiles()
+        self.move_options = self.character.movement.find_possible_tiles(self.tile)
         for tile in self.move_options:
             tile.set_option()
         self.tile.select()
