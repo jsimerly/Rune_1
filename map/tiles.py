@@ -3,9 +3,9 @@ from .game_tile import GameTile
 
 
 class Grass(GameTile):
-    def __init__(self, q: int, r: int, layout, surface):
+    def __init__(self, q: int, r: int, layout):
         super().__init__(
-            q=q, r=r, layout=layout, surface=surface,
+            q=q, r=r, layout=layout,
             
             surface_color=(140, 181, 101), 
             is_passable=True, 
@@ -20,9 +20,9 @@ class Grass(GameTile):
         return super().__repr__()
 
 class Tree(GameTile):
-    def __init__(self, q: int, r: int, layout, surface):
+    def __init__(self, q: int, r: int, layout):
         super().__init__(
-            q, r, layout, surface,
+            q, r, layout,
             
             surface_color=(12, 36, 2), 
             is_passable=False, 
@@ -35,9 +35,9 @@ class Tree(GameTile):
 
 #Different from trees only because some characters interact directly with trees.
 class Rock(GameTile):
-    def __init__(self, q: int, r: int, layout, surface):
+    def __init__(self, q: int, r: int, layout):
         super().__init__(
-            q, r, layout, surface,
+            q, r, layout,
             
             surface_color=(58,50,50), 
             is_passable=False, 
@@ -49,9 +49,9 @@ class Rock(GameTile):
         )
 
 class Water(GameTile):
-    def __init__(self, q: int, r: int, layout, surface):
+    def __init__(self, q: int, r: int, layout):
         super().__init__(
-            q, r, layout, surface,
+            q, r, layout,
              
             surface_color=(152, 216, 227), 
             is_passable=False, 
@@ -63,9 +63,9 @@ class Water(GameTile):
         )
 
 class Brush(GameTile):
-    def __init__(self, q: int, r: int, layout, surface):
+    def __init__(self, q: int, r: int, layout):
         super().__init__(
-            q, r, layout, surface,
+            q, r, layout,
             
             surface_color=(191, 174, 46), 
             is_passable=True, 
@@ -77,9 +77,9 @@ class Brush(GameTile):
         )
 
 class RoughTerrian(GameTile):
-    def __init__(self, q: int, r: int, layout, surface):
+    def __init__(self, q: int, r: int, layout):
         super().__init__(
-            q, r, layout, surface,
+            q, r, layout,
             
             surface_color=(94, 122, 66),
             is_passable=True, 

@@ -1,9 +1,10 @@
 from typing import Callable, Dict, Any, List
 from abc import ABC, abstractmethod
 import pygame as pg
+from client.ui.ui_object import UIObject
 
 
-class Button(ABC):
+class Button(UIObject):
     def __init__(self):
         self._rect = None
 
@@ -20,7 +21,11 @@ class Button(ABC):
     @abstractmethod
     def on_click(self) -> Callable or None:
         '''Method to be executed on click'''
-        pass
+        ...
+
+    @abstractmethod
+    def draw(self):
+        ...
 
 class ButtonManager:
     def __init__(self):

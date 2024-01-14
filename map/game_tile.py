@@ -20,7 +20,6 @@ class GameTile(Hex):
     def __init__(self, 
         q:int, r:int,
         layout: Layout,
-        surface: pg.Surface,
         #add border and selection surface
 
         surface_color: (int, int, int),
@@ -34,7 +33,6 @@ class GameTile(Hex):
     ):
         super().__init__(q, r)
         self.layout = layout
-        self.surface = surface
 
         self.coords_on = False
         self.color = surface_color
@@ -57,10 +55,13 @@ class GameTile(Hex):
         self.click_manager = ClickManager(self)
 
     '''Character'''
+    def spawn_character(self, character: AbstractCharacter):
+        self.character = character
+        character.spawn_to(self)
+
     def add_character(self, character: AbstractCharacter):
         self.character = character
         character.current_tile = self
-        character.sprite.draw(self.center_pixel)
 
     def remove_character(self):
         self.character = None
@@ -69,33 +70,29 @@ class GameTile(Hex):
     ''' Drawing
         This section is for actually rendering the tile and it's objects on onto the canvas.
     '''
-    def draw(self, color=None):
-        self.draw_background()
-        self.draw_border()
-        if self.character:
-            self.draw_character()
-        if self.ghost_character:
-            self.draw_ghost()
+    def draw(self, screen: pg.Surface):
+        self.draw_background(screen)
+        self.draw_border(screen)
 
         if self.coords_on:
             coord_text = f'{self.q}, {self.r}'
-            self.draw_text(coord_text)
+            self.draw_text(screen, coord_text)
          
     
-    def draw_text(self, text):
+    def draw_text(self, screen: pg.Surface, text: str):
             point = self.center_pixel
             pg.font.init()
             font = pg.font.SysFont('Arial', 12)
             text_surface = font.render(text, True, (255, 255, 255))
             text_pos = (point[0] - text_surface.get_width() // 2, point[1] - text_surface.get_height() // 2)
 
-            self.surface.blit(text_surface, text_pos)  
+            screen.blit(text_surface, text_pos)  
     
-    def draw_background(self):
+    def draw_background(self, screen: pg.Surface):
         verticies = self.verticies
-        pg.draw.polygon(self.surface, self.color, verticies)
+        pg.draw.polygon(screen, self.color, verticies)
 
-    def draw_border(self, color=None):
+    def draw_border(self, screen:pg.Surface, color=None):
         outline_size = 1
         outline_color = LIGHT_GREY
         if self.is_option:
@@ -108,12 +105,8 @@ class GameTile(Hex):
 
         if color:
             outline_color = color
-
-        pg.draw.polygon(self.surface, self.color, self.verticies, 4) #used to reset previous border
-        pg.draw.polygon(self.surface, outline_color, self.verticies ,outline_size)
-
-    def fill_outline(self):
-        pass
+ 
+        pg.draw.polygon(screen, outline_color, self.verticies, outline_size)
         
     def draw_character(self):
         if self.character:
@@ -163,7 +156,6 @@ class GameTile(Hex):
 
     def select(self):
         self.is_selected = True
-
 
     def deselect(self):
         self.is_selected = False

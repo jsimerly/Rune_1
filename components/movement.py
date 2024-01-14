@@ -1,6 +1,6 @@
 from __future__ import annotations
 from .abstact_component import AbstactComponent
-from typing import TYPE_CHECKING, Any, List, Set, Optional, Dict
+from typing import TYPE_CHECKING, Any, List, Set, Optional, Dict, Tuple
 from map.game_map import GameMap  
 from utils import time_it
 from client.surfaces import GameSurfaces
@@ -12,8 +12,11 @@ if TYPE_CHECKING:
 
     
 class MovementQueue:
-    def __init__(self):
+    def __init__(self, color: Tuple[int,int,int]):
         self.queue: Optional[List[GameTile]] = []
+        self.pixels: List[Tuple[int,int]] = []
+        self.game_surfaces = GameSurfaces()
+        self.color = color + (150,)
 
     def __call__(self) -> Optional[List[GameTile]]:
         return self.queue
@@ -34,81 +37,60 @@ class MovementQueue:
         
     def add_tile(self, tile:GameTile):
         self.queue.append(tile)
+        self.handle_update()
 
     def remove_tile(self, tile:GameTile):
         self.queue.remove(tile)
+        self.handle_update()
 
     def remove_end_tile(self):
         self.queue.pop()
+        self.handle_update()
         
     def set_queue(self, tiles: List[GameTile]):
         self.queue = tiles
+        self.handle_update()
 
     def set_queue_to(self, start_tile: GameTile, end_tile: GameTile) -> bool:
         self.queue = astar(start_tile, end_tile)
+        self.handle_update()
 
     def clear(self):
         self.queue = []
+        self.handle_update()
+
+
+    ''' Draw '''
+    def draw(self, screen: pg.Surface):
+        if len(self.pixels) >= 2:
+            trans_surface = pg.Surface(screen.get_size(), pg.SRCALPHA)
+            pg.draw.lines(trans_surface, self.color, False, self.pixels, 6)
+            screen.blit(trans_surface, (0, 0))
+
+    def handle_update(self):
+        if len(self.queue) >= 2:
+            self.pixels = [tile.center_pixel for tile in self.queue]
+            self.game_surfaces.add_to_layer(self.game_surfaces.movement, self)
+        else:
+            self.game_surfaces.remove_from_layer(self.game_surfaces.movement, self)
+
 
 class MovementComponent(AbstactComponent):
     def __init__(self, character: AbstractCharacter) -> None:
         super().__init__()
         self.character = character
         self.range = 5
-        self.queue: MovementQueue = MovementQueue()
-
-        game_surfaces = GameSurfaces()
-        self.movement_surface = game_surfaces.movement_surface
-        self.border_surface = game_surfaces.border_surface
-        self.path_surface = pg.Surface(self.movement_surface.get_size(), pg.SRCALPHA)
-        self.path_surface.set_alpha(150)
-
-        self.line_rect = None
+        print(character.color)
+        self.queue: MovementQueue = MovementQueue(character.color)
 
     ''' Movement '''
     def move(self, end_tile:GameTile) -> List[GameTile]:
         start_tile = self.character.current_tile
         self.queue.set_queue_to(start_tile, end_tile)
-        self.draw_movement()
         return self.queue()
     
     def clear_move(self):
-        self.queue.clear()
-        self.undraw_movement()
-    
-    ''' Draw '''
-    def draw_movement(self):
-        if len(self.queue()) >= 2:
-            tile_centers = []
-            for tile in self.queue():
-                tile_centers.append(tile.center_pixel)
-
-            pg.draw.lines(
-                self.path_surface, 
-                self.character.color, 
-                False, tile_centers, 3
-            )
-            
-            self.movement_surface.blit(self.path_surface, (0,0))
-
-    def undraw_movement(self):
-        empty = pg.Color(0,0,0,0)
-        clear_surface = pg.Surface(self.path_surface.get_size(), pg.SRCALPHA)
-        clear_surface.set_alpha(150)
-        clear_surface.fill(empty)
-        clear_surface.set_alpha(None)
-
-        self.path_surface.blit(clear_surface, (0,0))
-        self.movement_surface.blit(self.path_surface, (0,0))
-
-        # empty = pg.Color(0,0,0,0)
-        # self.path_surface.fill(empty)
-        # self.path_surface.set_alpha(None)
-        # self.movement_surface.blit(self.path_surface, (0,0))
-        # self.path_surface.set_alpha(150)
-
-    def draw_reachable(self):
-        pass
+        self.queue.clear()    
 
     ''' Algos '''
     def find_possible_tiles(self):
@@ -155,7 +137,7 @@ class Node:
     def __eq__(self, other: GameTile) -> bool:
         return self.tile == other.tile
 
-@time_it
+# @time_it
 def astar(start_tile: GameTile, target_tile: GameTile) -> Optional[List[GameTile]]:
     start_node = Node(None, start_tile)
     start_node.g, start_node.h, start_node.f = 0, 0, 0

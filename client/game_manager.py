@@ -10,6 +10,7 @@ from client.ui.buttons.spawn_button import SpawnButton
 if TYPE_CHECKING:
     from map.loadouts.map_layout import MapLayout
     from character.abs_character import AbstractCharacter
+    from map.game_tile import GameTile
 
 
 class GameManager:
@@ -21,10 +22,10 @@ class GameManager:
         self.surfaces = GameSurfaces(screen=screen)
         self.layout = map.layout
 
-        self.tiles = map.generate_map(self.surfaces.tile_surface)
+        self.tiles: Dict[Tuple[int,int], GameTile] = map.generate_map()
         for tile in self.tiles.values():
             tile.set_tile_map(self.tiles)
-            tile.draw()
+            self.surfaces.add_to_layer(self.surfaces.standard_tiles, tile)
 
         self.characters: List[AbstractCharacter] = []
         self.buildings = []
@@ -49,10 +50,10 @@ class GameManager:
     def add_character(self, character: AbstractCharacter):
         self.characters.append(character)
         spawn_button = SpawnButton(
-            surface=self.surfaces.ui_surface,
             character=character,
             pixel_pos=(100, (250*(len(self.characters)-1)) + 100)
         )
+        self.surfaces.add_to_layer(self.surfaces.ui, spawn_button)
         self.register_button(spawn_button)
 
     def add_building(self, building):

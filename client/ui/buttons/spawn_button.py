@@ -12,8 +12,7 @@ class State(Enum):
 
     ...
 class SpawnButton(Button):
-    def __init__(self, surface: pg.Surface, character: AbstractCharacter, pixel_pos: Tuple[int,int]):
-        self.surface = surface
+    def __init__(self, character: AbstractCharacter, pixel_pos: Tuple[int,int]):
         self.character = character
 
         self.states = State
@@ -26,7 +25,6 @@ class SpawnButton(Button):
 
         self.rect = self.image.get_rect(center=pixel_pos)
         self.selected_rect = self.selected_image.get_rect(center=pixel_pos)
-        self.draw()
 
     def on_click(self):
         if self.state == self.states.DISABLED:
@@ -38,11 +36,8 @@ class SpawnButton(Button):
         else:
             self.set_state(self.states.UNSELECTED)
 
-        self.draw()
-
     def set_state(self, state):
         self.state = state
-        self.draw()
 
     def select(self):
         self.set_state(self.states.SELECTED)
@@ -53,7 +48,7 @@ class SpawnButton(Button):
     def disable(self):
         self.set_state(self.states.DISABLED) 
 
-    def draw(self):
+    def draw(self, screen: pg.Surface):
         image_map = {
             self.states.UNSELECTED: self.image,
             self.states.SELECTED: self.selected_image,
@@ -62,8 +57,8 @@ class SpawnButton(Button):
 
         image = image_map[self.state]
         if self.state == self.states.SELECTED:
-            self.surface.fill(BGCOLOR, self.rect)
-            self.surface.blit(image, self.selected_rect)
+            screen.fill(BGCOLOR, self.rect)
+            screen.blit(image, self.selected_rect)
         else:
-            self.surface.fill(BGCOLOR, self.selected_rect)
-            self.surface.blit(image, self.rect)
+            screen.fill(BGCOLOR, self.selected_rect)
+            screen.blit(image, self.rect)

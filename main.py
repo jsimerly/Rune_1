@@ -15,8 +15,8 @@ screen.fill(BGCOLOR)
 clock = pg.time.Clock()
 
 game_manager = GameManager(map_1, screen)
-crud = Crud(game_manager.surfaces.character_surface)
-emilie = Emilie(game_manager.surfaces.character_surface)
+crud = Crud()
+emilie = Emilie()
 game_manager.add_character(crud)
 game_manager.add_character(emilie)
 
@@ -56,7 +56,7 @@ while is_running:
                 is_dragging = True
 
         game_manager.update(mouse_pos)
-        game_manager.surfaces.render()
+        game_manager.surfaces.draw()
 
     pg.display.flip()
     clock.tick(FPS)

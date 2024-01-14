@@ -12,9 +12,8 @@ class SpriteComponent(AbstactComponent):
     GHOST_ALPHA = 100
 
     def __init__(self, image: pg.image):
-        surfaces = GameSurfaces()
-        self.char_surface = surfaces.character_surface
         self.pixel_pos: (int,int) = None
+        self.ghost_pos: (int, int) = None
 
         self.standard_image = pg.transform.scale(image, self.NORMAL_SIZE)
         self.ghost_image = self.standard_image.copy()
@@ -28,22 +27,23 @@ class SpriteComponent(AbstactComponent):
         x -= self.NORMAL_SIZE[0] // 2
         y -= self. NORMAL_SIZE[1] // 2
         return ((x,y))
-
-    def draw(self, pixel_pos: (int, int)):
+    
+    def move_to_pixel(self, center_pixel_pos: (int,int)):
+        pixel_pos = self.get_topleft_pos(center_pixel_pos)
         self.pixel_pos = pixel_pos
-        top_left_pixel = self.get_topleft_pos(pixel_pos)
-        self.char_surface.blit(self.standard_image, top_left_pixel)
 
-    def draw_ghost(self, pixel_pos: (int, int)):
-        self.pixel_pos = pixel_pos
-        top_left_pixel = self.get_topleft_pos(pixel_pos)
-        self.char_surface.blit(self.ghost_image, top_left_pixel)
+    def move_ghost_to_pixel(self, center_pixel_pos: (int, int)):
+        pixel_pos = self.get_topleft_pos(center_pixel_pos)
+        self.ghost_pos = pixel_pos
+
+    def draw(self, screen: pg.Surface):
+        if self.pixel_pos:
+            screen.blit(self.standard_image, self.pixel_pos)
+
+    def draw_ghost(self, screen: pg.Surface):
+        if self.ghost_pos:
+            screen.blit(self.ghost_image,self.ghost_pos)
         
-    def undraw(self, pixel_pos: (int, int)=None):
-        pixel_pos = pixel_pos if pixel_pos else self.pixel_pos
-        top_left_pixel = self.get_topleft_pos(self.pixel_pos)
-        rect_to_clear = pg.Rect(top_left_pixel, self.NORMAL_SIZE)
-        self.char_surface.fill(self.empty, rect_to_clear)
 
 
         

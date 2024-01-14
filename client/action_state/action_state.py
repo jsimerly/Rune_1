@@ -176,7 +176,7 @@ class SpawningState_Click(ActionState):
         if obj.character:
             print("Cannot place a character ontop of another character.")
             return False
-        obj.add_character(self.context.character)
+        obj.spawn_character(self.context.character)
         self.context.ui_obj.deselect()
         return True
         
