@@ -18,7 +18,7 @@ layout = Layout(
 )
 shape=layout.hexagon
 shape_params = {
-    'radius' : 9,
+    'radius' : 8,
 }
 
 special_tiles = {
@@ -42,8 +42,8 @@ image_path = 'objective/runes/rune/gui/rune_std.webp'
 objectives = [
     {
         'class': Rune,
-        'tile': (-3,2),
-        'radius': 4,
+        'tile': (-3,0),
+        'radius': 3,
         'power': 334,
         'image_path': image_path,
     }

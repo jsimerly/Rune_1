@@ -39,6 +39,8 @@ class GameTile(Hex):
 
         self.coords_on = False
         self.color = surface_color
+        self.overlay_cache = None
+
         self.map_interaction = MapInteractionComponent(
             is_passable=is_passable,
             can_pierce=can_pierce,
@@ -120,9 +122,8 @@ class GameTile(Hex):
 
             screen.blit(text_surface, text_pos)  
     
-    def draw_background(self, screen: pg.Surface):
-        verticies = self.verticies        
-        pg.draw.polygon(screen, self.color, verticies)
+    def draw_background(self, screen: pg.Surface):      
+        pg.draw.polygon(screen, self.color, self.verticies)
 
     def draw_border(self, screen:pg.Surface, color=None):
         outline_size = 1
@@ -139,7 +140,15 @@ class GameTile(Hex):
             outline_color = color
  
         pg.draw.polygon(screen, outline_color, self.verticies, outline_size)
-        
+
+    def draw_overlay(self, screen:pg.Surface, color: Tuple[int,int,int,int]):
+        if not self.overlay_cache:
+            trans_surface = pg.Surface(screen.get_size(), pg.SRCALPHA)
+            pg.draw.polygon(trans_surface, color, self.verticies)
+            self.overlay_cache = trans_surface
+
+        screen.blit(self.overlay_cache, (0,0))
+
     def move_to_border_layer(self):
         self.surface.add_to_layer(self.surface.border_tiles, self)
         self.surface.remove_from_layer(self.surface.standard_tiles, self)
