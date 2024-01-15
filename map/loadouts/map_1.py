@@ -42,7 +42,7 @@ image_path = 'objective/runes/rune/gui/rune_std.webp'
 objectives = [
     {
         'class': Rune,
-        'tile': (0,0),
+        'tile': (-3,2),
         'radius': 4,
         'power': 334,
         'image_path': image_path,
