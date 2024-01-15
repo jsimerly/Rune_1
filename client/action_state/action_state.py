@@ -181,14 +181,19 @@ class SpawningState_Click(ActionState):
         if self.character.current_tile:
             self.character.remove_from_tile()
 
+        self.spawn_options = self.character.team.get_spawnable_tiles()
+        for tile in self.spawn_options:
+            tile.set_option()
+ 
         self.context.ui_obj.select()
         
     def on_exit(self):
-        ...
+        for tile in self.spawn_options:
+            tile.remove_option()
 
     def _spawn_character(self, obj: GameTile) -> bool:
-        if obj.character:
-            print("Cannot place a character ontop of another character.")
+        if not obj.map_interaction.can_end_on:
+            print("Cannot spawn your character there as something else is already in the way.")
             return False
         obj.spawn_character(self.context.character)
         self.context.ui_obj.deselect()

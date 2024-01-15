@@ -5,6 +5,7 @@ from client.action_state.action_state import Click, DragStart, DragEnd
 from character.characters.crud.crud import Crud
 from character.characters.emilie.emilie import Emilie
 from map.loadouts.map_1 import map_1
+from team.team import Team
 
 pg.init()
 
@@ -12,7 +13,8 @@ screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pg.SRCALPHA)
 screen.fill(BGCOLOR)
 clock = pg.time.Clock()
 
-game_manager = GameManager(map_1, screen)
+team_1 = Team(team_id=1)
+game_manager = GameManager(map_1, screen, team_1)
 crud = Crud()
 emilie = Emilie()
 game_manager.add_character(crud)

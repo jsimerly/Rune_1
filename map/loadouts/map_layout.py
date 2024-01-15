@@ -39,7 +39,7 @@ class MapLayout:
         for building_class, coords in self.team_1_buildings.items():
             for cord in coords:
                 tile = game_map[cord]
-                building = building_class(tile)
+                building = building_class(tile, team_id=1)
                 tile.add_building(building)
         
         return game_map

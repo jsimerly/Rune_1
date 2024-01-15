@@ -8,11 +8,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from map.game_tile import GameTile
     from components.map_interaction import MapInteractionComponent
+    from components.spawning_component import SpawningComponent
 
 class AbstractBuilding(ABC):
-    def __init__(self) -> None:
-        self.tile = None
+    def __init__(self, tile: GameTile, team_id) -> None:
+        self.tile: GameTile = tile
+        self.team_id = team_id
         self.map_interaction: MapInteractionComponent
+        self.spawning: SpawningComponent
 
     @property
     def team(self):

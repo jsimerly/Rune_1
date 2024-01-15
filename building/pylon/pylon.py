@@ -2,7 +2,8 @@ from __future__ import annotations
 from building.abs_building import AbstractBuilding
 from components.sprite import SpriteComponent
 from components.map_interaction import MapInteractionComponent
-from typing import TYPE_CHECKING
+from components.spawning_component import SpawningComponent
+from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from team.team import Team
@@ -10,9 +11,8 @@ if TYPE_CHECKING:
 
 
 class Pylon(AbstractBuilding):
-    def __init__(self, tile: GameTile) -> None:
-        super().__init__()
-        self.tile: GameTile = tile
+    def __init__(self, tile:GameTile, team_id:int) -> None:
+        super().__init__(tile=tile, team_id=team_id)
         self.team: Team = None
 
         self.map_interaction = MapInteractionComponent(
@@ -29,10 +29,12 @@ class Pylon(AbstractBuilding):
         self.sprite: SpriteComponent
         self.set_sprite_comp(image)
         self.sprite.move_to_tile(tile)
-
+        self.spawning = SpawningComponent(radius=3, center_tile=tile)
 
     def set_team(self, team:Team):
         self.team = team
+
+
 
     
 

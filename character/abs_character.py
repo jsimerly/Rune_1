@@ -8,11 +8,13 @@ from typing import TYPE_CHECKING, List, Tuple
 from client.surfaces import GameSurfaces
 if TYPE_CHECKING:
     from map.game_tile import GameTile
+    from team.team import Team
 
 class AbstractCharacter(ABC):    
     def __init__(self):
         self.current_tile: GameTile = None
 
+        '''fix max drag distance when you create resoucing component'''
         self.sprite: SpriteComponent = None
         self.movement: MovementComponent = None
         self.map_interaction: MapInteractionComponent = MapInteractionComponent(
@@ -24,16 +26,19 @@ class AbstractCharacter(ABC):
             is_slowing = False,
             walkthrough_effects = None,
         )
+        self.team = None
         self.color = None
         self.surfaces = GameSurfaces()
 
     '''Set Up'''
+    def set_team(self, team: Team):
+        self.team = team
 
     def set_sprite_comp(self, image: pg.Surface):
         self.sprite = SpriteComponent(image)
 
     def set_movement_comp(self):
-        self.movement = MovementComponent(self)
+        self.movement = MovementComponent(self.color)
 
     def set_color(self, color: Tuple(int,int,int)):
         self.color = color

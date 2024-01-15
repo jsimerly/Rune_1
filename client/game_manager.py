@@ -11,25 +11,20 @@ if TYPE_CHECKING:
     from map.loadouts.map_layout import MapLayout
     from character.abs_character import AbstractCharacter
     from map.game_tile import GameTile
+    from team.team import Team
+    from building.abs_building import AbstractBuilding
 
 
 class GameManager:
     '''
         This is the client side game manager that will hold the state of all objects and manage clicks within the game board and UI. 
     '''
-    def __init__(self, map: MapLayout, screen: pg.Surface):
+    def __init__(self, map: MapLayout, screen: pg.Surface, team: Team):
         self.button_manager = ButtonManager() #event manager for buttons
         self.surfaces = GameSurfaces(screen=screen)
         self.layout = map.layout
 
-        self.tiles: Dict[Tuple[int,int], GameTile] = map.generate_map()
-        for tile in self.tiles.values():
-            tile.set_tile_map(self.tiles)
-            self.surfaces.add_to_layer(self.surfaces.standard_tiles, tile)
-
-            if tile.building:
-                self.surfaces.add_to_layer(self.surfaces.buildings, tile.building)
-
+        self.team: Team = team
         self.characters: List[AbstractCharacter] = []
         self.buildings = []
         self.enemy_characters: List[AbstractCharacter] = []
@@ -41,6 +36,20 @@ class GameManager:
 
         self.action_context = ActionContext()
         self.action_state = IdleState(self)
+
+        self.tiles: Dict[Tuple[int,int], GameTile] = map.generate_map()
+        for tile in self.tiles.values():
+            tile.set_tile_map(self.tiles)
+            self.surfaces.add_to_layer(self.surfaces.standard_tiles, tile)
+
+            if tile.building:
+                self.surfaces.add_to_layer(self.surfaces.buildings, tile.building)
+                if tile.building.team_id == team.team_id:
+                    team.add_building(tile.building)   
+                    self.buildings.append(tile.building)
+                else:
+                    self.enemy_buildings.append(tile.building)
+                    
 
     '''Register Events'''
     def register_button(self, button: Button):
@@ -59,12 +68,17 @@ class GameManager:
         self.surfaces.add_to_layer(self.surfaces.ui, spawn_button)
         self.register_button(spawn_button)
 
-    def add_building(self, building):
+        self.team.add_character(character)
+        character.set_team(self.team)
+
+    def add_building(self, building: AbstractBuilding):
         self.buildings.append(building)
+        self.team.add_building(building)
 
     def remove_building(self, building):
         if building in self.buildings:
             del self.buildings[building]
+            self.team.remove_building(building)
 
     def add_enemy_characters(self, character: AbstractCharacter):
         self.enemy_characters.append(character)
