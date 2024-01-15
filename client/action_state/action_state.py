@@ -195,6 +195,11 @@ class SpawningState_Click(ActionState):
         if not obj.map_interaction.can_end_on:
             print("Cannot spawn your character there as something else is already in the way.")
             return False
+        
+        if obj not in self.spawn_options:
+            print("You need to spawn the character inside of a teleporter's range.")
+            return False
+
         obj.spawn_character(self.context.character)
         self.context.ui_obj.deselect()
         return True
