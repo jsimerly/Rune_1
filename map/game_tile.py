@@ -11,6 +11,7 @@ from client.surfaces import GameSurfaces
 
 if TYPE_CHECKING:
     from character.abs_character import AbstractCharacter
+    from building.abs_building import AbstractBuilding
 
 
 pg.font.init()
@@ -52,25 +53,39 @@ class GameTile(Hex):
 
         self.character: AbstractCharacter = None
         self.ghost_character: AbstractCharacter = None
+        self.building: AbstractBuilding = None
 
     '''Character'''
     def spawn_character(self, character: AbstractCharacter):
         self.character = character
         self.ghost_character = character
         character.spawn_to(self)
+        self.resolve_other_mieractions()
 
     def character_move_to(self, other_tile: GameTile):
         other_tile.add_character(self.ghost_character)
         if other_tile != self:
             self.remove_character()
+        self.resolve_other_mieractions()
 
     def add_character(self, character: AbstractCharacter):
         self.character = character
         character.current_tile = self
+        self.resolve_other_mieractions()
 
     def remove_character(self):
         self.character = None
+        self.resolve_other_mieractions()
 
+    '''Buildings'''
+
+    def add_building(self, building: AbstractBuilding):
+        self.building = building   
+        self.resolve_other_mieractions()
+
+    def remove_building(self, building: AbstractBuilding):
+        self.building = building
+        self.resolve_other_mieractions()
     
     ''' Drawing
         This section is for actually rendering the tile and it's objects on onto the canvas.
@@ -163,6 +178,43 @@ class GameTile(Hex):
     
     def set_tile_map(self, tile_map):
         self.tile_map = tile_map
+
+    def resolve_other_mieractions(self) -> MapInteractionComponent:
+        other_mi: Optional[MapInteractionComponent] = None
+        if self.character:
+            other_mi = self.character.map_interaction
+
+        if self.building:
+            other_mi = self.building.map_interaction
+
+        if not other_mi:
+            return self.map_interaction
+
+        is_passable = self.map_interaction.default_is_passable
+        can_pierce = self.map_interaction.default_can_pierce
+        can_end_on = self.map_interaction.default_can_end_on
+        blocks_vision = self.map_interaction.default_blocks_vision
+        hides_occupants = self.map_interaction.default_hides_occupants
+        is_slowing = self.map_interaction.default_is_slowing
+
+        # Dominant value assignment (not is the dominant)
+        is_passable = is_passable and other_mi.is_passable # False
+        can_pierce = can_pierce and other_mi.can_pierce # False
+        can_end_on = can_end_on and other_mi.can_end_on # False
+        blocks_vision = blocks_vision or other_mi.blocks_vision # True
+        hides_occupants = hides_occupants or other_mi.hides_occupants # True
+        is_slowing = self.map_interaction or is_slowing # True
+
+        self.map_interaction.is_passable = is_passable
+        self.map_interaction.can_pierce = can_pierce
+        self.map_interaction.can_end_on = can_end_on
+        self.map_interaction.blocks_vision = blocks_vision
+        self.map_interaction.hides_occupants = hides_occupants
+        self.map_interaction.is_slowing = is_slowing
+
+        return self.map_interaction
+
+
 
     def select(self): #may need to add logic to selection to handle the rendering
         self.is_selected = True

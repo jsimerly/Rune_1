@@ -207,18 +207,22 @@ class CharacterMoveSelected(ActionState):
         
         if isinstance(obj, GameTile):
             if isinstance(input, Click):
-                self.character.move_to_tile(obj)
+                if obj in self.move_options:
+                    print('in move options')
+                    self.character.move_to_tile(obj)
                 return IdleState
             
         if isinstance(input, DragStart):
             self.character.drag_move_start()
             
         if isinstance(input, DragEnd):
-            self.character.drag_move_finish(obj)
+            if obj in self.move_options:
+                self.character.drag_move_finish(obj)
             return IdleState
             #check if we finished on a tile if not clear the queue
 
         #if an ability icon then we attack!
+        return None
             
     def update(self, mouse_pos):
         obj = self.game_manager.find_interactable_obj(mouse_pos)
@@ -263,14 +267,20 @@ class CharacterSelectedState(ActionState):
         
         if isinstance(obj, GameTile):
             if isinstance(input, Click):
-                self.character.move_to_tile(obj)
+                if obj in self.move_options:
+                    self.character.move_to_tile(obj)
+                else:
+                    print('You cannot move there.')
                 return IdleState
             
         if isinstance(input, DragStart):
             self.character.drag_move_start()
             
         if isinstance(input, DragEnd):
-            self.character.drag_move_finish(obj)
+            if obj in self.move_options:
+                self.character.drag_move_finish(obj)
+            else:
+                print('You cannot move there.')
             return IdleState
             #check if we finished on a tile if not clear the queue
 

@@ -27,6 +27,9 @@ class GameManager:
             tile.set_tile_map(self.tiles)
             self.surfaces.add_to_layer(self.surfaces.standard_tiles, tile)
 
+            if tile.building:
+                self.surfaces.add_to_layer(self.surfaces.buildings, tile.building)
+
         self.characters: List[AbstractCharacter] = []
         self.buildings = []
         self.enemy_characters: List[AbstractCharacter] = []

@@ -105,8 +105,6 @@ class MovementComponent(AbstactComponent):
         return possible
 
 ''' Algos '''
-
-
 def hex_reachable(start_tile: GameTile, max_range:int) -> Set[GameTile]:
     max_move = max_range
 
@@ -124,15 +122,14 @@ def hex_reachable(start_tile: GameTile, max_range:int) -> Set[GameTile]:
             for neighbor_tile in neighbors:
                 if all([
                     neighbor_tile not in visited,
-                    tile.map_interaction.is_passable
+                    tile.map_interaction.is_passable,
                 ]):
                     remaining_move = movement_range[tile] - neighbor_tile.map_interaction.movement_cost
                     if remaining_move >= 0:
                         if neighbor_tile.map_interaction.can_end_on:
                             visited.add(neighbor_tile)
-                            movement_range[neighbor_tile] = remaining_move
+                        movement_range[neighbor_tile] = remaining_move
                         fringes[k].append(neighbor_tile)
-
     return visited                
 
 class Node:

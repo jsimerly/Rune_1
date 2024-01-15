@@ -6,6 +6,7 @@ if TYPE_CHECKING:
     from character.abs_character import AbstractCharacter
     from components.movement import MovementQueue
     from ui.ui_object import UIObject
+    from building.abs_building import AbstractBuilding
 
 class GameSurfaces(metaclass=Singleton):
     def __init__(self, screen: pg.Surface) -> None:
@@ -13,7 +14,7 @@ class GameSurfaces(metaclass=Singleton):
         self.standard_tiles: Set[GameTile] = set()
         self.border_tiles: Set[GameTile] = set()
         self.selected_tiles: Set[GameTile] = set()
-        self.buildings: Set[Any] = None
+        self.buildings: Set[AbstractBuilding] = set()
         self.movement: Set[MovementQueue] = set()
         self.characters: Set[AbstractCharacter] = set() #include movement and abilities
         self.abilities: Set[Any] = None 
@@ -23,7 +24,7 @@ class GameSurfaces(metaclass=Singleton):
         self.draw_layer(self.standard_tiles)
         self.draw_layer(self.border_tiles)
         self.draw_layer(self.selected_tiles)
-        #building
+        self.draw_layer(self.buildings)
         self.draw_layer(self.movement)
         self.draw_layer(self.characters)
         #ability

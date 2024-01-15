@@ -1,6 +1,7 @@
 from __future__ import annotations
 from components.sprite import SpriteComponent
 from components.movement import MovementComponent
+from components.map_interaction import MapInteractionComponent
 import pygame as pg
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, List, Tuple
@@ -14,6 +15,15 @@ class AbstractCharacter(ABC):
 
         self.sprite: SpriteComponent = None
         self.movement: MovementComponent = None
+        self.map_interaction: MapInteractionComponent = MapInteractionComponent(
+            is_passable = True,
+            can_pierce = True,
+            can_end_on = False,
+            blocks_vision = False,
+            hides_occupants = False,
+            is_slowing = False,
+            walkthrough_effects = None,
+        )
         self.color = None
         self.surfaces = GameSurfaces()
 
