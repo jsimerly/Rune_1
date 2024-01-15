@@ -60,32 +60,31 @@ class GameTile(Hex):
         self.character = character
         self.ghost_character = character
         character.spawn_to(self)
-        self.resolve_other_mieractions()
+        self.resolve_other_map_interactions()
 
     def character_move_to(self, other_tile: GameTile):
         other_tile.add_character(self.ghost_character)
         if other_tile != self:
             self.remove_character()
-        self.resolve_other_mieractions()
 
     def add_character(self, character: AbstractCharacter):
         self.character = character
         character.current_tile = self
-        self.resolve_other_mieractions()
+        self.resolve_other_map_interactions()
 
     def remove_character(self):
         self.character = None
-        self.resolve_other_mieractions()
+        self.resolve_other_map_interactions()
 
     '''Buildings'''
 
     def add_building(self, building: AbstractBuilding):
         self.building = building   
-        self.resolve_other_mieractions()
+        self.resolve_other_map_interactions()
 
     def remove_building(self, building: AbstractBuilding):
         self.building = building
-        self.resolve_other_mieractions()
+        self.resolve_other_map_interactions()
     
     ''' Drawing
         This section is for actually rendering the tile and it's objects on onto the canvas.
@@ -109,7 +108,7 @@ class GameTile(Hex):
             screen.blit(text_surface, text_pos)  
     
     def draw_background(self, screen: pg.Surface):
-        verticies = self.verticies
+        verticies = self.verticies        
         pg.draw.polygon(screen, self.color, verticies)
 
     def draw_border(self, screen:pg.Surface, color=None):
@@ -179,16 +178,13 @@ class GameTile(Hex):
     def set_tile_map(self, tile_map):
         self.tile_map = tile_map
 
-    def resolve_other_mieractions(self) -> MapInteractionComponent:
+    def resolve_other_map_interactions(self) -> MapInteractionComponent:
         other_mi: Optional[MapInteractionComponent] = None
         if self.character:
             other_mi = self.character.map_interaction
-
+            
         if self.building:
             other_mi = self.building.map_interaction
-
-        if not other_mi:
-            return self.map_interaction
 
         is_passable = self.map_interaction.default_is_passable
         can_pierce = self.map_interaction.default_can_pierce
@@ -197,13 +193,14 @@ class GameTile(Hex):
         hides_occupants = self.map_interaction.default_hides_occupants
         is_slowing = self.map_interaction.default_is_slowing
 
-        # Dominant value assignment (not is the dominant)
-        is_passable = is_passable and other_mi.is_passable # False
-        can_pierce = can_pierce and other_mi.can_pierce # False
-        can_end_on = can_end_on and other_mi.can_end_on # False
-        blocks_vision = blocks_vision or other_mi.blocks_vision # True
-        hides_occupants = hides_occupants or other_mi.hides_occupants # True
-        is_slowing = self.map_interaction or is_slowing # True
+        if other_mi:
+            # Dominant value assignment (not is the dominant)
+            is_passable = is_passable and other_mi.is_passable # False
+            can_pierce = can_pierce and other_mi.can_pierce # False
+            can_end_on = can_end_on and other_mi.can_end_on # False
+            blocks_vision = blocks_vision or other_mi.blocks_vision # True
+            hides_occupants = hides_occupants or other_mi.hides_occupants # True
+            is_slowing = self.map_interaction or is_slowing # True
 
         self.map_interaction.is_passable = is_passable
         self.map_interaction.can_pierce = can_pierce

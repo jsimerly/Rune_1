@@ -20,6 +20,7 @@ class MapInteractionComponent(AbstactComponent):
         self.blocks_vision = blocks_vision
         self.hides_occupants = hides_occupants
         self.is_slowing = is_slowing
+        
         self.default_is_passable = is_passable
         self.default_can_pierce = can_pierce
         self.default_can_end_on = can_end_on
@@ -51,13 +52,13 @@ class MapInteractionComponent(AbstactComponent):
         self.is_passable = self.default_is_passable
 
     def reset_can_pierce(self):
-        self.is_passable = self.default_can_pierce
+        self.can_pierce = self.default_can_pierce
 
     def reset_can_end_on(self):
-        self.is_passable = self.default_can_end_on
+        self.can_end_on = self.default_can_end_on
 
     def reset_blocks_vision(self):
-        self.is_passable = self.default_blocks_vision
+        self.blocks_vision = self.default_blocks_vision
     
     def reset_hides_occupant(self):
         self.hides_occupants = self.default_hides_occupants
