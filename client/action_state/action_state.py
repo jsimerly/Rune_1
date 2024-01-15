@@ -9,7 +9,7 @@ from client.ui.buttons.ability_button import AbilityButton
 from client.ui.buttons.spawn_button import SpawnButton
 from client.ui.buttons.end_turn_button import EndTurnButton
 from client.ui.buttons.button import Button
-from hex import Layout
+
 if TYPE_CHECKING:
     from game_manager import GameManager
 
@@ -25,7 +25,6 @@ class ActionState(Protocol):
 
     def on_exit(self):
         ...
-
 
 class MouseInput(ABC):
      def __init__(self, pixel) -> None:
@@ -179,7 +178,9 @@ class SpawningState_Click(ActionState):
         self.character = character
 
         if self.character.current_tile:
+            self.character.clear_move()
             self.character.remove_from_tile()
+            self.character.sprite.remove_ghost()
 
         self.spawn_options = self.character.team.get_spawnable_tiles()
         for tile in self.spawn_options:
@@ -199,6 +200,7 @@ class SpawningState_Click(ActionState):
         if obj not in self.spawn_options:
             print("You need to spawn the character inside of a teleporter's range.")
             return False
+
 
         obj.spawn_character(self.context.character)
         self.context.ui_obj.deselect()

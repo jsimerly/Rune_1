@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
 
 pg.font.init()
+font = pg.font.SysFont('Arial', 12)
 
 class GameTile(Hex):
     def __init__(self, 
@@ -76,6 +77,11 @@ class GameTile(Hex):
         self.character = None
         self.resolve_other_map_interactions()
 
+    def remove_ghost_character(self):
+        self.ghost_character = None
+        print(1)
+
+
     '''Buildings'''
 
     def add_building(self, building: AbstractBuilding):
@@ -100,8 +106,6 @@ class GameTile(Hex):
     
     def draw_text(self, screen: pg.Surface, text: str):
             point = self.center_pixel
-            pg.font.init()
-            font = pg.font.SysFont('Arial', 12)
             text_surface = font.render(text, True, (255, 255, 255))
             text_pos = (point[0] - text_surface.get_width() // 2, point[1] - text_surface.get_height() // 2)
 

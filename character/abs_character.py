@@ -94,6 +94,7 @@ class AbstractCharacter(ABC):
         self.sprite.draw(screen)
         self.sprite.draw_ghost(screen)
 
+
     
 
 

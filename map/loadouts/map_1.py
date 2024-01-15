@@ -3,6 +3,7 @@ from hex import Layout, orientation_pointy, Point
 from settings import SCREEN_HEIGHT, SCREEN_WIDTH
 from map.tiles import *
 from building.pylon.pylon import Pylon
+from building.main_base.main_base import MainBase
 from map.loadouts.map_layout import MapLayout
 
 orientation=orientation_pointy
@@ -26,11 +27,18 @@ special_tiles = {
 }
 
 team_1_buildings = {
-    Pylon: [(-4,0)]
+    Pylon: [(-5,4), (1,4)]
 }
+team_1_main_base = [(-3,6), (-4, 7), (-3,7)]
 
 team_2_buildings = {
-    Pylon: [(4,0)]
+    Pylon: [(0,4)]
+}
+
+team_2_main_base = [(2,-5), (2,-6), (3,-6)]
+
+objectives = {
+
 }
 
 
@@ -40,5 +48,7 @@ map_1 = MapLayout(
     shape_params=shape_params,
     special_tiles=special_tiles,
     team_1_buildings=team_1_buildings,
-    team_2_buildings=team_2_buildings
+    team_1_main_base=team_1_main_base,
+    team_2_buildings=team_2_buildings,
+    team_2_main_base=team_2_main_base,
 )

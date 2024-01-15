@@ -26,6 +26,8 @@ class SpawningComponent(AbstactComponent):
             for r in range(r1, r2):
                 tile_cords = (self.center_tile.q + q, self.center_tile.r + r)
                 if tile_cords in self.center_tile.tile_map:
-                    options.append(self.center_tile.tile_map[tile_cords])
+                    tile = self.center_tile.tile_map[tile_cords]
+                    if tile.map_interaction.can_end_on:
+                        options.append(tile)
 
         return options
