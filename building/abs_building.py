@@ -16,6 +16,7 @@ class AbstractBuilding(ABC):
         self.team_id = team_id
         self.map_interaction: MapInteractionComponent
         self.spawning: SpawningComponent
+        self.sprite: SpriteComponent
 
     @property
     def team(self):
@@ -24,63 +25,6 @@ class AbstractBuilding(ABC):
     @team.setter
     def team(self, value):
         self._team = value
-
-    @property
-    def is_passable(self):
-        return self._is_passable
-
-    @is_passable.setter
-    def is_passable(self, value):
-        self._is_passable = value
-
-    @property
-    def can_pierce(self):
-        return self._can_pierce
-
-    @can_pierce.setter
-    def can_pierce(self, value):
-        self._can_pierce = value
-
-    @property
-    def can_end_on(self):
-        return self._can_end_on
-
-    @can_end_on.setter
-    def can_end_on(self, value):
-        self._can_end_on = value
-
-    @property
-    def blocks_vision(self):
-        return self._blocks_vision
-
-    @blocks_vision.setter
-    def blocks_vision(self, value):
-        self._blocks_vision = value
-
-    @property
-    def hides_occupants(self):
-        return self._hides_occupants
-
-    @hides_occupants.setter
-    def hides_occupants(self, value):
-        self._hides_occupants = value
-
-    @property
-    def is_slowing(self):
-        return self._is_slowing
-
-    @is_slowing.setter
-    def is_slowing(self, value):
-        self._is_slowing = value
-
-    @property
-    def walkthrough_effects(self):
-        return self._walkthrough_effects
-
-    @walkthrough_effects.setter
-    def walkthrough_effects(self, value):
-        self._walkthrough_effects = value
-
 
     def set_team(self, team: Team):
         self.team = team

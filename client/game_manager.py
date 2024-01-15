@@ -49,6 +49,9 @@ class GameManager:
                     self.buildings.append(tile.building)
                 else:
                     self.enemy_buildings.append(tile.building)
+
+            if tile.objective:
+                self.surfaces.add_to_layer(self.surfaces.objectives, tile.objective)
                     
 
     '''Register Events'''

@@ -5,6 +5,7 @@ from map.tiles import *
 from building.pylon.pylon import Pylon
 from building.main_base.main_base import MainBase
 from map.loadouts.map_layout import MapLayout
+from objective.runes.rune.rune import Rune
 
 orientation=orientation_pointy
 size = Point(36, 36)
@@ -37,9 +38,16 @@ team_2_buildings = {
 
 team_2_main_base = [(2,-5), (2,-6), (3,-6)]
 
-objectives = {
-
-}
+image_path = 'objective/runes/rune/gui/rune_std.webp'
+objectives = [
+    {
+        'class': Rune,
+        'tile': (0,0),
+        'radius': 4,
+        'power': 334,
+        'image_path': image_path,
+    }
+]
 
 
 map_1 = MapLayout(
@@ -51,4 +59,5 @@ map_1 = MapLayout(
     team_1_main_base=team_1_main_base,
     team_2_buildings=team_2_buildings,
     team_2_main_base=team_2_main_base,
+    objectives=objectives
 )

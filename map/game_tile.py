@@ -12,6 +12,7 @@ from client.surfaces import GameSurfaces
 if TYPE_CHECKING:
     from character.abs_character import AbstractCharacter
     from building.abs_building import AbstractBuilding
+    from objective.abs_objective import AbstactObjective
 
 
 pg.font.init()
@@ -55,6 +56,7 @@ class GameTile(Hex):
         self.character: AbstractCharacter = None
         self.ghost_character: AbstractCharacter = None
         self.building: AbstractBuilding = None
+        self.objective: AbstactObjective = None
 
     '''Character'''
     def spawn_character(self, character: AbstractCharacter):
@@ -79,8 +81,6 @@ class GameTile(Hex):
 
     def remove_ghost_character(self):
         self.ghost_character = None
-        print(1)
-
 
     '''Buildings'''
 
@@ -88,8 +88,17 @@ class GameTile(Hex):
         self.building = building   
         self.resolve_other_map_interactions()
 
-    def remove_building(self, building: AbstractBuilding):
-        self.building = building
+    def remove_building(self):
+        self.building = None #potentially could put rubble on these tiles
+        self.resolve_other_map_interactions()
+
+    '''Objective'''
+    def add_objective(self, objective: AbstactObjective):
+        self.objective = objective
+        self.resolve_other_map_interactions()
+
+    def remove_objective(self):
+        self.objective = None
         self.resolve_other_map_interactions()
     
     ''' Drawing

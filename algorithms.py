@@ -32,6 +32,19 @@ def hex_reachable(start_tile: GameTile, max_range:int) -> Set[GameTile]:
                         fringes[k].append(neighbor_tile)
     return visited
 
+def in_radius_end_on(center_tile: GameTile, radius:int) -> List[GameTile]:
+    options = []
+    for q in range(-radius, radius + 1):
+        r1 = max(-radius, -q - radius)
+        r2 = min(radius, -q + radius) + 1
+        for r in range(r1, r2):
+            tile_cords = (center_tile.q + q, center_tile.r + r)
+            if tile_cords in center_tile.tile_map:
+                tile = center_tile.tile_map[tile_cords]
+                if tile.map_interaction.can_end_on:
+                    options.append(tile)
+
+    return options
 
 class Node:
     def __init__(self, parent=None, tile: GameTile=None):

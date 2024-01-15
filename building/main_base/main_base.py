@@ -14,7 +14,6 @@ if TYPE_CHECKING:
     from team.team import Team
     from map.game_tile import GameTile
 
-
 class MainBaseSprite(SpriteComponent):
     NORMAL_SIZE = (75, 75)
 
@@ -31,7 +30,7 @@ class MainBaseSpawning(SpawningComponent):
                     if tile.map_interaction.can_end_on:
                         options.append(tile)
 
-        return []
+        return options
 
 class MainBase(AbstractBuilding):
     def __init__(self, tiles: List[GameTile], team_id:int) -> None:
@@ -53,13 +52,12 @@ class MainBase(AbstractBuilding):
         self.sprite: SpriteComponent = MainBaseSprite(image)
         x, y = 0, 0
         for tile in self.tiles:
-            print(tile.center_pixel)
             x += tile.center_pixel[0]
             y += tile.center_pixel[1]
         x = x//3 
         y = y//3 - 15
         self.sprite.move_to_pixel((x,y))
-        self.spawning = MainBaseSpawning(radius=5, center_tile=tiles[0])
+        self.spawning = MainBaseSpawning(radius=4, center_tile=tiles[0])
 
     def set_team(self, team:Team):
         self.team = team

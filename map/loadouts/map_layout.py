@@ -18,6 +18,7 @@ class MapLayout:
         team_1_main_base,
         team_2_buildings,
         team_2_main_base,
+        objectives,
     ):
         self.layout = layout
         self.shape = shape
@@ -27,6 +28,7 @@ class MapLayout:
         self.team_1_main_base: MainBase = team_1_main_base
         self.team_2_buildings: Dict[AbstractBuilding, Tuple[int,int]] = team_2_buildings
         self.team_2_main_base: MainBase = team_2_main_base
+        self.objectives = objectives
         
     #could handle random map elements
     def generate_map(self) -> Dict[Tuple[int, int], GameTile]:
@@ -64,5 +66,17 @@ class MapLayout:
         for tile in base_tiles_t2:
             tile.add_building(main_base_t2)
 
+        for objective_data in self.objectives:
+            obj_class = objective_data['class']
+            tile = None
+            del objective_data['class']
+            if 'tile' in objective_data:
+                tile = game_map[objective_data['tile']]
+                objective_data['tile'] = tile
 
+            obj_inst = obj_class(
+                **objective_data
+            )
+            tile.add_objective(obj_inst)
+            
         return game_map

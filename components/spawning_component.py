@@ -1,6 +1,6 @@
 from __future__ import annotations
 from components.abstact_component import AbstactComponent
-from algorithms import hex_reachable
+from algorithms import in_radius_end_on
 from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
@@ -19,15 +19,5 @@ class SpawningComponent(AbstactComponent):
         self.center_tile = tile
     
     def find_spawnable(self) -> List[GameTile]:
-        options = []
-        for q in range(-self.radius, self.radius + 1):
-            r1 = max(-self.radius, -q - self.radius)
-            r2 = min(self.radius, -q + self.radius) + 1
-            for r in range(r1, r2):
-                tile_cords = (self.center_tile.q + q, self.center_tile.r + r)
-                if tile_cords in self.center_tile.tile_map:
-                    tile = self.center_tile.tile_map[tile_cords]
-                    if tile.map_interaction.can_end_on:
-                        options.append(tile)
-
+        options = in_radius_end_on(self.center_tile, self.radius)
         return options
