@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 
 pg.font.init()
 font = pg.font.SysFont('Arial', 12)
-
 class GameTile(Hex):
     def __init__(self, 
         q:int, r:int,

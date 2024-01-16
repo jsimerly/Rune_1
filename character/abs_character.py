@@ -99,6 +99,11 @@ class AbstractCharacter(ABC):
     def draw(self, screen: pg.Surface):
         self.sprite.draw(screen)
         self.sprite.draw_ghost(screen)
+        if self.current_tile:
+            x, y = self.current_tile.center_pixel
+            x += 15
+            y -= 30
+            self.leveling.draw(screen, pixel_pos=(x,y))
 
 
     
