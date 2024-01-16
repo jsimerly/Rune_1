@@ -2,7 +2,7 @@ from __future__ import annotations
 from building.abs_building import AbstractBuilding
 from components.sprite import SpriteComponent
 from components.map_interaction import MapInteractionComponent
-from components.spawning_component import SpawningComponent
+from components.spawning import SpawningComponent
 from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:

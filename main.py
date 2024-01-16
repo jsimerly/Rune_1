@@ -6,6 +6,7 @@ from character.characters.crud.crud import Crud
 from character.characters.emilie.emilie import Emilie
 from map.loadouts.map_1 import map_1
 from team.team import Team
+from server.turn_event_manager import TurnManager
 
 pg.init()
 
@@ -19,6 +20,9 @@ crud = Crud()
 emilie = Emilie()
 game_manager.add_character(crud)
 game_manager.add_character(emilie)
+
+turn_manager = TurnManager(game_manager)
+game_manager.end_turn_callback = turn_manager.team_1_end_turn
 
 mouse_down_start_pos = None
 is_dragging = False

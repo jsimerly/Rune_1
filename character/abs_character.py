@@ -2,6 +2,7 @@ from __future__ import annotations
 from components.sprite import SpriteComponent
 from components.movement import MovementComponent
 from components.map_interaction import MapInteractionComponent
+from components.leveling import LevelingComponent
 import pygame as pg
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, List, Tuple
@@ -11,12 +12,16 @@ if TYPE_CHECKING:
     from team.team import Team
 
 class AbstractCharacter(ABC):    
-    def __init__(self):
+    def __init__(self, image: pg.Surface, color:Tuple[int,int,int]):
         self.current_tile: GameTile = None
+        self.team = None
+        self.color = color
+        self.surfaces = GameSurfaces()
 
         '''fix max drag distance when you create resoucing component'''
-        self.sprite: SpriteComponent = None
-        self.movement: MovementComponent = None
+        self.sprite: SpriteComponent = SpriteComponent(image)
+        self.movement: MovementComponent = MovementComponent(color)
+        self.leveling: LevelingComponent = LevelingComponent()
         self.map_interaction: MapInteractionComponent = MapInteractionComponent(
             is_passable = True,
             can_pierce = True,
@@ -26,9 +31,7 @@ class AbstractCharacter(ABC):
             is_slowing = False,
             walkthrough_effects = None,
         )
-        self.team = None
-        self.color = None
-        self.surfaces = GameSurfaces()
+
 
     '''Set Up'''
     def set_team(self, team: Team):
@@ -39,6 +42,9 @@ class AbstractCharacter(ABC):
 
     def set_movement_comp(self):
         self.movement = MovementComponent(self.color)
+
+    def set_leveling_comp(self):
+        self.leveling = LevelingComponent()
 
     def set_color(self, color: Tuple(int,int,int)):
         self.color = color

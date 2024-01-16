@@ -4,7 +4,7 @@ from pygame import image as image
 from building.abs_building import AbstractBuilding
 from components.sprite import SpriteComponent
 from components.map_interaction import MapInteractionComponent
-from components.spawning_component import SpawningComponent
+from components.spawning import SpawningComponent
 from typing import TYPE_CHECKING, List
 import pygame as pg
 

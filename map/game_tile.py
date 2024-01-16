@@ -116,11 +116,11 @@ class GameTile(Hex):
          
     
     def draw_text(self, screen: pg.Surface, text: str):
-            point = self.center_pixel
-            text_surface = font.render(text, True, (255, 255, 255))
-            text_pos = (point[0] - text_surface.get_width() // 2, point[1] - text_surface.get_height() // 2)
+        point = self.center_pixel
+        text_surface = font.render(text, True, (255, 255, 255))
+        text_pos = (point[0] - text_surface.get_width() // 2, point[1] - text_surface.get_height() // 2)
 
-            screen.blit(text_surface, text_pos)  
+        screen.blit(text_surface, text_pos)  
     
     def draw_background(self, screen: pg.Surface):      
         pg.draw.polygon(screen, self.color, self.verticies)

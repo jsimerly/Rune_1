@@ -106,8 +106,8 @@ class IdleState(ActionState):
                 return AbilityState_Click
             
             if isinstance(obj, EndTurnButton):
-                return TurnEndedState
-            
+                self.game_manager.end_turn()
+                return IdleState
             
         #Drag
         if isinstance(input, DragStart):

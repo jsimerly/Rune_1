@@ -32,14 +32,35 @@ class Rune(AbstactObjective):
 
     def on_end_of_turn(self):
         super().on_end_of_turn()
+        tile_in_range = self.find_tiles_in_range()
+
+        for tile in tile_in_range:
+            if tile.character:
+                distance = tile.distance_to(self.tile)
+                pp_gain = self._get_pp(distance)
+                tile.character.leveling.add_pp(pp_gain)
+        
+                print(tile.character.leveling.pp)
+
+    def _get_pp(self, distance):
+        pp_map = {
+            0: 500,
+            1: 334,
+            2: 250,
+            3: 150,
+            4: 100,
+        }
+        if distance in pp_map:
+            return pp_map[distance]
+        return 100
 
     def _get_opacity(self, distance):
         opacity_map = {
             0: 70,
-            1: 70,
-            2: 55,
-            3: 40,
-            4: 25,
+            1: 55,
+            2: 40,
+            3: 25,
+            4: 20,
         }
         if distance in opacity_map:
             return opacity_map[distance]

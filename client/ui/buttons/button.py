@@ -19,7 +19,7 @@ class Button(UIObject):
         self._rect = value
 
     @abstractmethod
-    def on_click(self) -> Callable or None:
+    def on_click(self):
         '''Method to be executed on click'''
         ...
 

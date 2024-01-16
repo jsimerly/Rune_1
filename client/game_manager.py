@@ -7,6 +7,8 @@ import pygame as pg
 from client.surfaces import GameSurfaces
 from client.ui.buttons.button import ButtonManager
 from client.ui.buttons.spawn_button import SpawnButton
+from objective.runes.rune.rune import Rune
+from client.ui.buttons.end_turn_button import EndTurnButton
 if TYPE_CHECKING:
     from map.loadouts.map_layout import MapLayout
     from character.abs_character import AbstractCharacter
@@ -19,8 +21,8 @@ class GameManager:
     '''
         This is the client side game manager that will hold the state of all objects and manage clicks within the game board and UI. 
     '''
-    def __init__(self, map: MapLayout, screen: pg.Surface, team: Team):
-        self.button_manager = ButtonManager() #event manager for buttons
+    def __init__(self, map: MapLayout, screen: pg.Surface, team: Team):#server id to be added later and we'll make a request instead of a callback
+        self.button_manager = ButtonManager()
         self.surfaces = GameSurfaces(screen=screen)
         self.layout = map.layout
 
@@ -30,12 +32,14 @@ class GameManager:
         self.enemy_characters: List[AbstractCharacter] = []
         self.enemy_buildings = []
 
-        self.leveling_stones = []
+        self.leveling_stones: List[Rune] = []
         self.leveling_shards = []
         self.altars = []
 
         self.action_context = ActionContext()
         self.action_state = IdleState(self)
+        self.end_turn_callback = None #will inject this on TurnManager instantiation
+        self.turn_ended = False
 
         self.tiles: Dict[Tuple[int,int], GameTile] = map.generate_map()
         for tile in self.tiles.values():
@@ -52,7 +56,17 @@ class GameManager:
 
             if tile.objective:
                 self.surfaces.add_to_layer(self.surfaces.objectives, tile.objective)
-                    
+                if isinstance(tile.objective, Rune):
+                    self.leveling_stones.append(tile.objective)
+
+        end_button = EndTurnButton() 
+        self.register_button(end_button)
+        self.surfaces.add_to_layer(self.surfaces.ui, end_button)
+
+    '''Turn'''
+    def end_turn(self):
+        self.turn_ended = True  
+        self.end_turn_callback() #add all the data in json that is needed to handle moves
 
     '''Register Events'''
     def register_button(self, button: Button):
