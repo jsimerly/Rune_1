@@ -95,6 +95,21 @@ class AbstractCharacter(ABC):
         self.current_tile = None
         self.surfaces.remove_from_layer(self.surfaces.characters, obj=self)
 
+    '''Processing'''
+    def process_next_move(self) -> bool:
+        if not self.movement.queue.is_empty:
+            next_tile = self.movement.queue.queue.pop(0)
+            next_tile.process_character_walkthrough(self)
+
+            
+            if self.movement.queue.is_empty:
+                self.current_tile = next_tile
+                return False
+
+            return True
+        return False
+            
+
     '''Drawing'''
     def draw(self, screen: pg.Surface):
         self.sprite.draw(screen)

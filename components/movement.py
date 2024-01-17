@@ -46,6 +46,7 @@ class MovementQueue:
     def remove_end_tile(self):
         self.queue.pop()
         self.handle_update()
+
         
     def set_queue(self, tiles: List[GameTile]):
         self.queue = tiles

@@ -1,6 +1,7 @@
 from __future__ import annotations
 from objective.abs_objective import AbstactObjective
 from components.sprite import SpriteComponent
+from components.map_interaction import MapInteractionComponent
 from typing import TYPE_CHECKING, List
 from algorithms import hex_radius
 
@@ -25,6 +26,14 @@ class Rune(AbstactObjective):
         image = self.open_image(image_path)
         self.set_sprite_comp(image)
         self.sprite.move_to_tile(self.tile)
+        self.map_interatcion = MapInteractionComponent(
+            is_passable=True,
+            can_pierce=True,
+            can_end_on=True,
+            blocks_vision=False,
+            hides_occupants=False,
+            is_slowing=False,
+        )
         
 
     def find_tiles_in_range(self) -> List[GameTile]:
@@ -40,8 +49,6 @@ class Rune(AbstactObjective):
                 pp_gain = self._get_pp(distance)
                 tile.character.leveling.add_pp(pp_gain)
         
-                print(tile.character.leveling.pp)
-
     def _get_pp(self, distance):
         pp_map = {
             0: 500,

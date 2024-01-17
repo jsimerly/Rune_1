@@ -59,6 +59,11 @@ class GameTile(Hex):
         self.building: AbstractBuilding = None
         self.objective: AbstactObjective = None
 
+    ''' Processing '''
+    def process_character_walkthrough(self, character):
+        for effect in self.map_interaction.walkthrough_effects:
+            effect(character)
+
     '''Character'''
     def spawn_character(self, character: AbstractCharacter):
         self.character = character
@@ -201,11 +206,23 @@ class GameTile(Hex):
 
     def resolve_other_map_interactions(self) -> MapInteractionComponent:
         other_mi: Optional[MapInteractionComponent] = None
+        self.map_interaction.walkthrough_effects = []
+
+        if self.objective:
+            other_mi = self.objective.map_interatcion
+            walk_effect = self.objective.map_interatcion.walkthrough_effects
+            self.map_interaction.add_walkthrough_effect(walk_effect)
+
         if self.character:
             other_mi = self.character.map_interaction
+            walk_effect = self.character.map_interaction.walkthrough_effects
+            self.map_interaction.add_walkthrough_effect(walk_effect)
             
         if self.building:
             other_mi = self.building.map_interaction
+            walk_effect = self.building.map_interaction.walkthrough_effects
+            self.map_interaction.add_walkthrough_effect(walk_effect)
+
 
         is_passable = self.map_interaction.default_is_passable
         can_pierce = self.map_interaction.default_can_pierce
@@ -229,6 +246,8 @@ class GameTile(Hex):
         self.map_interaction.blocks_vision = blocks_vision
         self.map_interaction.hides_occupants = hides_occupants
         self.map_interaction.is_slowing = is_slowing
+
+        
 
         return self.map_interaction
 

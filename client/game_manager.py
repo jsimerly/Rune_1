@@ -66,7 +66,9 @@ class GameManager:
     '''Turn'''
     def end_turn(self):
         self.turn_ended = True  
-        self.end_turn_callback() #add all the data in json that is needed to handle moves
+        self.end_turn_callback(
+            
+        ) #add all the data in json that is needed to handle moves
 
     '''Register Events'''
     def register_button(self, button: Button):

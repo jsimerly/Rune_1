@@ -28,14 +28,14 @@ class RuneShards(AbstactObjective):
         image = self.open_image(image_path)
         self.set_sprite_comp(image)
         self.sprite.move_to_tile(self.tile)
-        self.map_interatcions = MapInteractionComponent(
+        self.map_interatcion = MapInteractionComponent(
             is_passable=True,
             can_pierce=True,
             can_end_on=True,
             blocks_vision=False,
             hides_occupants=False,
             is_slowing=False,
-            walkthrough_effects=self.walkthough_effect
+            walkthrough_effects=[self.walkthough_effect]
         )
 
     def walkthough_effect(self, character: AbstractCharacter):

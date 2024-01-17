@@ -15,7 +15,7 @@ class AbstactObjective(ABC):
         self.spawn_turn = spawn_turn
         self.duration = None
         self.sprite: SpriteComponent
-        self.map_interatcions: MapInteractionComponent
+        self.map_interatcion: MapInteractionComponent
         
     @abstractmethod
     def on_end_of_turn(self):

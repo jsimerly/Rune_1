@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Callable
+from time import sleep
 
 if TYPE_CHECKING:
     from client.game_manager import GameManager
@@ -30,13 +31,50 @@ class TurnManager:
         self.t1_is_ended = True
         turn_ended = self.check_for_end()
         if turn_ended:
+            self.handle_end_of_turn()
+            # Start of Turn 
+            # Movement
+                # Picking Up Shards
+                # Melee Abilities
+                # Walkthrough Effects
+            # Abilities
+                # Damage
+                # Healing / Shielding
+            # Other
+                # Misc Player Movement
+                # Altar Process
+                # Rune Processing
+                # Respawn Handling
+            #Turn over
+
             self.leveling()
 
     '''Start of Turn'''
 
     '''End of Turn'''
     def handle_end_of_turn(self):
+        self.movement()
         self.leveling()
+
+    ''' Movement '''
+    def movement(self):
+        processing_movement = True
+        while processing_movement:
+            some_moves_left = False
+            index = 0
+            for character in self.t1_game_manager.team.characters:
+                moves_left = character.process_next_move()
+                
+                if moves_left:
+                    some_moves_left = True
+
+            if not some_moves_left:
+                break
+            
+            sleep(0.25)
+            if index > 20:
+                break
+            index += 1
 
     def leveling(self):
         for rune in self.t1_game_manager.leveling_stones:

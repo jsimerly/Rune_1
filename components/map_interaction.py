@@ -11,7 +11,7 @@ class MapInteractionComponent(AbstactComponent):
         blocks_vision, 
         hides_occupants, 
         is_slowing,       
-        walkthrough_effects
+        walkthrough_effects = []
     ):
 
         self.is_passable = is_passable
@@ -71,8 +71,9 @@ class MapInteractionComponent(AbstactComponent):
             #do effects 
             pass
 
-    def add_walkthrough_effect(self, effect: Callable):
-        self.walkthrough_effects.append(effect)
+    def add_walkthrough_effect(self, effect: List[Callable]):
+        if effect:
+            self.walkthrough_effects.extend(effect)
 
     def remove_walkthrough_effect(self, effect:Callable):
         if effect in self.walkthrough_effects:

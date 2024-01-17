@@ -67,7 +67,7 @@ while is_running:
     pg.display.flip()
     clock.tick(FPS)
     clock_time = clock.get_time()
-    if clock_time > 100:
+    if clock_time > 200:
         print(clock_time)
 
 pg.quit()
