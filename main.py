@@ -1,11 +1,11 @@
 import pygame as pg
 from settings import *
-from client.game_manager import GameManager
-from client.action_state.action_state import Click, DragStart, DragEnd
-from character.characters.crud.crud import Crud
-from character.characters.emilie.emilie import Emilie
+from zclient.game_manager import GameManager
+from zclient.action_state.action_state import Click, DragStart, DragEnd
+# from character.characters.crud.crud import Crud
+# from character.characters.emilie.emilie import Emilie
 from map.loadouts.map_1 import map_1
-from team.team import Team
+# from team.team import Team
 from server.turn_event_manager import TurnManager
 
 pg.init()

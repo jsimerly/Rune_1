@@ -20,6 +20,14 @@ class TCPClient:
         self.__initialized = True
         self.uri = 'ws://localhost:8765'
         self.loop = asyncio.get_event_loop()
+        self.websocket = None
+    
+    async def connect(self):
+        self.websocket = await websockets.connect(self.uri)
+        await self.start_listening()
+
+    async def close_connection(self):
+        await self.websocket.close()
 
     def create_task(self, task: Callable):
         self.loop.create_task(task)
@@ -34,17 +42,29 @@ class TCPClient:
         
         if not isinstance(message, dict):
             raise ValueError('messages must be a dictionary or json format to be sent using send_data.')
-        
-        
-        async with websockets.connect(self.uri) as websocket:
-            package = {
-                'type': type,
-                'message': message
-            }
-            package = json.dumps(package)
-            await websocket.send(package)
-            response = await websocket.recv()
-            print(response)
+    
+        if not self.websocket:
+            await self.connect()
+            
+
+
+        package = {
+            'type': type,
+            'message': message
+        }
+        package = json.dumps(package)
+        await self.websocket.send(package)
+        # response = await self.websocket.recv()
+        # return response
+    
+    async def listen_for_messages(self):
+        while True:
+            message = await self.websocket.recv()
+            print(message)
+    
+    async def start_listening(self):
+        asyncio.create_task(self.listen_for_messages())
+
 
 
             

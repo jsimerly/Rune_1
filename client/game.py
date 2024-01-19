@@ -87,7 +87,6 @@ class Game:
             print(self.clock.get_time())
         self.clock.tick(FPS)
 
-    
 if __name__ == '__main__':
     game = Game()
     while game.is_running:

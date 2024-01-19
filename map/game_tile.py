@@ -7,7 +7,7 @@ from components.map_interaction import MapInteractionComponent
 from abc import ABC, abstractmethod
 from math import radians, cos, sin
 from utils import time_it
-from client.surfaces import GameSurfaces
+from zclient.surfaces import GameSurfaces
 
 if TYPE_CHECKING:
     from character.abs_character import AbstractCharacter

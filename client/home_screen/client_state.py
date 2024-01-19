@@ -108,11 +108,15 @@ class HomeScreenState(ClientState):
         self.is_waiting_for_game = True
         self.start_button.text = 'Cancel'
         self.start_button.on_click = self.cancel_clicked
-        start_data = {'key': 'poop', 'number':420}
+        start_data = {'user':self.user['username']}
         self.socket.create_task(
-            self.socket.send_data(start_data, 'looking_for'),
+            self.handle_response(start_data)
         )
 
+    async def handle_response(self, message):
+        response = await self.socket.send_data(message, 'looking_for')
+        print(response)
+        
 
     def cancel_clicked(self):
         self.is_waiting_for_game = False
