@@ -8,6 +8,8 @@ import pygame as pg
 from settings import SCREEN_HEIGHT, SCREEN_WIDTH
 from client_socket import TCPClient
 from home_screen.gui.inputs import TextInput
+import asyncio
+import websockets
 
 if TYPE_CHECKING:
     from mouse_inputs import MouseInput
@@ -108,8 +110,9 @@ class HomeScreenState(ClientState):
         self.start_button.on_click = self.cancel_clicked
         start_data = {'key': 'poop', 'number':420}
         self.socket.create_task(
-            self.socket.send_data(start_data)
+            self.socket.send_data(start_data, 'looking_for'),
         )
+
 
     def cancel_clicked(self):
         self.is_waiting_for_game = False

@@ -28,12 +28,25 @@ class TCPClient:
         self.loop.call_soon(self.loop.stop)
         self.loop.run_forever()
 
-    async def send_data(self, message):
+    async def send_data(self, message, type):
+        if type not in ['looking_for', 'draft', 'player_queues', 'end_game']:
+            raise ValueError("Type must be one of the following: looking_for', 'draft', 'player_queues', 'end_game'")
+        
+        if not isinstance(message, dict):
+            raise ValueError('messages must be a dictionary or json format to be sent using send_data.')
+        
+        
         async with websockets.connect(self.uri) as websocket:
-            if isinstance(message, dict):
-                message = json.dumps(message)
-            await websocket.send(message)
+            package = {
+                'type': type,
+                'message': message
+            }
+            package = json.dumps(package)
+            await websocket.send(package)
             response = await websocket.recv()
             print(response)
+
+
+            
 
 
