@@ -1,6 +1,7 @@
 import asyncio
 import websockets
 import json
+from uuid import uuid4
 from typing import Callable
 
 
