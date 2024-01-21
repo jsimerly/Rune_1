@@ -45,8 +45,7 @@ class TCPClient:
     
         if not self.websocket:
             await self.connect()
-            
-
+        
 
         package = {
             'type': type,
@@ -61,6 +60,8 @@ class TCPClient:
         while True:
             message = await self.websocket.recv()
             print(message)
+
+    ''''NEED TO ROUTE THIS TO WHATEVER THE CODE IS. THIS IS WHERE ALL OUR CONNECTIONS WILL COME FROm.'''
     
     async def start_listening(self):
         asyncio.create_task(self.listen_for_messages())

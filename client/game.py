@@ -87,8 +87,13 @@ class Game:
             print(self.clock.get_time())
         self.clock.tick(FPS)
 
+    def handle_close(self):
+        self.socket.loop.run_until_complete(self.socket.close_connection())
+        pg.quit()
+
 if __name__ == '__main__':
     game = Game()
     while game.is_running:
         game.game_loop()
-    pg.quit()
+    game.handle_close()
+

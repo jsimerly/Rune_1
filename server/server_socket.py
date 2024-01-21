@@ -24,15 +24,20 @@ class GameServer:
                 data = json.loads(message)
                 if data['type'] == 'looking_for':
                     game_id, ws_1, ws_2 = self.handle_looking_for_game(data['message'], websocket)
-
+                        
                     if game_id != None:
-                        asyncio.create_task(ws_1.send(game_id))
-                        asyncio.create_task(ws_2.send(game_id))
+                        if ws_1.open:
+                            asyncio.create_task(ws_1.send(game_id))
+                        if ws_2.open:
+                            asyncio.create_task(ws_2.send(game_id))
                     else:
                         await websocket.send('Waiting on other players...')
+        except Exception as e:
+            print(e)
+            print("Connection closed unexpectedly.")
         finally:
-            print("REMOVED CONNECTION")
-            self.connections.remove(websocket)
+            print(f'{websocket} removed.')
+            await self.unregister(websocket)
     
     async def start(self):
         async with websockets.serve(self.handle_connection, self.host, self.port):

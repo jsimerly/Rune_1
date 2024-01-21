@@ -115,7 +115,7 @@ class HomeScreenState(ClientState):
 
     async def handle_response(self, message):
         response = await self.socket.send_data(message, 'looking_for')
-        print(response)
+        print(f'start_resp: {response}')
         
 
     def cancel_clicked(self):
@@ -124,7 +124,10 @@ class HomeScreenState(ClientState):
         self.start_button.on_click = self.start_clicked
 
     def exit_clicked(self):
+        self.socket.loop.run_until_complete(self.socket.close_connection())
         pg.quit()
+
+        
 
 
 

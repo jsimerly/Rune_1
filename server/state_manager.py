@@ -1,5 +1,6 @@
 from typing import Protocol
 import asyncio
+from uuid import uuid4
 
 
 class ServerState(Protocol):
