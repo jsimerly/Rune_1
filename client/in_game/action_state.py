@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Protocol, Tuple, Dict, Set, List, TYPE_CHECKING
 from abc import ABC
 from map.game_tile import GameTile
-from zclient.surfaces import GameSurfaces
+from client.in_game.surfaces import GameSurfaces
 from character.abs_character import AbstractCharacter
 from zclient.ui.buttons.button import Button, ButtonManager
 from zclient.ui.buttons.ability_button import AbilityButton
@@ -11,7 +11,7 @@ from zclient.ui.buttons.end_turn_button import EndTurnButton
 from zclient.ui.buttons.button import Button
 
 if TYPE_CHECKING:
-    from game_manager import GameManager
+    from client.in_game.game_manager import GameManager
 
 class ActionState(Protocol):
     def input(self, obj) -> ActionState:

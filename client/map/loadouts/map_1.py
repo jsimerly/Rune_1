@@ -1,6 +1,6 @@
 
 from hex import Layout, orientation_pointy, Point
-from settings import SCREEN_HEIGHT, SCREEN_WIDTH
+from client.settings import SCREEN_HEIGHT, SCREEN_WIDTH
 from map.tiles import *
 from building.pylon.pylon import Pylon
 from building.main_base.main_base import MainBase

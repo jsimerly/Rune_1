@@ -6,12 +6,15 @@ from components.leveling import LevelingComponent
 import pygame as pg
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, List, Tuple
-from zclient.surfaces import GameSurfaces
+from client.in_game.surfaces import GameSurfaces
 if TYPE_CHECKING:
     from map.game_tile import GameTile
     from team.team import Team
 
 class AbstractCharacter(ABC):    
+    '''
+        This is the base character class that all playable characters will subclass.
+    '''
     def __init__(self, image: pg.Surface, color:Tuple[int,int,int]):
         self.current_tile: GameTile = None
         self.team = None

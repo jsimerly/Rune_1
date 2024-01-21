@@ -1,14 +1,14 @@
 from __future__ import annotations
-from .ui.buttons.button import ButtonManager, Button
-from .clickable_obj import Clickable, Draggable, ContinueAction
+from ...zclient.ui.buttons.button import ButtonManager, Button
+from ...zclient.clickable_obj import Clickable, Draggable, ContinueAction
 from typing import List, Dict, Callable, TYPE_CHECKING, Optional, Tuple
-from zclient.action_state.action_state import IdleState, ActionState, MouseInput, ActionContext
+from client.in_game.action_state import IdleState, ActionState, MouseInput, ActionContext
 import pygame as pg
 from zclient.ui.buttons.button import ButtonManager
 from zclient.ui.buttons.spawn_button import SpawnButton
 from objective.runes.rune.rune import Rune
 from zclient.ui.buttons.end_turn_button import EndTurnButton
-from zclient.surfaces import GameSurfaces
+from client.in_game.surfaces import GameSurfaces
 if TYPE_CHECKING:
     from map.loadouts.map_layout import MapLayout
     from character.abs_character import AbstractCharacter

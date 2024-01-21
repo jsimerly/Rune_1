@@ -1,7 +1,7 @@
 from components.abstact_component import AbstactComponent
 from typing import Tuple
 import pygame as pg
-from settings import DARK_GREY
+from client.settings import DARK_GREY
 
 pg.font.init()
 font = pg.font.SysFont('Arial Bold', 20)

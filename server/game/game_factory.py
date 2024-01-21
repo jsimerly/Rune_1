@@ -1,9 +1,5 @@
-from typing import Protocol
-import asyncio
-from uuid import uuid4
 
-
-class MatchMaking:
+class GameFactory(ServerState):
     def __init__(self) -> None:
         self.user_1 = None
         self.ws_1 = None

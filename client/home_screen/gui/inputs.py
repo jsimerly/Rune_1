@@ -1,6 +1,6 @@
 import pygame as pg
 from key_inputs import KeyInput
-from settings import SCREEN_WIDTH, SCREEN_HEIGHT
+from client.settings import SCREEN_WIDTH, SCREEN_HEIGHT
 
 
 class TextInput:

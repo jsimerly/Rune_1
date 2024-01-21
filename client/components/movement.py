@@ -2,7 +2,7 @@ from __future__ import annotations
 from .abstact_component import AbstactComponent
 from typing import TYPE_CHECKING, Any, List, Set, Optional, Dict, Tuple
 from utils import time_it
-from zclient.surfaces import GameSurfaces
+from client.in_game.surfaces import GameSurfaces
 import pygame as pg
 from algorithms import astar, hex_reachable
 

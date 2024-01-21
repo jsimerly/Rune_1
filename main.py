@@ -1,7 +1,7 @@
 import pygame as pg
-from settings import *
-from zclient.game_manager import GameManager
-from zclient.action_state.action_state import Click, DragStart, DragEnd
+from client.settings import *
+from client.in_game.game_manager import GameManager
+from client.in_game.action_state import Click, DragStart, DragEnd
 # from character.characters.crud.crud import Crud
 # from character.characters.emilie.emilie import Emilie
 from map.loadouts.map_1 import map_1

@@ -3,9 +3,9 @@ from client_state_proto import ClientState
 from typing import Protocol, Dict, TYPE_CHECKING, List
 from .gui.buttons import StartButton, ExitButton, EnterButton
 from mouse_inputs import Click, DragEnd
-from settings import BGCOLOR
+from client.settings import BGCOLOR
 import pygame as pg
-from settings import SCREEN_HEIGHT, SCREEN_WIDTH
+from client.settings import SCREEN_HEIGHT, SCREEN_WIDTH
 from client_socket import TCPClient
 from home_screen.gui.inputs import TextInput
 import asyncio

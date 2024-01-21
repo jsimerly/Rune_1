@@ -1,5 +1,5 @@
 import pygame as pg
-from settings import *
+from client.settings import *
 from mouse_inputs import Click, DragStart, Dragging, DragEnd
 from key_inputs import KeyInput
 from client_state_manager import ClientStateManager

@@ -1,10 +1,10 @@
 import asyncio
 import websockets
 import json
-from state_manager import GameFactory
+from state_manager import MatchMaking
 
-game_factory = GameFactory()
 
+match_maker = MatchMaking()
 class GameServer:
     def __init__(self, host, port) -> None:
         self.host = host
@@ -44,7 +44,7 @@ class GameServer:
             await asyncio.Future() 
 
     def handle_looking_for_game(self, message, websocket):
-        return game_factory.register_team(message, websocket)
+        return match_maker.register_team(message, websocket)
 
 
 if __name__ == '__main__':

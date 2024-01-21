@@ -1,4 +1,4 @@
-from .singleton import Singleton
+from ...zclient.singleton import Singleton
 import pygame as pg
 from typing import TYPE_CHECKING, List, Any, Set
 if TYPE_CHECKING:

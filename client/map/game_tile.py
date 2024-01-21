@@ -1,13 +1,13 @@
 from __future__ import annotations
 from hex import Hex, Layout
 from typing import Callable, Optional, List, TYPE_CHECKING, Dict, Tuple
-from settings import LIGHT_GREY
+from client.settings import LIGHT_GREY
 import pygame as pg
 from components.map_interaction import MapInteractionComponent
 from abc import ABC, abstractmethod
 from math import radians, cos, sin
 from utils import time_it
-from zclient.surfaces import GameSurfaces
+from client.in_game.surfaces import GameSurfaces
 
 if TYPE_CHECKING:
     from character.abs_character import AbstractCharacter
