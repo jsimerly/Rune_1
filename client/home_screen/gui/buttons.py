@@ -1,7 +1,7 @@
 from ui_objects.template import TextButton
 from typing import Callable
 import pygame as pg
-from client.settings import SCREEN_WIDTH, SCREEN_HEIGHT
+from settings import SCREEN_WIDTH, SCREEN_HEIGHT
 
 
 class StartButton(TextButton):

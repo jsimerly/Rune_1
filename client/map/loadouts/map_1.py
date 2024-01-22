@@ -1,5 +1,5 @@
 
-from hex import Layout, orientation_pointy, Point
+from client.hex import Layout, orientation_pointy, Point
 from client.settings import SCREEN_HEIGHT, SCREEN_WIDTH
 from map.tiles import *
 from building.pylon.pylon import Pylon

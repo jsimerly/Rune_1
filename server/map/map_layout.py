@@ -1,4 +1,3 @@
-
 from map.tiles import *
 from client.hex import Layout
 from typing import Dict, Tuple, List, TYPE_CHECKING
@@ -8,6 +7,7 @@ if TYPE_CHECKING:
     from building.abs_building import AbstractBuilding
     from map.game_tile import GameTile
     from team.team import Team
+    
 class MapLayout:
     def __init__(self,
         layout: Layout,

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from components.abstact_component import AbstactComponent
-from algorithms import in_radius_end_on
+from client.algorithms import in_radius_end_on
 from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:

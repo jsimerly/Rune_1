@@ -1,10 +1,10 @@
 from __future__ import annotations
 from .abstact_component import AbstactComponent
 from typing import TYPE_CHECKING, Any, List, Set, Optional, Dict, Tuple
-from utils import time_it
+from client.utils import time_it
 from client.in_game.surfaces import GameSurfaces
 import pygame as pg
-from algorithms import astar, hex_reachable
+from client.algorithms import astar, hex_reachable
 
 if TYPE_CHECKING:
     from character.abs_character import AbstractCharacter

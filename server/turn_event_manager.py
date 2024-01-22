@@ -2,8 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Callable
 from time import sleep
 
-if TYPE_CHECKING:
-    from client.game_manager import GameManager
+
 
 #highly coupled with GameManager, really just a 1 to 1 extension
 class TurnManager:

@@ -1,5 +1,5 @@
 import pygame as pg
-from client.settings import *
+from settings import *
 from mouse_inputs import Click, DragStart, Dragging, DragEnd
 from key_inputs import KeyInput
 from client_state_manager import ClientStateManager
@@ -83,8 +83,8 @@ class Game:
         self.render()
         self.socket.run_one()
 
-        if self.clock.get_time() > 150:
-            print(self.clock.get_time())
+        # if self.clock.get_time() > 150:
+        #     print(self.clock.get_time())
         self.clock.tick(FPS)
 
     def handle_close(self):

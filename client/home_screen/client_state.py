@@ -3,9 +3,8 @@ from client_state_proto import ClientState
 from typing import Protocol, Dict, TYPE_CHECKING, List
 from .gui.buttons import StartButton, ExitButton, EnterButton
 from mouse_inputs import Click, DragEnd
-from client.settings import BGCOLOR
 import pygame as pg
-from client.settings import SCREEN_HEIGHT, SCREEN_WIDTH
+from settings import SCREEN_HEIGHT, SCREEN_WIDTH, BGCOLOR
 from client_socket import TCPClient
 from home_screen.gui.inputs import TextInput
 import asyncio
@@ -114,7 +113,14 @@ class HomeScreenState(ClientState):
         )
 
     async def handle_response(self, message):
-        response = await self.socket.send_data(message, 'looking_for')
+        package_kwargs = {
+            'type' : 'lfg',
+            'username' : self.user['username'],
+            'data' : message
+        }
+        response = await self.socket.send_data(
+            **package_kwargs
+        )
         print(f'start_resp: {response}')
         
 

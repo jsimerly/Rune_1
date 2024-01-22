@@ -2,7 +2,7 @@ import asyncio
 import websockets
 import json
 from uuid import uuid4
-from typing import Callable
+from typing import Callable, Dict
 
 
 class TCPClient:
@@ -36,11 +36,11 @@ class TCPClient:
         self.loop.call_soon(self.loop.stop)
         self.loop.run_forever()
 
-    async def send_data(self, message, type):
-        if type not in ['looking_for', 'draft', 'player_queues', 'end_game']:
+    async def send_data(self, username: str, type: str,  data: Dict):
+        if type not in ['lfg', 'draft', 'player_queues', 'end_game']:
             raise ValueError("Type must be one of the following: looking_for', 'draft', 'player_queues', 'end_game'")
         
-        if not isinstance(message, dict):
+        if not isinstance(data, dict):
             raise ValueError('messages must be a dictionary or json format to be sent using send_data.')
     
         if not self.websocket:
@@ -49,7 +49,8 @@ class TCPClient:
 
         package = {
             'type': type,
-            'message': message
+            'username': username,
+            'data': data,
         }
         package = json.dumps(package)
         await self.websocket.send(package)
