@@ -41,9 +41,6 @@ class GameServer:
                     game_id = game_info['game_id']
                     user_1 = game_info['user_1']
                     user_2 = game_info['user_2']
-                    print(game_id)
-                    print(user_1)
-                    print(user_2)
                     await self.notify_players_of_game(game_id, user_1, user_2)
 
             #sync recieving any new messages from the websocket
@@ -58,8 +55,7 @@ class GameServer:
             print("Connection closed unexpectedly.")
             traceback.print_exc()
         finally:
-            print(f'{websocket} removed.')
-            await self.unregister(websocket)
+            print(f'{websocket.remote_address} removed.')
     
     async def start(self):
         async with websockets.serve(self.handle_connection, self.host, self.port):
@@ -69,10 +65,31 @@ class GameServer:
         return match_maker.register_team(user)
     
     async def notify_players_of_game(self, game_id, user_1: User, user_2: User):
+            game_info_package = {
+                "type": "game_found",
+                "draft": {
+                    "draft_id": str(game_id),
+                    "team_1": {
+                        "user": {
+                            'username': user_1.username
+                        },
+                        "team_id": "make_later",
+                        "characters": []
+                    },
+                    "team_2": {
+                        "user": {
+                            'username': user_2.username
+                        },
+                        "team_id": "make_later",
+                        "characters": []
+                    }
+                }
+            }
+            package = json.dumps(game_info_package)
             if user_1.websocket.open:
-                asyncio.create_task(user_1.websocket.send(str(game_id)))
+                asyncio.create_task(user_1.websocket.send(package))
             if user_2.websocket.open:
-                asyncio.create_task(user_2.websocket.send(str(game_id)))
+                asyncio.create_task(user_2.websocket.send(package))
 
 
 if __name__ == '__main__':

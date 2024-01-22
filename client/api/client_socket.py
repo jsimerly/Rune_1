@@ -3,6 +3,7 @@ import websockets
 import json
 from uuid import uuid4
 from typing import Callable, Dict
+from api.api_schema import load_message
 
 
 class TCPClient:
@@ -21,6 +22,7 @@ class TCPClient:
         self.uri = 'ws://localhost:8765'
         self.loop = asyncio.get_event_loop()
         self.websocket = None
+        self.message_callback = None
     
     async def connect(self):
         self.websocket = await websockets.connect(self.uri)
@@ -60,7 +62,8 @@ class TCPClient:
     async def listen_for_messages(self):
         while True:
             message = await self.websocket.recv()
-            print(message)
+            message = load_message(message)
+            self.message_callback(message)
 
     ''''NEED TO ROUTE THIS TO WHATEVER THE CODE IS. THIS IS WHERE ALL OUR CONNECTIONS WILL COME FROm.'''
     

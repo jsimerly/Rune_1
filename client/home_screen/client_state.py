@@ -5,7 +5,7 @@ from .gui.buttons import StartButton, ExitButton, EnterButton
 from mouse_inputs import Click, DragEnd
 import pygame as pg
 from settings import SCREEN_HEIGHT, SCREEN_WIDTH, BGCOLOR
-from client_socket import TCPClient
+from api.client_socket import TCPClient
 from home_screen.gui.inputs import TextInput
 import asyncio
 import websockets
@@ -112,6 +112,8 @@ class HomeScreenState(ClientState):
             self.handle_response(start_data)
         )
 
+    ''' Networking '''
+
     async def handle_response(self, message):
         package_kwargs = {
             'type' : 'lfg',
@@ -121,8 +123,10 @@ class HomeScreenState(ClientState):
         response = await self.socket.send_data(
             **package_kwargs
         )
-        print(f'start_resp: {response}')
-        
+
+    def server_input(self, message):
+        print('-------- input made it to client state -----------')
+        print(message)
 
     def cancel_clicked(self):
         self.is_waiting_for_game = False

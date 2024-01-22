@@ -3,7 +3,7 @@ from settings import *
 from mouse_inputs import Click, DragStart, Dragging, DragEnd
 from key_inputs import KeyInput
 from client_state_manager import ClientStateManager
-from client_socket import TCPClient
+from api.client_socket import TCPClient
 import asyncio
 
 class Game:
@@ -21,6 +21,7 @@ class Game:
 
         self.state_manager = ClientStateManager() 
         self.socket = TCPClient()
+        self.socket.message_callback = self.get_server_input
 
     def get_mouse_action(self, events):
         mouse_pos = pg.mouse.get_pos()
@@ -54,6 +55,10 @@ class Game:
         if len(key_strokes) > 0:
             return key_strokes
         return None
+
+    def get_server_input(self, message):
+        print('get_server_input ran')
+        self.state_manager.current_state.server_input(message)
         
     def drag_threshold_reached(self, mouse_pos):
             dx = mouse_pos[0] - self.mouse_down_pos[0]
