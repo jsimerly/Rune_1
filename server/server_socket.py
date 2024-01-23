@@ -65,31 +65,31 @@ class GameServer:
         return match_maker.register_team(user)
     
     async def notify_players_of_game(self, game_id, user_1: User, user_2: User):
-            game_info_package = {
-                "type": "game_found",
-                "draft": {
-                    "draft_id": str(game_id),
-                    "team_1": {
-                        "user": {
-                            'username': user_1.username
-                        },
-                        "team_id": "make_later",
-                        "characters": []
+        game_info_package = {
+            "type": "game_found",
+            "draft": {
+                "draft_id": str(game_id),
+                "team_1": {
+                    "user": {
+                        'username': user_1.username
                     },
-                    "team_2": {
-                        "user": {
-                            'username': user_2.username
-                        },
-                        "team_id": "make_later",
-                        "characters": []
-                    }
+                    "team_id": "make_later",
+                    "characters": []
+                },
+                "team_2": {
+                    "user": {
+                        'username': user_2.username
+                    },
+                    "team_id": "make_later",
+                    "characters": []
                 }
             }
-            package = json.dumps(game_info_package)
-            if user_1.websocket.open:
-                asyncio.create_task(user_1.websocket.send(package))
-            if user_2.websocket.open:
-                asyncio.create_task(user_2.websocket.send(package))
+        }
+        package = json.dumps(game_info_package)
+        if user_1.websocket.open:
+            asyncio.create_task(user_1.websocket.send(package))
+        if user_2.websocket.open:
+            asyncio.create_task(user_2.websocket.send(package))
 
 
 if __name__ == '__main__':

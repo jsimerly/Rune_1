@@ -57,7 +57,6 @@ class Game:
         return None
 
     def get_server_input(self, message):
-        print('get_server_input ran')
         self.state_manager.current_state.server_input(message)
         
     def drag_threshold_reached(self, mouse_pos):
