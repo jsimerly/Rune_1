@@ -10,6 +10,61 @@ look_for_game_schema = {
     'required' : ['type', 'username']
 }
 
+user_schema = {
+    'type' : 'object',
+    'properties' : {
+        'username' : {'type': 'string'}
+    },
+    'required' : ['username']
+}
+
+team_schema = {
+    'type' : 'object',
+    'properties' : {
+        'user': {'$ref': '#/definitions/user'},
+        'team_id' : {'type': 'string'},
+        'characters' : {'type': 'array', 'items': {'type': 'string'}},
+    },
+    'required' : ['user', 'team_id', 'characters'],
+    'definitions' : {
+        'user' : user_schema
+    }
+}
+
+draft_schema = {
+    'type' : 'object',
+    'properties' : {
+        'draft_id' : {'type': 'string'},
+        'team_1' : {'$ref': '#/definitions/team'},
+        'team_2' : {'$ref': '#/definitions/team'},
+    },
+    'required' : [],
+    'definitions' : {
+        'team' : team_schema
+    }   
+}
+
+#drafting schema
+drafting_schema = {
+    'type' : 'object',
+    'properties' : {
+        'type': {'type': 'string'},
+        'user': {'$ref': '#/definitions/user'},
+        'character':{'type': 'string'},
+        'pick_ban': {'type': 'string' }
+        
+    },
+    'required': ['user', 'character', 'type', 'pick_band'],
+    'definitions' : {
+        'user' : user_schema
+    }
+}
+
+#turn queues schem
+
+
+
+
 schema_map = {
     'lfg' : look_for_game_schema
 }
