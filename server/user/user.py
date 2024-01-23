@@ -15,6 +15,7 @@ class User:
 
     def remove_game(self, game: Game):
         self.games.remove(game)
+
  
 
     
