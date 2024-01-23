@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from user.user import User
     from team.team import Team
     from game.game import Game
+    from drafting.draft import Draft
 
 def serialize_user(user: User):
     return {
@@ -17,7 +18,7 @@ def serialize_team(team: Team):
         'characters': team.characters
     }
 
-def serializer_draft_start(draft):
+def serializer_draft_start(draft: Draft):
     return {
         'draft_id': draft.draft_id,
         'team_1': serialize_team(draft.team_1),
@@ -32,18 +33,18 @@ def serializer_game_start(game: Game):
         'round': game.round
     }
 
-def serializer_draft_ban(user: User, character):
+def serializer_draft_ban(team: Team, character):
     return {
         'type': 'drafting',
-        'user': serialize_user(user),
+        'user': serialize_team(team),
         'character': character,
         'pick_ban': 'ban'
     }
 
-def serializer_draft_pick(user: User, character):
+def serializer_draft_pick(team: Team, character):
     return {
         'type': 'drafting',
-        'user': serialize_user(user),
+        'user': serialize_team(team),
         'character': character,
         'pick_ban': 'pick'
     }
