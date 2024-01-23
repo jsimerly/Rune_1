@@ -9,7 +9,6 @@ user_schema = {
     'required' : ['username']
 }
 
-
 team_schema = {
     'type' : 'object',
     'properties' : {

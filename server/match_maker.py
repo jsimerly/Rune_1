@@ -31,7 +31,7 @@ class MatchMaking:
         self.user_1 = None
         self.user_2 = None
         # return serializered game information here including the uuid and opponent.
-        game_id = game.uuid
+        game_id = game.game_id
         game_info = {
             'game_id': game_id,
             'user_1' : user_1,

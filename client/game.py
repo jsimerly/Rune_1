@@ -18,10 +18,14 @@ class Game:
         self.is_dragging = False
         self.mouse_down_pos = None
         self.drag_threshold = 30
+        self.user = None
 
-        self.state_manager = ClientStateManager() 
+        self.state_manager = ClientStateManager(self.set_user) 
         self.socket = TCPClient()
         self.socket.message_callback = self.get_server_input
+
+    def set_user(self, user):
+        self.user = user
 
     def get_mouse_action(self, events):
         mouse_pos = pg.mouse.get_pos()
@@ -58,6 +62,25 @@ class Game:
 
     def get_server_input(self, message):
         self.state_manager.current_state.server_input(message)
+        self.handle_server_input(message)
+
+    def handle_server_input(self, message):
+        if message['type'] == 'game_found':
+            data = message['draft']
+            draft_id = data['draft_id']
+            team_1_username = data['team_1']['user']['username']
+            team_2_username = data['team_2']['user']['username']
+            if team_1_username == self.user:
+                opponent = team_2_username
+            else:
+                opponent = team_1_username
+
+            kwargs = {
+                'draft_id' : draft_id,
+                'opponent' : opponent,
+            }
+        
+            self.state_manager.start_draft(kwargs)
         
     def drag_threshold_reached(self, mouse_pos):
             dx = mouse_pos[0] - self.mouse_down_pos[0]

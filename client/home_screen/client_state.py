@@ -1,6 +1,6 @@
 from __future__ import annotations
 from client_state_proto import ClientState
-from typing import Protocol, Dict, TYPE_CHECKING, List
+from typing import Protocol, Dict, TYPE_CHECKING, List, Callable
 from .gui.buttons import StartButton, ExitButton, EnterButton
 from mouse_inputs import Click, DragEnd
 import pygame as pg
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from gui.buttons import TextButton
 
 class HomeScreenState(ClientState):
-    def __init__(self) -> None:
+    def __init__(self, set_user: Callable) -> None:
         pg.font.init()
         self.font = pg.font.SysFont(None, 36)
         logo_image = pg.image.load('home_screen/gui/rune_logo.webp')
@@ -33,6 +33,7 @@ class HomeScreenState(ClientState):
         self.buttons.append(self.enter_button)
         self.inputs: List[TextInput] = [self.user_name_input]
         self.selected_input: TextInput = None
+        self.set_user = set_user
 
         self.socket = TCPClient()
     
@@ -41,6 +42,7 @@ class HomeScreenState(ClientState):
             'is_logged_in': False,
         }
         self.is_waiting_for_game = False
+        self.game_found = False
 
     def render(self, display: pg.Surface):
         display.fill(BGCOLOR)
@@ -53,6 +55,9 @@ class HomeScreenState(ClientState):
 
             if self.is_waiting_for_game:
                 self.draw_waiting(display)
+
+            if self.game_found:
+                self.draw_game_found(display)
                 
         else:
             self.user_name_input.draw(display)
@@ -68,6 +73,12 @@ class HomeScreenState(ClientState):
         display.blit(rotated_icon, position)
 
         text = 'Waiting for another player...'
+        text_surface = self.font.render(text, True, (255, 255, 255))
+        text_position = (775, 620)
+        display.blit(text_surface, text_position)
+
+    def draw_game_found(self, display: pg.Surface):
+        text = 'Match Found'
         text_surface = self.font.render(text, True, (255, 255, 255))
         text_position = (775, 620)
         display.blit(text_surface, text_position)
@@ -123,10 +134,12 @@ class HomeScreenState(ClientState):
         response = await self.socket.send_data(
             **package_kwargs
         )
+        self.set_user(self.user['username'])
 
     def server_input(self, message):
-        print('-------- input made it to client state -----------')
-        print(message)
+        if message['type'] == 'game_found':
+            self.game_found = True
+            
 
     def cancel_clicked(self):
         self.is_waiting_for_game = False
@@ -136,6 +149,10 @@ class HomeScreenState(ClientState):
     def exit_clicked(self):
         self.socket.loop.run_until_complete(self.socket.close_connection())
         pg.quit()
+
+    def on_exit(self) -> Dict:
+        self.buttons = []
+        self.user_name_input = None
 
         
 
