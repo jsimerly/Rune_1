@@ -7,6 +7,7 @@ import pygame as pg
 from settings import SCREEN_HEIGHT, SCREEN_WIDTH, BGCOLOR
 from api.client_socket import TCPClient
 from home_screen.gui.inputs import TextInput
+from user.user import User
 import asyncio
 import websockets
 
@@ -16,7 +17,7 @@ if TYPE_CHECKING:
     from gui.buttons import TextButton
 
 class HomeScreenState(ClientState):
-    def __init__(self, set_user: Callable) -> None:
+    def __init__(self) -> None:
         pg.font.init()
         self.font = pg.font.SysFont(None, 36)
         logo_image = pg.image.load('home_screen/gui/rune_logo.webp')
@@ -33,7 +34,7 @@ class HomeScreenState(ClientState):
         self.buttons.append(self.enter_button)
         self.inputs: List[TextInput] = [self.user_name_input]
         self.selected_input: TextInput = None
-        self.set_user = set_user
+       
 
         self.socket = TCPClient()
     
@@ -134,7 +135,7 @@ class HomeScreenState(ClientState):
         response = await self.socket.send_data(
             **package_kwargs
         )
-        self.set_user(self.user['username'])
+        user = User(username=self.user['username'])
 
     def server_input(self, message):
         if message['type'] == 'game_found':

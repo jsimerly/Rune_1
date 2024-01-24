@@ -10,8 +10,8 @@ if TYPE_CHECKING:
     import pygame as pg
 
 class ClientStateManager:
-    def __init__(self, set_user: Callable) -> None:
-        self.current_state: ClientState = HomeScreenState(set_user)
+    def __init__(self) -> None:
+        self.current_state: ClientState = HomeScreenState()
 
     def start_draft(self, data):
         self.current_state.on_exit()

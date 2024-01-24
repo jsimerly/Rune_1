@@ -4,6 +4,7 @@ from mouse_inputs import Click, DragStart, Dragging, DragEnd
 from key_inputs import KeyInput
 from client_state_manager import ClientStateManager
 from api.client_socket import TCPClient
+from user.user import User
 import asyncio
 
 class Game:
@@ -18,14 +19,11 @@ class Game:
         self.is_dragging = False
         self.mouse_down_pos = None
         self.drag_threshold = 30
-        self.user = None
 
-        self.state_manager = ClientStateManager(self.set_user) 
+        self.user = User()
+        self.state_manager = ClientStateManager() 
         self.socket = TCPClient()
         self.socket.message_callback = self.get_server_input
-
-    def set_user(self, user):
-        self.user = user
 
     def get_mouse_action(self, events):
         mouse_pos = pg.mouse.get_pos()
@@ -39,6 +37,7 @@ class Game:
                     self.is_dragging = False
                     self.mouse_down_pos = None
                     return DragEnd(mouse_pos)
+                self.mouse_down_pos = None
                 return Click(mouse_pos)
             
             if self.mouse_down_pos and not self.is_dragging:
@@ -70,7 +69,7 @@ class Game:
             draft_id = data['draft_id']
             team_1_username = data['team_1']['user']['username']
             team_2_username = data['team_2']['user']['username']
-            if team_1_username == self.user:
+            if team_1_username == self.user.is_logged_in:
                 opponent = team_2_username
             else:
                 opponent = team_1_username

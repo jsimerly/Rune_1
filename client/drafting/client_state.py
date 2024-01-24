@@ -11,7 +11,7 @@ class DraftingState(ClientState):
         self.opponent = opponent
         self.character_icons: List[DraftIcon] = []
         self.create_icons()
-        self.selected_character = None
+        self.selected_icon: DraftIcon = None
     
     def render(self, display: pg.Surface):
         display.fill(BGCOLOR)
@@ -39,5 +39,7 @@ class DraftingState(ClientState):
     def check_for_icon_collision(self, pixel_pos: (int,int)):
         for icon in self.character_icons:
             if icon.rect.collidepoint(pixel_pos):
+                if self.selected_icon:
+                    self.selected_icon.unselect()
+                self.selected_icon = icon
                 icon.on_click()
-
