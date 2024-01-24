@@ -36,12 +36,9 @@ class DraftIcon(AbsButton):
 
     def draw_unpickable(self, display: pg.Surface):
         #draws an X through a the icon
-        pg.draw.aaline(display, (255, 0, 0), 
-            self.rect.topleft + 20, self.rect.bottomright - 20, 4
-        )
-        pg.draw.aaline(display, (255, 0, 0), 
-            self.rect.topright + 20, self.rect.bottomleft - 20, 4
-        )
+        p1 = (self.rect.topright[0], self.rect.topright[1])
+        p2 = (self.rect.bottomleft[0], self.rect.bottomleft[1])
+        pg.draw.line(display, (168, 10, 10), p1, p2, 16)
 
     def on_click(self):
         self.select()
