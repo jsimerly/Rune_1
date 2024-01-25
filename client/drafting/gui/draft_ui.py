@@ -8,6 +8,7 @@ class DraftUI:
     def __init__(self, n_picks:int, n_bans:int) -> None:
         self.n_picks = n_picks
         self.n_bans = n_bans
+        self.is_banning = True
 
         self.draft_icons: List[DraftIcon] = []
         self.create_icons()
@@ -15,7 +16,7 @@ class DraftUI:
         self.opp_bans: List[BannedCharacter] = []
         self.my_picks: List[DraftedCharacter] = []
         self.opp_picks: List[DraftedCharacter] = []
-        self.lock_in_button: LockInButton = LockInButton((750, 650))
+        self.lock_in_button: LockInButton = LockInButton((750, 900))
         self.create_pick_bans()
 
         self.ui_elements = self.draft_icons + self.my_bans + self.my_picks + self.opp_bans + self.opp_picks 
@@ -23,7 +24,7 @@ class DraftUI:
         
     def create_icons(self):
         x_pos = 450
-        y_pos = 300
+        y_pos = 550
         for Icon in draft_icons:
             icon = Icon((x_pos, y_pos))
             x_pos += icon.size[0] + 5
@@ -33,7 +34,7 @@ class DraftUI:
             self.draft_icons.append(icon)
 
     def create_pick_bans(self):
-        y_pos = 100
+        y_pos = 150
         my_pos = (100, y_pos)
         opp_pos = (1550, y_pos)
 
@@ -64,4 +65,8 @@ class DraftUI:
     def render(self, display: pg.Surface):
         display.fill(BGCOLOR)
         for element in self.ui_elements:
-            element.draw(display)
+            if not isinstance(element, DraftIcon):
+                element.draw(display)
+
+        for icon in self.draft_icons:
+            icon.draw(display, self.is_banning)

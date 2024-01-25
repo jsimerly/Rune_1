@@ -62,16 +62,27 @@ class DraftIcon(AbsButton):
     def picked_banned(self):
         self.is_picked_or_banned = True
 
-    def draw(self, display: pg.Surface):
+    def draw(self, display: pg.Surface, is_banning=False):
         display.blit(self.image, self.rect)
         if self.is_selected:
-            self.draw_selected(display)
+            if is_banning:
+                self.draw_banning(display)
+            else:
+                self.draw_selected(display)
 
         if self.is_picked_or_banned:
             self.draw_unpickable(display)
 
     def draw_selected(self, display: pg.Surface):
         pg.draw.rect(display, (240, 244, 250), self.rect, 8)
+
+    def draw_banning(self, display: pg.Surface):
+        #draws an X through a the icon
+        p1 = (self.rect.topright[0], self.rect.topright[1])
+        p2 = (self.rect.bottomleft[0], self.rect.bottomleft[1])
+        pg.draw.line(display, (168, 10, 10), p1, p2, 16)
+        pg.draw.rect(display, (168, 10, 10), self.rect, 8)
+
 
     def draw_unpickable(self, display: pg.Surface):
         #draws an X through a the icon
