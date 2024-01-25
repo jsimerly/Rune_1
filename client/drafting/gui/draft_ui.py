@@ -54,11 +54,11 @@ class DraftUI:
             opp_pos = (opp_pos[0], opp_pos[1] + 155)
 
     def get_clicked_element(self, pixel):
-        print(pixel)
+        print(self.ui_elements)
         for element in self.ui_elements:
             if element.rect.collidepoint(pixel):
                 return element
-            return None
+        return None
 
     def render(self, display: pg.Surface):
         display.fill(BGCOLOR)
