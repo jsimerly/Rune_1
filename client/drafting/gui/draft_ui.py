@@ -1,6 +1,6 @@
 import pygame as pg
 from settings import BGCOLOR
-from .draft_icons import draft_icons, DraftIcon
+from .draft_buttons import draft_icons, DraftIcon, LockInButton
 from .drafted_characeter import DraftedCharacter, BannedCharacter
 from typing import TYPE_CHECKING, List
 
@@ -15,9 +15,11 @@ class DraftUI:
         self.opp_bans: List[BannedCharacter] = []
         self.my_picks: List[DraftedCharacter] = []
         self.opp_picks: List[DraftedCharacter] = []
+        self.lock_in_button: LockInButton = LockInButton((750, 650))
         self.create_pick_bans()
 
-        self.ui_elements = self.draft_icons + self.my_bans + self.my_picks + self.opp_bans + self.opp_picks
+        self.ui_elements = self.draft_icons + self.my_bans + self.my_picks + self.opp_bans + self.opp_picks 
+        self.ui_elements.append(self.lock_in_button)
         
     def create_icons(self):
         x_pos = 450
@@ -25,7 +27,7 @@ class DraftUI:
         for Icon in draft_icons:
             icon = Icon((x_pos, y_pos))
             x_pos += icon.size[0] + 5
-            if x_pos > 1400:
+            if x_pos > 1300:
                 x_pos = 450
                 y_pos += 155
             self.draft_icons.append(icon)
@@ -54,7 +56,6 @@ class DraftUI:
             opp_pos = (opp_pos[0], opp_pos[1] + 155)
 
     def get_clicked_element(self, pixel):
-        print(self.ui_elements)
         for element in self.ui_elements:
             if element.rect.collidepoint(pixel):
                 return element
@@ -62,5 +63,5 @@ class DraftUI:
 
     def render(self, display: pg.Surface):
         display.fill(BGCOLOR)
-        for icon in self.ui_elements:
-            icon.draw(display)
+        for element in self.ui_elements:
+            element.draw(display)

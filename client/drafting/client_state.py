@@ -1,11 +1,11 @@
 from client_state_proto import ClientState
-from .gui.draft_icons import draft_icons, DraftIcon
+from .gui.draft_buttons import draft_icons, DraftIcon
 from mouse_inputs import Click, DragEnd, MouseInput
 from typing import Dict, List
 import pygame as pg
 from settings import BGCOLOR
 from .draft_manager import DraftManager
-from .gui.draft_ui import DraftUI, DraftIcon
+from .gui.draft_ui import DraftUI, DraftIcon, LockInButton
 
 class DraftingState(ClientState): #Controller
     def __init__(self, draft_id: str, opponent: str) -> None:
@@ -19,15 +19,14 @@ class DraftingState(ClientState): #Controller
 
     def mouse_input(self, input: MouseInput):
         if isinstance(input, Click) or isinstance(input, DragEnd):
-            print(1)
             element = self.draft_ui.get_clicked_element(input.pixel)
             if element:
-                print(2)
                 if isinstance(element, DraftIcon):
                     for icon in self.draft_ui.draft_icons:
                         icon.unselect()
-                    print(3)
                     element.select()
+                if isinstance(element, LockInButton):
+                    element.on_click()
 
     def server_input(self, message: Dict):
         pass

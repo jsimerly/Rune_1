@@ -2,6 +2,45 @@ import pygame as pg
 from ui_objects.abs_ui_object import AbsButton
 from typing import List, Type
 from settings import LIGHT_GREY
+import time
+
+
+class LockInButton(AbsButton):
+    def __init__(self, position) -> None:
+        self.size = (300, 50)
+        rect = pg.Rect(position, self.size)
+        self.color = (240, 244, 250)
+        self.text_color = (0, 0 ,0)
+        self.font = pg.font.SysFont(None, 24)
+
+        self.show_outline = False
+        self.outline_start_time = None
+
+        super().__init__(rect)
+
+    def draw(self, display: pg.Surface):
+        pg.draw.rect(display, (240, 244, 250), self.rect)     
+        self.draw_text(display=display)
+        
+        if self.show_outline:
+            pg.draw.rect(display, (0,0,0), self.rect, 2)
+
+            if time.time() - self.outline_start_time > 0.25:
+                self.show_outline = False
+
+
+    def draw_text(self, display: pg.Surface):
+        text_surface = self.font.render('Lock-In', True, self.text_color)
+        point = self.rect.center
+        text_pos = (point[0] - text_surface.get_width() // 2, point[1] - text_surface.get_height() // 2)
+        display.blit(text_surface, text_pos)
+
+    def on_click(self):
+        print('ya')
+        self.show_outline = True
+        self.outline_start_time = time.time()
+
+
 
 class DraftIcon(AbsButton):
     def __init__(self, position: (int, int), image_path:str, character_name:str):
