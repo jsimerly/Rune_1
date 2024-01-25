@@ -27,28 +27,30 @@ class Game:
 
     def get_mouse_action(self, events):
         mouse_pos = pg.mouse.get_pos()
+        action = None
         for event in events:
             if event.type == pg.MOUSEBUTTONDOWN:
                 if not self.mouse_down_pos:
                     self.mouse_down_pos = mouse_pos
 
+            if self.is_dragging:
+                action = Dragging(mouse_pos)
+
             if event.type == pg.MOUSEBUTTONUP:
                 if self.is_dragging:
                     self.is_dragging = False
                     self.mouse_down_pos = None
-                    return DragEnd(mouse_pos)
-                self.mouse_down_pos = None
-                return Click(mouse_pos)
+                    action = DragEnd(mouse_pos)
+                else:
+                    self.mouse_down_pos = None
+                    action = Click(mouse_pos)
             
             if self.mouse_down_pos and not self.is_dragging:
                 if self.drag_threshold_reached(mouse_pos):
                     self.is_dragging = True
-                    return DragStart(mouse_pos)
-
-            if self.is_dragging:
-                return Dragging(mouse_pos)
+                    action = DragStart(mouse_pos)
             
-            return None
+        return action
         
     def get_key_input(self, events):
         key_strokes = []
