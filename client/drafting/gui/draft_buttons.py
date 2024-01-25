@@ -25,7 +25,7 @@ class LockInButton(AbsButton):
         if self.show_outline:
             pg.draw.rect(display, (0,0,0), self.rect, 2)
 
-            if time.time() - self.outline_start_time > 0.25:
+            if time.time() - self.outline_start_time > 0.15:
                 self.show_outline = False
 
 
