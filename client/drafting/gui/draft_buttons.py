@@ -167,7 +167,7 @@ class KaneDraftButton(DraftIcon):
         super().__init__(
             position, 
             'drafting/gui/icons/kane_icon.png', 
-            'Athlea',
+            'Kane',
         )
 
 class LuDraftButton(DraftIcon):
