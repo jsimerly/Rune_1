@@ -29,7 +29,8 @@ class TCPClient:
         await self.start_listening()
 
     async def close_connection(self):
-        await self.websocket.close()
+        if self.websocket:
+            await self.websocket.close()
 
     def create_task(self, task: Callable):
         self.loop.create_task(task)

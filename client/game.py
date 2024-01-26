@@ -4,6 +4,7 @@ from mouse_inputs import Click, DragStart, Dragging, DragEnd
 from key_inputs import KeyInput
 from client_state_manager import ClientStateManager
 from api.client_socket import TCPClient
+from user.user import User
 import asyncio
 
 class Game:
@@ -18,38 +19,38 @@ class Game:
         self.is_dragging = False
         self.mouse_down_pos = None
         self.drag_threshold = 30
-        self.user = None
 
-        self.state_manager = ClientStateManager(self.set_user) 
+        self.user = User()
+        self.state_manager = ClientStateManager() 
         self.socket = TCPClient()
         self.socket.message_callback = self.get_server_input
 
-    def set_user(self, user):
-        self.user = user
-
     def get_mouse_action(self, events):
         mouse_pos = pg.mouse.get_pos()
+        action = None
         for event in events:
             if event.type == pg.MOUSEBUTTONDOWN:
                 if not self.mouse_down_pos:
                     self.mouse_down_pos = mouse_pos
 
+            if self.is_dragging:
+                action = Dragging(mouse_pos)
+
             if event.type == pg.MOUSEBUTTONUP:
                 if self.is_dragging:
                     self.is_dragging = False
                     self.mouse_down_pos = None
-                    return DragEnd(mouse_pos)
-                return Click(mouse_pos)
+                    action = DragEnd(mouse_pos)
+                else:
+                    self.mouse_down_pos = None
+                    action = Click(mouse_pos)
             
             if self.mouse_down_pos and not self.is_dragging:
                 if self.drag_threshold_reached(mouse_pos):
                     self.is_dragging = True
-                    return DragStart(mouse_pos)
-
-            if self.is_dragging:
-                return Dragging(mouse_pos)
+                    action = DragStart(mouse_pos)
             
-            return None
+        return action
         
     def get_key_input(self, events):
         key_strokes = []
@@ -70,7 +71,7 @@ class Game:
             draft_id = data['draft_id']
             team_1_username = data['team_1']['user']['username']
             team_2_username = data['team_2']['user']['username']
-            if team_1_username == self.user:
+            if team_1_username == self.user.is_logged_in:
                 opponent = team_2_username
             else:
                 opponent = team_1_username

@@ -1,43 +1,42 @@
 from client_state_proto import ClientState
-from .gui.draft_icons import draft_icons, DraftIcon
+from .gui.draft_buttons import draft_icons, DraftIcon
 from mouse_inputs import Click, DragEnd, MouseInput
-from typing import List
+from typing import Dict, List
 import pygame as pg
 from settings import BGCOLOR
+from .draft_manager import DraftManager
+from .gui.draft_ui import DraftUI, DraftIcon, LockInButton
 
-class DraftingState(ClientState):
+class DraftingState(ClientState): #Controller
     def __init__(self, draft_id: str, opponent: str) -> None:
         self.draft_id = draft_id
         self.opponent = opponent
-        self.character_icons: List[DraftIcon] = []
-        self.create_icons()
-        self.selected_character = None
+        self.draft_manager = DraftManager(n_picks=3, n_bans=1, characters=[])
+        self.draft_ui = DraftUI(n_picks=3, n_bans=1)
+
     
     def render(self, display: pg.Surface):
-        display.fill(BGCOLOR)
-        self.draw_icons(display)
-
-    def create_icons(self):
-        x_pos = 300
-        y_pos = 300
-        for Icon in draft_icons:
-            icon = Icon((x_pos, y_pos))
-            x_pos += icon.size[0] + 5
-            if x_pos > 1200:
-                x_pos = 300
-                y_pos += 155
-            self.character_icons.append(icon)
-
-    def draw_icons(self, display: pg.Surface):
-        for icon in self.character_icons:
-            icon.draw(display)
+        self.draft_ui.render(display)
 
     def mouse_input(self, input: MouseInput):
         if isinstance(input, Click) or isinstance(input, DragEnd):
-            self.check_for_icon_collision(input.pixel)
+            element = self.draft_ui.get_clicked_element(input.pixel)
+            if element:
+                if isinstance(element, DraftIcon):
+                    for icon in self.draft_ui.draft_icons:
+                        icon.unselect()
+                    element.select()
+                    self.draft_ui.select_character(element.character_name)
+                    self.draft_manager.select_character(element.character_name)
+                    
+                    if self.draft_manager.my_turn:
+                        if self.draft_manager.phase == 1:
+                            print(1)
+                        self.draft_ui.set_ban_icon(1, image=element.image)
 
-    def check_for_icon_collision(self, pixel_pos: (int,int)):
-        for icon in self.character_icons:
-            if icon.rect.collidepoint(pixel_pos):
-                icon.on_click()
+                if isinstance(element, LockInButton):
+                    element.on_click()
+
+    def server_input(self, message: Dict):
+        pass
 
