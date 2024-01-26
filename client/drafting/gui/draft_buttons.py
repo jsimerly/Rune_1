@@ -39,7 +39,6 @@ class LockInButton(AbsButton):
         display.blit(text_surface, text_pos)
 
     def on_click(self):
-        print('ya')
         self.show_outline = True
         self.outline_start_time = time.time()
 
@@ -131,12 +130,12 @@ class CrudDraftButton(DraftIcon):
             'Crud',
         )
 
-class EmilieDraftButton(DraftIcon):
+class EmilyDraftButton(DraftIcon):
     def __init__(self, position: (int, int)):
         super().__init__(
             position, 
-            'drafting/gui/icons/emilie_icon.png', 
-            'Emilie',
+            'drafting/gui/icons/emily_icon.png', 
+            'Emily',
         )
 
 class HercDraftButton(DraftIcon):
@@ -176,7 +175,7 @@ class LuDraftButton(DraftIcon):
         super().__init__(
             position, 
             'drafting/gui/icons/lu_icon.png', 
-            'Herc',
+            'Lu',
         )
 
 class NaviDraftButton(DraftIcon):
@@ -208,7 +207,7 @@ draft_icons: List[Type[DraftIcon]] = [
     BiziDraftButton,
     BolindaDraftButton,
     CrudDraftButton,
-    EmilieDraftButton,
+    EmilyDraftButton,
     HercDraftButton,
     IvanDraftButton,
     JudyDraftButton,

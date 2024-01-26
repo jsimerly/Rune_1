@@ -20,19 +20,29 @@ class CharacterPreview:
         self.ability = abilities
 
         self.font = pg.font.SysFont(None, 28)
+        self.character_font = pg.font.SysFont(None, 40)
 
     def draw(self, display: pg.Surface):
         self.draw_image(display)
+        self.draw_name(display)
         x_pos = 810
         y_pos = self.position[1]
-        y_pos += 300 # padding and 400 for image height
+        y_pos += 280 # padding and 400 for image height
         self.draw_survivability(display=display, pos=(x_pos,y_pos))
         self.draw_damage(display=display, pos=(x_pos, y_pos + 30))
         self.draw_utility(display=display, pos=(x_pos, y_pos + 60))
         self.draw_difficulty(display=display, pos=(x_pos, y_pos + 90))
 
+
     def draw_image(self, display: pg.Surface):
         display.blit(self.image, self.position)
+
+    def draw_name(self, display: pg.Surface):
+        text_surface = self.character_font.render(self.name, True, (255, 255, 255))
+        x_pos = self.position[0] + 400 + 300
+        y_pos = self.position[1]
+        text_pos = (x_pos, y_pos)
+        display.blit(text_surface, text_pos)
 
     def draw_info_type(self, display: pg.Surface, 
         pos:(int,int), name: str, value: int, color: (int, int, int),
@@ -134,12 +144,12 @@ class CrudPreview(CharacterPreview):
             abilities=[]
         )
 
-class EmiliePreview(CharacterPreview):
+class EmilyPreview(CharacterPreview):
     def __init__(self, position: (int, int)) -> None:
         super().__init__(
             position,  
-            name='Emilie',
-            image_path='drafting/gui/full_image/emilie.png',
+            name='Emily',
+            image_path='drafting/gui/full_image/emily.png',
             survivability=6, 
             damage=2, 
             utility=10, 
@@ -256,7 +266,7 @@ draft_previews: List[Type[CharacterPreview]] = [
     BiziPreview,
     BolindaPreview,
     CrudPreview,
-    EmiliePreview,
+    EmilyPreview,
     HercPreview,
     IvanPreview,
     JudyPreview,
