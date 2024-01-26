@@ -18,9 +18,10 @@ class LockInButton(AbsButton):
 
         super().__init__(rect)
 
-    def draw(self, display: pg.Surface):
+    def draw(self, display: pg.Surface, is_ban:bool = False):
+        text = 'Ban' if is_ban else 'Pick'
         pg.draw.rect(display, (240, 244, 250), self.rect)     
-        self.draw_text(display=display)
+        self.draw_text(display=display, text=text)
         
         if self.show_outline:
             pg.draw.rect(display, (0,0,0), self.rect, 2)
@@ -29,8 +30,10 @@ class LockInButton(AbsButton):
                 self.show_outline = False
 
 
-    def draw_text(self, display: pg.Surface):
-        text_surface = self.font.render('Lock-In', True, self.text_color)
+    def draw_text(self, display: pg.Surface, text=None):
+        if text == None:
+            text = 'Lock-In'
+        text_surface = self.font.render(text, True, self.text_color)
         point = self.rect.center
         text_pos = (point[0] - text_surface.get_width() // 2, point[1] - text_surface.get_height() // 2)
         display.blit(text_surface, text_pos)
@@ -144,6 +147,14 @@ class HercDraftButton(DraftIcon):
             'Herc',
         )
 
+class IvanDraftButton(DraftIcon):
+    def __init__(self, position: (int, int)):
+        super().__init__(
+            position, 
+            'drafting/gui/icons/ivan_icon.png', 
+            'Ivan',
+        )
+
 class JudyDraftButton(DraftIcon):
     def __init__(self, position: (int, int)):
         super().__init__(
@@ -189,7 +200,7 @@ class TimDraftButton(DraftIcon):
         super().__init__(
             position, 
             'drafting/gui/icons/tim_icon.png', 
-            'Papa',
+            'Tim',
         )
 
 draft_icons: List[Type[DraftIcon]] = [
@@ -199,6 +210,7 @@ draft_icons: List[Type[DraftIcon]] = [
     CrudDraftButton,
     EmilieDraftButton,
     HercDraftButton,
+    IvanDraftButton,
     JudyDraftButton,
     KaneDraftButton,
     LuDraftButton,

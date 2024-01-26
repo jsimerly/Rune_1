@@ -26,7 +26,9 @@ class DraftingState(ClientState): #Controller
                     for icon in self.draft_ui.draft_icons:
                         icon.unselect()
                     element.select()
+                    self.draft_ui.select_character(element.character_name)
                     self.draft_manager.select_character(element.character_name)
+                    
                     if self.draft_manager.my_turn:
                         if self.draft_manager.phase == 1:
                             print(1)
