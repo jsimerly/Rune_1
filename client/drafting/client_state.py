@@ -13,6 +13,7 @@ class DraftingState(ClientState): #Controller
         self.opponent = opponent
         self.draft_manager = DraftManager(n_picks=3, n_bans=1, characters=[])
         self.draft_ui = DraftUI(n_picks=3, n_bans=1)
+
     
     def render(self, display: pg.Surface):
         self.draft_ui.render(display)
@@ -25,6 +26,12 @@ class DraftingState(ClientState): #Controller
                     for icon in self.draft_ui.draft_icons:
                         icon.unselect()
                     element.select()
+                    self.draft_manager.select_character(element.character_name)
+                    if self.draft_manager.my_turn:
+                        if self.draft_manager.phase == 1:
+                            print(1)
+                        self.draft_ui.set_ban_icon(1, image=element.image)
+
                 if isinstance(element, LockInButton):
                     element.on_click()
 

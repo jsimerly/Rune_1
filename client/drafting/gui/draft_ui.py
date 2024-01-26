@@ -56,6 +56,11 @@ class DraftUI:
             my_pos = (my_pos[0], my_pos[1] + 155)
             opp_pos = (opp_pos[0], opp_pos[1] + 155)
 
+    def set_ban_icon(self, ban_pos: int, image: pg.Surface):
+        ban_pos -= 1
+        if ban_pos < len(self.my_bans):
+            self.my_bans[ban_pos].set_image(image)
+
     def get_clicked_element(self, pixel):
         for element in self.ui_elements:
             if element.rect.collidepoint(pixel):

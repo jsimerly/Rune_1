@@ -9,7 +9,7 @@ class DraftedCharacter:
         self.rect = pg.Rect(position, self.size)
         self.outline_color = (149, 220, 252)
 
-    def set_image(self, image):
+    def set_image(self, image: pg.Surface):
         self.image = image
 
     def set_is_active(self):
@@ -24,6 +24,9 @@ class DraftedCharacter:
         self.is_picked = True
 
     def draw(self, display: pg.Surface):
+        if self.image:
+            display.blit(self.image, self.rect)
+            
         if self.is_active:
             pg.draw.rect(display, self.outline_color, self.rect, 8)
 
@@ -36,8 +39,7 @@ class DraftedCharacter:
         ]):
             pg.draw.rect(display, self.outline_color, self.rect, 3)
 
-        if self.image:
-            display.blit(self.image, self.rect)
+
 
 class BannedCharacter(DraftedCharacter):
     def __init__(self, position: (int, int, int)):

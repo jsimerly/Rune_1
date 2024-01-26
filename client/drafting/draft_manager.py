@@ -15,6 +15,8 @@ class DraftManager:
         self.characters = characters
         self.n_picks = n_picks
         self.n_ban = n_bans
+        self.selected_character = None
+        self.my_turn = True
 
         self.bans = []
         self.opponent_bans = []
@@ -41,9 +43,12 @@ class DraftManager:
         
         return True
     
-    def ban_character(self, character: str):
-        if self._is_available(character):
-            self.bans.append(character)
+    def select_character(self, character: str):
+        self.selected_character = character
+    
+    def ban_character(self):
+        if self._is_available(self.select_character):
+            self.bans.append(self.select_character)
         print('You cannot ban that character.')
 
 

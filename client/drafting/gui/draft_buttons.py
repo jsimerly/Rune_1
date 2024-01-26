@@ -78,8 +78,8 @@ class DraftIcon(AbsButton):
 
     def draw_banning(self, display: pg.Surface):
         #draws an X through a the icon
-        p1 = (self.rect.topright[0], self.rect.topright[1])
-        p2 = (self.rect.bottomleft[0], self.rect.bottomleft[1])
+        p1 = (self.rect.topright[0] - 20, self.rect.topright[1] + 20)
+        p2 = (self.rect.bottomleft[0] + 20, self.rect.bottomleft[1] - 20)
         pg.draw.line(display, (168, 10, 10), p1, p2, 16)
         pg.draw.rect(display, (168, 10, 10), self.rect, 8)
 
@@ -100,7 +100,7 @@ class AthleaDraftButton(DraftIcon):
     def __init__(self, position: (int, int)):
         super().__init__(
             position, 
-            'drafting/gui/icons/athlea_draft_icon.png', 
+            'drafting/gui/icons/athlea_icon.png', 
             'Athlea',
         )
 
@@ -108,7 +108,7 @@ class BiziDraftButton(DraftIcon):
     def __init__(self, position: (int, int)):
         super().__init__(
             position, 
-            'drafting/gui/icons/bizi_draft_icon.webp', 
+            'drafting/gui/icons/bizi_icon.png', 
             'Bizi',
         )
 
@@ -116,7 +116,7 @@ class BolindaDraftButton(DraftIcon):
     def __init__(self, position: (int, int)):
         super().__init__(
             position, 
-            'drafting/gui/icons/bolinda_drafting_icon.png', 
+            'drafting/gui/icons/bolinda_icon.png', 
             'Bolinda',
         )
 
@@ -124,7 +124,7 @@ class CrudDraftButton(DraftIcon):
     def __init__(self, position: (int, int)):
         super().__init__(
             position, 
-            'drafting/gui/icons/crud_draft_icon.png', 
+            'drafting/gui/icons/crud_icon.png', 
             'Crud',
         )
 
@@ -132,7 +132,7 @@ class EmilieDraftButton(DraftIcon):
     def __init__(self, position: (int, int)):
         super().__init__(
             position, 
-            'drafting/gui/icons/emilie_draft_icon.webp', 
+            'drafting/gui/icons/emilie_icon.png', 
             'Emilie',
         )
 
@@ -140,7 +140,7 @@ class HercDraftButton(DraftIcon):
     def __init__(self, position: (int, int)):
         super().__init__(
             position, 
-            'drafting/gui/icons/herc_drafting_icon.png', 
+            'drafting/gui/icons/herc_icon.png', 
             'Herc',
         )
 
@@ -148,7 +148,7 @@ class JudyDraftButton(DraftIcon):
     def __init__(self, position: (int, int)):
         super().__init__(
             position, 
-            'drafting/gui/icons/judy_draft_icon.webp', 
+            'drafting/gui/icons/judy_icon.png', 
             'Judy',
         )
 
@@ -156,7 +156,7 @@ class KaneDraftButton(DraftIcon):
     def __init__(self, position: (int, int)):
         super().__init__(
             position, 
-            'drafting/gui/icons/kane_drafting_icon.png', 
+            'drafting/gui/icons/kane_icon.png', 
             'Athlea',
         )
 
@@ -164,7 +164,7 @@ class LuDraftButton(DraftIcon):
     def __init__(self, position: (int, int)):
         super().__init__(
             position, 
-            'drafting/gui/icons/lu_draft_icon.png', 
+            'drafting/gui/icons/lu_icon.png', 
             'Herc',
         )
 
@@ -172,7 +172,7 @@ class NaviDraftButton(DraftIcon):
     def __init__(self, position: (int, int)):
         super().__init__(
             position, 
-            'drafting/gui/icons/navi_draft_icon.png', 
+            'drafting/gui/icons/navi_icon.png', 
             'Navi',
         )
 
@@ -180,7 +180,7 @@ class PapaDraftButton(DraftIcon):
     def __init__(self, position: (int, int)):
         super().__init__(
             position, 
-            'drafting/gui/icons/papa_draft_icon.png', 
+            'drafting/gui/icons/papa_icon.png', 
             'Papa',
         )
 
@@ -188,7 +188,7 @@ class TimDraftButton(DraftIcon):
     def __init__(self, position: (int, int)):
         super().__init__(
             position, 
-            'drafting/gui/icons/tim_draft_icon.png', 
+            'drafting/gui/icons/tim_icon.png', 
             'Papa',
         )
 
