@@ -127,15 +127,16 @@ class HomeScreenState(ClientState):
     ''' Networking '''
 
     async def handle_response(self, message):
+        user = User(username=self.user['username'])
         package_kwargs = {
             'type' : 'lfg',
-            'username' : self.user['username'],
+            'user' : user,
             'data' : message
         }
         response = await self.socket.send_data(
             **package_kwargs
         )
-        user = User(username=self.user['username'])
+        
 
     def server_input(self, message):
         if message['type'] == 'game_found':

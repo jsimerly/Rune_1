@@ -89,7 +89,7 @@ class CharacterPreview:
             display= display, pos=pos,
             name = 'Difficulty',
             value = self.difficulty,
-            color = (38, 209, 206)
+            color = (149, 220, 252)
         )
 
 class AthleaPreview(CharacterPreview):

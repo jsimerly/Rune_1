@@ -1,9 +1,13 @@
+from __future__ import annotations
 import asyncio
 import websockets
 import json
 from uuid import uuid4
-from typing import Callable, Dict
+from typing import Callable, Dict, TYPE_CHECKING
 from api.api_schema import load_message
+
+if TYPE_CHECKING:
+    from user.user import User
 
 
 class TCPClient:
@@ -39,7 +43,7 @@ class TCPClient:
         self.loop.call_soon(self.loop.stop)
         self.loop.run_forever()
 
-    async def send_data(self, username: str, type: str,  data: Dict):
+    async def send_data(self, user: User, type: str,  data: Dict):
         if type not in ['lfg', 'draft', 'player_queues', 'end_game']:
             raise ValueError("Type must be one of the following: looking_for', 'draft', 'player_queues', 'end_game'")
         
@@ -52,7 +56,7 @@ class TCPClient:
 
         package = {
             'type': type,
-            'username': username,
+            'username': user.username,
             'data': data,
         }
         package = json.dumps(package)

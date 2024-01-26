@@ -1,5 +1,7 @@
 from enum import Enum
 from typing import List
+from api.client_socket import TCPClient
+from user.user import User
 
 class DraftPhase(Enum):
     BAN_1 = 1
@@ -24,6 +26,8 @@ class DraftManager:
         self.opponnent_characters = []
 
         self.phase = DraftPhase.BAN_1  
+        self.socket = TCPClient()
+        self.user = User()
 
     def _is_available(self, character: str):
         if character not in self.characters:
@@ -48,9 +52,22 @@ class DraftManager:
     
     def ban_character(self):
         if self._is_available(self.select_character):
-            self.bans.append(self.select_character)
+            self.bans.append(self.selected_character)
+            self.send_ban_message(self.selected_character)
+            
         print('You cannot ban that character.')
 
+    def send_ban_message(self, character: str):
+        package_kwargs = {
+            'type' : 'draft',
+            'data' : {
+                'pick_type': 'ban',
+                'selected_character' : character,
+            },
+            'user' : self.user
+        }
+
+        self.socket.send_data(**package_kwargs)
 
     def next_phase(self):
         next_value = self.state.value + 1
@@ -58,5 +75,7 @@ class DraftManager:
             self.complete = True
             return
         self.state = DraftPhase(next_value)
+
+
 
     
