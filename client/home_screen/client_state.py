@@ -137,12 +137,10 @@ class HomeScreenState(ClientState):
             **package_kwargs
         )
         
-
     def server_input(self, message):
         if message['type'] == 'game_found':
             self.game_found = True
             
-
     def cancel_clicked(self):
         self.is_waiting_for_game = False
         self.start_button.text = 'Start a Game'

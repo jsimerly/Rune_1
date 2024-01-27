@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import TYPE_CHECKING
 from uuid import uuid4
 from enum import Enum
@@ -7,18 +8,18 @@ if TYPE_CHECKING:
 
 
 class DraftPhase(Enum):
-    BAN1_TEAM1 = "Ban 1 - Team 1"
-    BAN2_TEAM2 = "Ban 2 - Team 2"
-    PICK1_TEAM1 = "Pick 1 - Team 1"
-    PICK2_3_TEAM2 = "Pick 2/3 - Team 2"
-    PICK4_5_TEAM1 = "Pick 4/5 - Team 1"
-    PICK6_TEAM2 = "Pick 6 - Team 2"
+    BAN1_TEAM1 = 1
+    BAN2_TEAM2 = 2
+    PICK1_TEAM1 = 3
+    PICK2_3_TEAM2 = 4
+    PICK4_5_TEAM1 = 5
+    PICK6_TEAM2 = 6
 
 
 class Draft:
-    def __init__(self, team_1, team_2) -> None:
-        self.team_1 = team_1
-        self.team_2 = team_2
+    def __init__(self, team_1: Team, team_2: Team) -> None:
+        self.team_1: Team = team_1
+        self.team_2: Team = team_2
         self.bans = {"team_1":[], "team_2":[]}
         self.picks = {"team_1":[],"team_2":[]}
         self.draft_id = uuid4()

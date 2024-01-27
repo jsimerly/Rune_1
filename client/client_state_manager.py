@@ -15,7 +15,7 @@ class ClientStateManager:
 
     def start_draft(self, data):
         self.current_state.on_exit()
-        self.current_state = DraftingState(**data)
+        self.current_state = DraftingState(draft_data=data)
         self.current_state.on_enter()
 
     def start_game(self):

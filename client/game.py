@@ -67,21 +67,8 @@ class Game:
 
     def handle_server_input(self, message):
         if message['type'] == 'game_found':
-            data = message['draft']
-            draft_id = data['draft_id']
-            team_1_username = data['team_1']['user']['username']
-            team_2_username = data['team_2']['user']['username']
-            if team_1_username == self.user.is_logged_in:
-                opponent = team_2_username
-            else:
-                opponent = team_1_username
-
-            kwargs = {
-                'draft_id' : draft_id,
-                'opponent' : opponent,
-            }
-        
-            self.state_manager.start_draft(kwargs)
+            data = message['draft']        
+            self.state_manager.start_draft(data)
         
     def drag_threshold_reached(self, mouse_pos):
             dx = mouse_pos[0] - self.mouse_down_pos[0]

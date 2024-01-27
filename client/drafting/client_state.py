@@ -8,12 +8,12 @@ from .draft_manager import DraftManager
 from .gui.draft_ui import DraftUI, DraftIcon, LockInButton
 
 class DraftingState(ClientState): #Controller
-    def __init__(self, draft_id: str, opponent: str) -> None:
-        self.draft_id = draft_id
-        self.opponent = opponent
+    def __init__(self, draft_data: Dict) -> None:
+        self.draft_id = draft_data['draft_id']
+        self.team_1 = draft_data['team_1']
+        self.team_2 = draft_data['team_2']
         self.draft_manager = DraftManager(n_picks=3, n_bans=1, characters=[])
         self.draft_ui = DraftUI(n_picks=3, n_bans=1)
-
     
     def render(self, display: pg.Surface):
         self.draft_ui.render(display)
