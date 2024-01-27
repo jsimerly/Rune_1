@@ -6,7 +6,8 @@ import time
 
 
 class LockInButton(AbsButton):
-    def __init__(self, position) -> None:
+    def __init__(self, position, locked=True) -> None:
+        self.locked = locked
         self.size = (300, 50)
         rect = pg.Rect(position, self.size)
         self.color = (240, 244, 250)
@@ -20,7 +21,8 @@ class LockInButton(AbsButton):
 
     def draw(self, display: pg.Surface, is_ban:bool = False):
         text = 'Ban' if is_ban else 'Pick'
-        pg.draw.rect(display, (240, 244, 250), self.rect)     
+        bg_color = (240, 244, 250) if not self.locked else (100, 100, 100)
+        pg.draw.rect(display, bg_color, self.rect)     
         self.draw_text(display=display, text=text)
         
         if self.show_outline:
@@ -33,14 +35,17 @@ class LockInButton(AbsButton):
     def draw_text(self, display: pg.Surface, text=None):
         if text == None:
             text = 'Lock-In'
-        text_surface = self.font.render(text, True, self.text_color)
+
+        text_color = self.text_color if not self.locked else (75, 75, 75)
+        text_surface = self.font.render(text, True, text_color)
         point = self.rect.center
         text_pos = (point[0] - text_surface.get_width() // 2, point[1] - text_surface.get_height() // 2)
         display.blit(text_surface, text_pos)
 
     def on_click(self):
-        self.show_outline = True
-        self.outline_start_time = time.time()
+        if not self.locked:
+            self.show_outline = True
+            self.outline_start_time = time.time()
 
 
 

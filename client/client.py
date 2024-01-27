@@ -7,7 +7,7 @@ from api.client_socket import TCPClient
 from user.user import User
 import asyncio
 
-class Game:
+class Client:
     def __init__(self) -> None:
         pg.init()
 
@@ -107,7 +107,7 @@ class Game:
         pg.quit()
 
 if __name__ == '__main__':
-    game = Game()
+    game = Client()
     while game.is_running:
         game.game_loop()
     game.handle_close()

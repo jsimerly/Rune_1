@@ -141,6 +141,7 @@ class HomeScreenState(ClientState):
         if message['type'] == 'game_found':
             self.game_found = True
             
+
     def cancel_clicked(self):
         self.is_waiting_for_game = False
         self.start_button.text = 'Start a Game'

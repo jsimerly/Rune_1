@@ -6,14 +6,29 @@ import pygame as pg
 from settings import BGCOLOR
 from .draft_manager import DraftManager
 from .gui.draft_ui import DraftUI, DraftIcon, LockInButton
+from user.user import User
+from drafting.draft_phase import DraftPhase
 
 class DraftingState(ClientState): #Controller
     def __init__(self, draft_data: Dict) -> None:
         self.draft_id = draft_data['draft_id']
         self.team_1 = draft_data['team_1']
         self.team_2 = draft_data['team_2']
-        self.draft_manager = DraftManager(n_picks=3, n_bans=1, characters=[])
-        self.draft_ui = DraftUI(n_picks=3, n_bans=1)
+
+        self.user = User()
+        self.is_team_1 = self.user.username == self.team_1['user']['username']
+
+        self.phase = DraftPhase.TEAM_1_BAN_1
+        self.draft_manager = DraftManager(
+            n_picks=3, 
+            n_bans=1, 
+            characters=[], 
+            is_team_1 = self.is_team_1,
+            phase=self.phase
+        )
+        self.draft_ui = DraftUI(
+            n_picks=3, n_bans=1, phase=self.phase, is_team_1 = self.is_team_1
+        )
     
     def render(self, display: pg.Surface):
         self.draft_ui.render(display)
@@ -40,3 +55,9 @@ class DraftingState(ClientState): #Controller
     def server_input(self, message: Dict):
         pass
 
+    def next_phase(self):
+        next_value = self.state.value + 1
+        if next_value > len(DraftPhase):
+            self.complete = True
+            return
+        self.state = DraftPhase(next_value)

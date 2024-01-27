@@ -10,6 +10,7 @@ import traceback
 from typing import TYPE_CHECKING, Tuple, Optional, Dict
 from server_socket import TCPServer
 import asyncio
+from serializer import serialize_team, serialize_user
 
 if TYPE_CHECKING:
     from user.user import User
@@ -27,14 +28,13 @@ class GameServer:
         if draft_info:
             user_1 = draft_info.team_1.user
             user_2 = draft_info.team_2.user
-            print(draft_info)
             serialized_data = json.dumps(
             {
                 'type': 'game_found',
                 'draft' : {
                     'draft_id': str(draft_info.draft_id),
-                    'team_1': str(draft_info.team_1.team_id),
-                    'team_2': str(draft_info.team_2.team_id),
+                    'team_1': serialize_team(draft_info.team_1),
+                    'team_2': serialize_team(draft_info.team_2),
                 }
                 
             })
@@ -51,41 +51,7 @@ class GameServer:
 
     def handle_looking_for_game(self, user) -> Tuple[UUID, User, User]:
         return self.matchmaker.register_team(user)
-
-    # async def handle_connection(self, websocket, path):
-    #     print('New Connection Established')
-    #     try:
-    #         first_message = await websocket.recv()
-    #         username = json.loads(first_message).get('username')
-    #         await self.register(username, websocket)
-    #         print('User Regsitered: ', username)
-
-    #         user = self.user_manager.get_user(username)
-    #         if user:
-    #             game_info = self.handle_looking_for_game(user) 
-    #             if game_info is not None:
-    #                 game_id = game_info['game_id']
-    #                 user_1 = game_info['user_1']
-    #                 user_2 = game_info['user_2']
-    #                 await self.notify_players_of_game(game_id, user_1, user_2)
-
-    #         #sync recieving any new messages from the websocket
-    #         async for raw_message in websocket:
-    #             #this does validation to make sure it's proper schema\
-    #             data = load_message(raw_message) 
-    #             user = self.user_manager.get_user(data['username'])
-    #             if not user:
-    #                 raise ValueError('No user with that username exists.')
-
-    #     except Exception as e:
-    #         print("Connection closed unexpectedly.")
-    #         traceback.print_exc()
-    #     finally:
-    #         print(f'{websocket.remote_address} removed.')
-    
-
-
-        
+       
 
 if __name__ == '__main__':
     server = GameServer()

@@ -4,12 +4,14 @@ from .draft_buttons import draft_icons, DraftIcon, LockInButton
 from .drafted_characeter import DraftedCharacter, BannedCharacter
 from .character_preview import draft_previews, CharacterPreview
 from typing import TYPE_CHECKING, List, Dict
+from drafting.draft_phase import DraftPhase
 
 class DraftUI:
-    def __init__(self, n_picks:int, n_bans:int) -> None:
+    def __init__(self, n_picks:int, n_bans:int, phase, is_team_1:bool) -> None:
         self.n_picks = n_picks
         self.n_bans = n_bans
-        self.is_banning = True
+        self.phase = phase
+        self.is_team_1 = is_team_1
 
         self.draft_icons: List[DraftIcon] = []
 
@@ -17,7 +19,7 @@ class DraftUI:
         self.opp_bans: List[BannedCharacter] = []
         self.my_picks: List[DraftedCharacter] = []
         self.opp_picks: List[DraftedCharacter] = []
-        self.lock_in_button: LockInButton = LockInButton((750, 900))
+        self.lock_in_button: LockInButton = LockInButton((750, 900), not is_team_1)
         self.previews_map: Dict[str, CharacterPreview] = {}
 
         self.selected_character = None
@@ -29,6 +31,20 @@ class DraftUI:
         self.ui_elements = self.draft_icons + self.my_bans + self.my_picks + self.opp_bans + self.opp_picks 
         self.clickable_elements = self.draft_icons + [self.lock_in_button]
 
+    def is_my_turn(self):
+        team_1_turn = any(
+                self.phase == DraftPhase.TEAM_1_BAN_1,
+                self.phase == DraftPhase.TEAM_1_PICK_1,
+                self.phase == DraftPhase.TEAM_1_PICK_2,
+                self.phase == DraftPhase.TEAM_1_PICK_3,
+            )
+        
+        if team_1_turn and self.is_team_1:
+            return True
+        return False
+    
+    def handle_turn_change(self):
+        self.lock_in_button.locked = not self.is_my_turn()
         
     def create_icons(self):
         left_x = 375
@@ -92,7 +108,8 @@ class DraftUI:
                 element.draw(display)
 
         for icon in self.clickable_elements:
-            icon.draw(display, self.is_banning)
+            is_banning = self.phase == DraftPhase.TEAM_1_BAN_1 or self.phase == DraftPhase.TEAM_2_BAN_1
+            icon.draw(display, is_banning)
 
         if self.selected_character in self.previews_map:
             preview = self.previews_map[self.selected_character]

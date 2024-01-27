@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -14,7 +15,7 @@ def serialize_user(user: User):
 def serialize_team(team: Team):
     return {
         'user': serialize_user(team.user),
-        'team_id': team.team_id,
+        'team_id': str(team.team_id),
         'characters': team.characters
     }
 
@@ -27,7 +28,7 @@ def serializer_draft_start(draft: Draft):
 
 def serializer_game_start(game: Game):
     return {
-        'game_id': game.game_id,
+        'game_id': str(game.game_id),
         'team_1': serialize_team(game.team_1),
         'team_2': serialize_team(game.team_2),
         'round': game.round

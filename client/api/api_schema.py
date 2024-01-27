@@ -28,13 +28,13 @@ draft_schema = {
         'draft_id' : {'type': 'string'},
         'team_1' : {'type': 'string'},
         'team_2': {'type': 'string'},
-        # 'team_1' : {'$ref': '#/definitions/team'},
-        # 'team_2' : {'$ref': '#/definitions/team'},
+        'team_1' : {'$ref': '#/definitions/team'},
+        'team_2' : {'$ref': '#/definitions/team'},
     },
     'required' : [],
-    # 'definitions' : {
-    #     'team' : team_schema
-    # }   
+    'definitions' : {
+        'team' : team_schema
+    }   
 }
 
 game_schema = {
@@ -89,7 +89,6 @@ def validate_message(message):
     return True, ""
 
 def load_message(raw_message):
-    print(raw_message)
     try:
         message = json.loads(raw_message)
         is_valid, error = validate_message(message)

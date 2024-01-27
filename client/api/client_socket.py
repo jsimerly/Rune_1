@@ -8,8 +8,6 @@ from api.api_schema import load_message
 
 if TYPE_CHECKING:
     from user.user import User
-
-
 class TCPClient:
     _instance = None
 
@@ -61,16 +59,12 @@ class TCPClient:
         }
         package = json.dumps(package)
         await self.websocket.send(package)
-        # response = await self.websocket.recv()
-        # return response
     
     async def listen_for_messages(self):
         while True:
             message = await self.websocket.recv()
             message = load_message(message)
             self.message_callback(message)
-
-    ''''NEED TO ROUTE THIS TO WHATEVER THE CODE IS. THIS IS WHERE ALL OUR CONNECTIONS WILL COME FROm.'''
     
     async def start_listening(self):
         asyncio.create_task(self.listen_for_messages())
