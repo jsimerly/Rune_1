@@ -50,7 +50,7 @@ class CharacterPreview:
         if value > 10 or value <= 0:
             raise ValueError('value needs to be greater than 0 and less than 11')
         
-        width = 110 + 30 * value
+        width = 90 + 30 * value
         size = (width, 25) #calculate this based on value
         rect = pg.Rect(pos, size)
         pg.draw.rect(display, color, rect, 0, 5)
@@ -63,7 +63,7 @@ class CharacterPreview:
     def draw_survivability(self, display: pg.Surface, pos):
         self.draw_info_type(
             display= display, pos=pos,
-            name = 'Survivability',
+            name = 'Durability',
             value = self.survivability,
             color = (1, 77, 2)
         )

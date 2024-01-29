@@ -12,3 +12,6 @@ class User:
         if username is not None:
             self.username = username
             self.is_logged_in = True
+
+    def serialize(self):
+        return {'username': self.username}

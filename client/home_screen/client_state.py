@@ -114,34 +114,27 @@ class HomeScreenState(ClientState):
             self.user['username'] = self.user_name_input.text
             self.user['is_logged_in'] = True
             self.buttons.remove(self.enter_button)
+            self.socket.login(self.user['username'])
 
     def start_clicked(self):
         self.is_waiting_for_game = True
         self.start_button.text = 'Cancel'
         self.start_button.on_click = self.cancel_clicked
-        start_data = {'user':self.user['username']}
-        self.socket.create_task(
-            self.handle_response(start_data)
+        
+        message = {'username':self.user['username']}
+        user = User(username=self.user['username'])
+        self.socket.send_message(
+            type='lfg',
+            user=user,
+            serialized_message=message
         )
 
     ''' Networking '''
-
-    async def handle_response(self, message):
-        user = User(username=self.user['username'])
-        package_kwargs = {
-            'type' : 'lfg',
-            'user' : user,
-            'data' : message
-        }
-        response = await self.socket.send_data(
-            **package_kwargs
-        )
         
     def server_input(self, message):
         if message['type'] == 'game_found':
             self.game_found = True
             
-
     def cancel_clicked(self):
         self.is_waiting_for_game = False
         self.start_button.text = 'Start a Game'

@@ -41,21 +41,33 @@ class TCPClient:
         self.loop.call_soon(self.loop.stop)
         self.loop.run_forever()
 
-    async def send_data(self, user: User, type: str,  data: Dict):
+    def login(self, username: str):
+        self.create_task(self._login(username))
+
+    async def _login(self, username:str):
+        await self.connect()
+        package = json.dumps(
+            {'username' : username}
+        )
+        await self.websocket.send(package)
+
+    def send_message(self, user: User, type: str, serialized_message: str):
+        self.create_task(self._send_message(user, type, serialized_message))
+
+    async def _send_message(self, user: User, type: str,  message: Dict):
         if type not in ['lfg', 'draft', 'player_queues', 'end_game']:
             raise ValueError("Type must be one of the following: looking_for', 'draft', 'player_queues', 'end_game'")
         
-        if not isinstance(data, dict):
+        if not isinstance(message, dict):
             raise ValueError('messages must be a dictionary or json format to be sent using send_data.')
     
         if not self.websocket:
             await self.connect()
         
-
         package = {
             'type': type,
-            'username': user.username,
-            'data': data,
+            'user': user.serialize(),
+            'data': message,
         }
         package = json.dumps(package)
         await self.websocket.send(package)
@@ -67,7 +79,7 @@ class TCPClient:
             self.message_callback(message)
     
     async def start_listening(self):
-        asyncio.create_task(self.listen_for_messages())
+        self.create_task(self.listen_for_messages())
 
 
 

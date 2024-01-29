@@ -67,7 +67,7 @@ class Client:
 
     def handle_server_input(self, message):
         if message['type'] == 'game_found':
-            data = message['draft']        
+            data = message['data']        
             self.state_manager.start_draft(data)
         
     def drag_threshold_reached(self, mouse_pos):

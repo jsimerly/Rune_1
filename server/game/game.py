@@ -1,4 +1,3 @@
-from team.team import Team
 from typing import TYPE_CHECKING
 from .states.game_state import InGameState
 from .states.drafting_state import DraftingState
@@ -13,8 +12,8 @@ class Game:
         self.game_id = uuid
         self.user_1: User = user_1
         self.user_2: User = user_2
-        self.team_1 = Team(user=user_1)
-        self.team_2 = Team(user=user_2)
+        # self.team_1 = Team(user=user_1)
+        # self.team_2 = Team(user=user_2)
         self.state: AbstactGameState = DraftingState(self.on_drafting_complete)
         self.round = 1
 

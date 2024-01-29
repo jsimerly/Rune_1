@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from user.user import User
-    from team.team import Team
+    from server.drafting.draft_team import Team
     from game.game import Game
     from drafting.draft import Draft
 

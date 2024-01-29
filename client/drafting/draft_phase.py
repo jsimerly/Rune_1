@@ -9,4 +9,4 @@ class DraftPhase(Enum):
     TEAM_1_PICK_2 = 6
     TEAM_1_PICK_3 = 7
     TEAM_2_PICK_3 = 8
-    COMPLETED = 7
+    COMPLETED = 9

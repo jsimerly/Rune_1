@@ -6,17 +6,19 @@ import pygame as pg
 from settings import BGCOLOR
 from .draft_manager import DraftManager
 from .gui.draft_ui import DraftUI, DraftIcon, LockInButton
+from .draft_team import DraftTeam
 from user.user import User
 from drafting.draft_phase import DraftPhase
+from api.client_socket import TCPClient
 
 class DraftingState(ClientState): #Controller
     def __init__(self, draft_data: Dict) -> None:
         self.draft_id = draft_data['draft_id']
-        self.team_1 = draft_data['team_1']
-        self.team_2 = draft_data['team_2']
+        self.team_1 = DraftTeam(draft_data['team_1']['team_id'])
+        self.team_2 = DraftTeam(draft_data['team_2']['team_id'])
 
         self.user = User()
-        self.is_team_1 = self.user.username == self.team_1['user']['username']
+        self.is_team_1 = draft_data['team'] == 1
 
         self.phase = DraftPhase.TEAM_1_BAN_1
         self.draft_manager = DraftManager(
@@ -29,6 +31,7 @@ class DraftingState(ClientState): #Controller
         self.draft_ui = DraftUI(
             n_picks=3, n_bans=1, phase=self.phase, is_team_1 = self.is_team_1
         )
+        self.socket = TCPClient()
     
     def render(self, display: pg.Surface):
         self.draft_ui.render(display)
@@ -52,7 +55,11 @@ class DraftingState(ClientState): #Controller
                 if isinstance(element, LockInButton):
                     element.on_click()
 
+    def notify_of_ban(self, character):
+        self.socket.send_data()
+
     def server_input(self, message: Dict):
+        print(message)
         pass
 
     def next_phase(self):

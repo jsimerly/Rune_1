@@ -2,11 +2,6 @@ from __future__ import annotations
 import asyncio
 import websockets
 import json
-from match_maker import MatchMaking
-from user.users_manager import UsersManager
-from api import load_message
-from uuid import UUID
-import traceback
 from typing import TYPE_CHECKING, Tuple, Optional, Callable, Dict
 
 if TYPE_CHECKING:
@@ -21,9 +16,13 @@ class TCPServer:
             cls._instance.__initialized = False
         return cls._instance
     
-    def __init__(self, add_user_callback: Callable, handle_message: Callable):
+    def __init__(self, add_user_callback: Callable=None, handle_message: Callable=None):
         if self.__initialized:
             return        
+        
+        if add_user_callback is None or handle_message is None:
+            raise ValueError("Initial instantiation of TCPServer requires 'add_user_callback' and 'handle_message' parameters")
+
         self.__initialized = True
         self.add_user_callback = add_user_callback
         self.handle_message_callback = handle_message
@@ -52,11 +51,16 @@ class TCPServer:
         except KeyError:
             print("Received JSON message without 'username' key")
 
+
     async def listen_for_messages(self, websocket):
         async for raw_messages in websocket:
             self.handle_message_callback(raw_messages)
 
-    async def send_message(self, user: User, package: Dict):
+    def send_message(self, user: User, serialized_message:str):
+        asyncio.create_task(self._send_message(user, serialized_message))
+
+    async def _send_message(self, user: User, package: str):
+        #need to handle types here as just like on the client side 
         if user.websocket in self.clients:
             await user.websocket.send(package)
 
