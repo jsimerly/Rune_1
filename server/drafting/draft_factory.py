@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 class DraftFactory:
     def create(self, user_1: User, user_2: User):
-        return Draft(user_2 = user_1, user_1 = user_2)
+        return Draft(user_1=user_1, user_2= user_2)
     
     def get_map(self):
         return "map_1"

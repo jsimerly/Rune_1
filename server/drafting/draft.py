@@ -67,7 +67,7 @@ class Draft:
         return False
     
     def handle_from_client(self, user, data):
-        print('---- draft data from clinet ----')
+        print('---- draft data from client ----')
         #could verify user is owner of team to prevent hacking, but shuldn't be an issue
         team_id = data['team_id']
         character_str = data['selected_character']
@@ -106,10 +106,13 @@ class Draft:
 
         user_1 = self.team_1.user
         user_2 = self.team_2.user
+    
+        self.notifiy_user_of_ban(user_1, 'ban')
+        self.notifiy_user_of_ban(user_2, 'ban')
 
     def notifiy_user_of_ban(self, user: User, ban: DraftBan):
-        message = {}
-        self.socket.send_message(user)
+        message = {'foo': 'poop'}
+        self.socket.send_message(user, 'draft', message)
         ...
 
 
