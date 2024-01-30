@@ -56,13 +56,17 @@ class TCPServer:
         async for raw_messages in websocket:
             self.handle_message_callback(raw_messages)
 
-    def send_message(self, user: User, serialized_message:str):
-        asyncio.create_task(self._send_message(user, serialized_message))
+    def send_message(self, user: User, type: str, serialized_message:str):
+        asyncio.create_task(self._send_message(user, type, serialized_message))
 
-    async def _send_message(self, user: User, package: str):
+    async def _send_message(self, user: User, type:str, package: str):
         #need to handle types here as just like on the client side 
+        message = json.dumps({
+            'type': type,
+            'data': package,
+        })
         if user.websocket in self.clients:
-            await user.websocket.send(package)
+            await user.websocket.send(message)
 
     async def start(self, host, port):
         async with websockets.serve(self.handle_connections, host, port):

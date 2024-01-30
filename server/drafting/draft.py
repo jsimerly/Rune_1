@@ -9,6 +9,7 @@ from .draft_team import DraftTeam, DraftPick, DraftBan
 
 if TYPE_CHECKING:
     from server.drafting.draft_team import DraftTeam, DraftCharacter, DraftPick, DraftBan, AbsDraftSelection
+    from user.user import User
     
 class DraftPhase(Enum):
     TEAM_1_BAN_1 = 1
@@ -74,19 +75,9 @@ class Draft:
             pick_type = data['pick_type']
             if pick_type == 'ban':
                 self.ban(character_str)
-                print(self.banned)
             if pick_type == 'pick':
                 self.pick(character_str)
-                print(self.picked)
-
         
-            #handle next phase and response
-
-        ...
-    def notifiy_user_of_ban(self, user):
-        message = {}
-        self.socket.send_message(user)
-        ...
 
     def verify_active_team(self, team_id: str):
         return str(team_id) == str(self.active_team.team_id)
@@ -112,6 +103,14 @@ class Draft:
         ban = DraftBan(self.active_team, character_obj)
         self.active_team.ban(ban)
         self.banned.add(ban)
+
+        user_1 = self.team_1.user
+        user_2 = self.team_2.user
+
+    def notifiy_user_of_ban(self, user: User, ban: DraftBan):
+        message = {}
+        self.socket.send_message(user)
+        ...
 
 
     def pick(self, team_id: str, character_str: str):

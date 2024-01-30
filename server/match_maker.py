@@ -42,24 +42,19 @@ class MatchMaking:
     def notify_players_of_draft(self, draft_obj: Draft):
         #serializer draft here
         serialized_draft_obj = draft_obj.serialize()
-        package_1 = json.dumps({
-            'type': 'game_found',
-            'data': {
+        package_1 = {
                 **serialized_draft_obj,
                 'team': 1,
             }
-        }) 
-        package_2 = json.dumps({
-            'type': 'game_found',
-            'data': {
+        package_2 = {
                 **serialized_draft_obj,
                 'team': 2,
             }
-        }) 
-
+    
+        
         user_1 = draft_obj.team_1.user
         user_2 = draft_obj.team_2.user
-        self.socket.send_message(user_1, package_1)
-        self.socket.send_message(user_2, package_2)
+        self.socket.send_message(user_1, 'game_found', package_1)
+        self.socket.send_message(user_2, 'game_found', package_2)
 
 
