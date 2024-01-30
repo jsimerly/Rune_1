@@ -19,6 +19,7 @@ class DraftingState(ClientState): #Controller
 
         self.user = User()
         self.is_team_1 = draft_data['team'] == 1
+        self.my_team = self.team_1 if self.is_team_1 else self.team_2
 
         self.phase = DraftPhase.TEAM_1_BAN_1
         self.draft_manager = DraftManager(
@@ -54,9 +55,22 @@ class DraftingState(ClientState): #Controller
 
                 if isinstance(element, LockInButton):
                     element.on_click()
+                    self.notify_of_ban('crud')
 
     def notify_of_ban(self, character):
-        self.socket.send_data()
+        package_kwargs = {
+            'type' : 'draft',
+            'serialized_message' : {
+                'draft_id': str(self.draft_id),
+                'team_id': str(self.my_team.team_id),
+                'pick_type': 'ban',
+                'phase': self.phase.value,
+                'selected_character' : character,
+            },
+            'user' : self.user
+        }
+
+        self.socket.send_message(**package_kwargs)
 
     def server_input(self, message: Dict):
         print(message)

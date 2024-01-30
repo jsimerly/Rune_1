@@ -1,9 +1,12 @@
 from __future__ import annotations
-from user.user import User
+
 from uuid import uuid4
 from typing import Set, List, TYPE_CHECKING
 from abc import ABC, abstractmethod 
 import json
+
+if TYPE_CHECKING:
+    from user.user import User
 
 class DraftCharacter:
     def __init__(self, name: str) -> None:
@@ -43,8 +46,8 @@ class DraftTeam:
     def __init__(self, user: User) -> None:
         self.user: User = user
         self.team_id = uuid4()
-        self.bans: Set[DraftBan] = []
-        self.picks: Set[DraftPick] = []
+        self.bans: Set[DraftBan] = set()
+        self.picks: Set[DraftPick] = set()
 
     def ban(self, ban: DraftBan):
         self.bans.add(ban)

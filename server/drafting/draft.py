@@ -5,6 +5,7 @@ from uuid import uuid4
 from enum import Enum
 import json
 from server_socket import TCPServer
+from .draft_team import DraftTeam, DraftPick, DraftBan
 
 if TYPE_CHECKING:
     from server.drafting.draft_team import DraftTeam, DraftCharacter, DraftPick, DraftBan, AbsDraftSelection
@@ -21,16 +22,17 @@ class DraftPhase(Enum):
     COMPLETED = 9
 
 class Draft:
-    def __init__(self, team_1: DraftTeam, team_2: DraftTeam) -> None:
-        self.team_1: DraftTeam = team_1
-        self.team_2: DraftTeam = team_2
-        self.draft_id = uuid4()
+    def __init__(self, user_1: DraftTeam, user_2: DraftTeam) -> None:
+        self.team_1: DraftTeam = DraftTeam(user_1)
+        self.team_2: DraftTeam = DraftTeam(user_2)
+        self.active_team = self.team_1
+
+        self.draft_id = str(uuid4())
         self.socket = TCPServer()
 
-        self.available: Dict[str, DraftCharacter] = {}
+        self.available: Dict[str, DraftCharacter] = draft_pool_map
         self.total_pool: List[str] = []
-        for name, cls in draft_pool_map.items():
-            self.available[name] = cls()
+        for name in draft_pool_map.keys():
             self.total_pool.append(name)
         
         self.banned: Set[DraftBan] = set()
@@ -63,22 +65,53 @@ class Draft:
             return str(self.team_2.team_id) == team_id
         return False
     
-    def is_valid_selection(self, team_id: str, character_str: str):
-        return all([
-            self.is_active_team(team_id),
-            character_str in self.total_pool,
-            character_str in self.available,
-        ])
-        #handle errors here and send them back to the client.
-
-    def ban(self, team_id: str, character_str: str):
+    def handle_from_client(self, user, data):
+        print('---- draft data from clinet ----')
+        #could verify user is owner of team to prevent hacking, but shuldn't be an issue
+        team_id = data['team_id']
+        character_str = data['selected_character']
         if self.is_valid_selection(team_id, character_str):
-            character_obj = self.available[character_str]()
-            del self.available[character_str]
-            
-            ban = DraftBan(character_obj)
-            self.team_1.ban(ban)
-            self.banned.add(ban)
+            pick_type = data['pick_type']
+            if pick_type == 'ban':
+                self.ban(character_str)
+                print(self.banned)
+            if pick_type == 'pick':
+                self.pick(character_str)
+                print(self.picked)
+
+        
+            #handle next phase and response
+
+        ...
+    def notifiy_user_of_ban(self, user):
+        message = {}
+        self.socket.send_message(user)
+        ...
+
+    def verify_active_team(self, team_id: str):
+        return str(team_id) == str(self.active_team.team_id)
+    
+    def verify_character_available(self, character_str):
+        return character_str in self.available
+    
+    def is_valid_selection(self, team_id: str, character_str: str):
+        if self.verify_active_team(team_id):
+            if self.verify_character_available(character_str):
+                return True
+
+            #handle not available
+            return False
+        #handle wrong team error
+        return False
+
+
+    def ban(self, character_str: str):
+        character_obj = self.available[character_str]()
+        del self.available[character_str]
+        
+        ban = DraftBan(self.active_team, character_obj)
+        self.active_team.ban(ban)
+        self.banned.add(ban)
 
 
     def pick(self, team_id: str, character_str: str):

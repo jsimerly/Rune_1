@@ -28,6 +28,7 @@ class MatchMaking:
             self.user_2 = None
             
             self.notify_players_of_draft(draft_obj)
+            return draft_obj
 
         return None
     

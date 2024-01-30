@@ -9,7 +9,7 @@ class DraftManager:
         self.n_picks = n_picks
         self.n_ban = n_bans
         self.is_team_1 = is_team_1
-        
+
         self.selected_character = None
         self.my_turn = True
 
@@ -60,7 +60,7 @@ class DraftManager:
             'user' : self.user
         }
 
-        self.socket.send_data(**package_kwargs)
+        self.socket.send_message(**package_kwargs)
 
 
 
