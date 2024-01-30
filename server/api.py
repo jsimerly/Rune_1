@@ -1,5 +1,6 @@
 from jsonschema import validate, ValidationError
 import json
+from typing import Dict
 
 look_for_game_schema = {
     'type' : 'object',
@@ -70,25 +71,25 @@ schema_map = {
 }
 
 def validate_message(message):
-    '''
-        We're using this function to validate that the message that was sent from the client is in a proper formate based on the 'type' that was sent. We'll need to build a simliar schema on the client to route moves.
-    '''
+    """
+    Validate that the message from the client contains 'type' and 'data'.
+    Additional validation can be handled in the respective objects based on 'type'.
+    """
     try:
-        # Extract message type
-        message_type = message.get('type')
-        if message_type not in schema_map:
-            raise ValidationError(f"Invalid message type: {message_type}")
+        # Check for presence of 'type' and 'data' keys
+        if 'type' not in message:
+            raise ValueError("Missing 'type' in message")
+        if 'data' not in message:
+            raise ValueError("Missing 'data' in message")
+        if 'user' not in message:
+            raise ValueError("missing 'user' in message")
+        
+        return True, ''
 
-        # Get the corresponding schema and validate
-        schema = schema_map[message_type]
-        validate(instance=message, schema=schema)
-    except ValidationError as e:
+    except ValueError as e:
         return False, str(e)
-    except KeyError as e:
-        return False, f"Key error: {str(e)}"
-    return True, ""
 
-def load_message(raw_message):
+def load_message(raw_message) -> Dict:
     try:
         message = json.loads(raw_message)
         is_valid, error = validate_message(message)

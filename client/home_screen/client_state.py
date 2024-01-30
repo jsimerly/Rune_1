@@ -79,6 +79,7 @@ class HomeScreenState(ClientState):
         display.blit(text_surface, text_position)
 
     def draw_game_found(self, display: pg.Surface):
+        self.is_waiting_for_game = False
         text = 'Match Found'
         text_surface = self.font.render(text, True, (255, 255, 255))
         text_position = (775, 620)
