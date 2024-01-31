@@ -1,14 +1,15 @@
 from client import Client
-from drafting.client_state import DraftingState
+from draft.draft_state import DraftState
 
 def run():
     game = Client()
     draft_data = {
         'draft_id' : 123,
-        'team_1': 455,
-        'team_2': 789,
+        'team_1': {'team_id': 123},
+        'team_2': {'team_id': 123},
+        'team': 1
     }
-    game.state_manager.current_state = DraftingState(draft_data=draft_data)
+    game.state_manager.current_state = DraftState(draft_data=draft_data)
     while game.is_running:
         game.game_loop()
     game.handle_close()

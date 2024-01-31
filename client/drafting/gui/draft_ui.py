@@ -1,50 +1,37 @@
+from __future__ import annotations
 import pygame as pg
 from settings import BGCOLOR
 from .draft_buttons import draft_icons, DraftIcon, LockInButton
 from .drafted_characeter import DraftedCharacter, BannedCharacter
 from .character_preview import draft_previews, CharacterPreview
 from typing import TYPE_CHECKING, List, Dict
-from drafting.draft_phase import DraftPhase
+
+if TYPE_CHECKING:
+    from drafting.client_state import DraftingState
 
 class DraftUI:
-    def __init__(self, n_picks:int, n_bans:int, phase, is_team_1:bool) -> None:
+    def __init__(self, n_picks:int, n_bans:int, draft_state: DraftingState) -> None:
         self.n_picks = n_picks
         self.n_bans = n_bans
-        self.phase = phase
-        self.is_team_1 = is_team_1
-
+        self.draft_state = draft_state
+   
         self.draft_icons: List[DraftIcon] = []
+        self.icon_map: Dict[str, DraftIcon] = {}
 
-        self.my_bans: List[BannedCharacter] = []
-        self.opp_bans: List[BannedCharacter] = []
-        self.my_picks: List[DraftedCharacter] = []
-        self.opp_picks: List[DraftedCharacter] = []
-        self.lock_in_button: LockInButton = LockInButton((750, 900), not is_team_1)
+        self.team_1_bans: List[BannedCharacter] = []
+        self.team_2_bans: List[BannedCharacter] = []
+        self.team_1_picks: List[DraftedCharacter] = []
+        self.team_2_picks: List[DraftedCharacter] = []
+        self.lock_in_button: LockInButton = LockInButton((750, 900), not self.draft_state.my_turn)
         self.previews_map: Dict[str, CharacterPreview] = {}
-
-        self.selected_character = None
 
         self.create_icons()
         self.create_pick_bans()
         self.create_previews()
 
-        self.ui_elements = self.draft_icons + self.my_bans + self.my_picks + self.opp_bans + self.opp_picks 
-        self.clickable_elements = self.draft_icons + [self.lock_in_button]
+        self.ui_elements = self.draft_icons + self.team_1_bans + self.team_1_picks + self.team_2_bans + self.team_2_picks 
+        self.clickable_elements = self.draft_icons + [self.lock_in_button]  
 
-    def is_my_turn(self):
-        team_1_turn = any(
-                self.phase == DraftPhase.TEAM_1_BAN_1,
-                self.phase == DraftPhase.TEAM_1_PICK_1,
-                self.phase == DraftPhase.TEAM_1_PICK_2,
-                self.phase == DraftPhase.TEAM_1_PICK_3,
-            )
-        
-        if team_1_turn and self.is_team_1:
-            return True
-        return False
-    
-    def handle_turn_change(self):
-        self.lock_in_button.locked = not self.is_my_turn()
         
     def create_icons(self):
         left_x = 375
@@ -57,6 +44,7 @@ class DraftUI:
                 x_pos = left_x
                 y_pos += 155
             self.draft_icons.append(icon)
+            self.icon_map[icon.character_name] = icon
 
     def create_pick_bans(self):
         y_pos = 150
@@ -66,8 +54,12 @@ class DraftUI:
         for _ in range(self.n_bans):
             my_ban = BannedCharacter(position=my_pos)
             opp_ban = BannedCharacter(position=opp_pos)
-            self.my_bans.append(my_ban)
-            self.opp_bans.append(opp_ban)
+            if self.draft_state.is_team_1:
+                self.team_1_bans.append(my_ban)
+                self.team_2_bans.append(opp_ban)
+            else:
+                self.team_2_bans.append(my_ban)
+                self.team_1_bans.append(opp_ban)     
 
             my_pos = (my_pos[0], my_pos[1] + 155)
             opp_pos = (opp_pos[0], opp_pos[1] + 155)
@@ -75,8 +67,12 @@ class DraftUI:
         for _ in range(self.n_picks):
             my_pick = DraftedCharacter(my_pos)
             opp_pick = DraftedCharacter(opp_pos)
-            self.my_picks.append(my_pick)
-            self.opp_picks.append(opp_pick)
+            if self.draft_state.is_team_1:
+                self.team_1_picks.append(my_pick)
+                self.team_2_picks.append(opp_pick)
+            else:
+                self.team_2_picks.append(my_pick)
+                self.team_1_picks.append(opp_pick)
 
             my_pos = (my_pos[0], my_pos[1] + 155)
             opp_pos = (opp_pos[0], opp_pos[1] + 155)
@@ -90,16 +86,24 @@ class DraftUI:
     def select_character(self, character: str):
         self.selected_character = character
 
-    def set_ban_icon(self, ban_pos: int, image: pg.Surface):
-        ban_pos -= 1
-        if ban_pos < len(self.my_bans):
-            self.my_bans[ban_pos].set_image(image)
+    def set_ban_icon(self,my_turn: bool, ban_pos: int, character_str: str):
+        image = self.icon_map[character_str].image
+        if my_turn:
+            self.team_1_bans[ban_pos].set_image(image)
+        else:
+            self.team_2_bans[ban_pos].set_image(image)
 
     def get_clicked_element(self, pixel):
         for element in self.clickable_elements:
             if element.rect.collidepoint(pixel):
                 return element
         return None
+    
+    def draw_current_selection_draft_icon(self, display: pg.Surface):
+        if self.draft_state.current_selection in self.icon_map:
+            icon = self.icon_map[self.draft_state.current_selection]
+            icon.draw()
+        
 
     def render(self, display: pg.Surface):
         display.fill(BGCOLOR)
@@ -108,9 +112,9 @@ class DraftUI:
                 element.draw(display)
 
         for icon in self.clickable_elements:
-            is_banning = self.phase == DraftPhase.TEAM_1_BAN_1 or self.phase == DraftPhase.TEAM_2_BAN_1
+            is_banning = self.draft_state.phase.current_phase.ban
             icon.draw(display, is_banning)
 
-        if self.selected_character in self.previews_map:
+        if self.draft_state.current_selection in self.previews_map:
             preview = self.previews_map[self.selected_character]
             preview.draw(display=display)

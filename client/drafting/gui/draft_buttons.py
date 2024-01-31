@@ -50,11 +50,12 @@ class LockInButton(AbsButton):
 
 
 class DraftIcon(AbsButton):
-    def __init__(self, position: (int, int), image_path:str, character_name:str):
+    def __init__(self, position: (int, int), image_path:str, character_name:str, server_char_name:str ):
         self.size = (150, 150)
         image = pg.image.load(image_path)
         self.image = pg.transform.scale(image, self.size)
         self.character_name: str = character_name
+        self.server_char_name: str = server_char_name
         rect = pg.Rect(position, self.size)
         self.is_selected = False #related to client selection
         self.is_picked_or_banned = False #this is an attribute related to server state
@@ -109,6 +110,7 @@ class AthleaDraftButton(DraftIcon):
             position, 
             'drafting/gui/icons/athlea_icon.png', 
             'Athlea',
+            'athlea'
         )
 
 class BiziDraftButton(DraftIcon):
@@ -117,6 +119,7 @@ class BiziDraftButton(DraftIcon):
             position, 
             'drafting/gui/icons/bizi_icon.png', 
             'Bizi',
+            'bizi'
         )
 
 class BolindaDraftButton(DraftIcon):
@@ -125,6 +128,7 @@ class BolindaDraftButton(DraftIcon):
             position, 
             'drafting/gui/icons/bolinda_icon.png', 
             'Bolinda',
+            'bolinda'
         )
 
 class CrudDraftButton(DraftIcon):
@@ -133,6 +137,7 @@ class CrudDraftButton(DraftIcon):
             position, 
             'drafting/gui/icons/crud_icon.png', 
             'Crud',
+            'crud'
         )
 
 class EmilyDraftButton(DraftIcon):
@@ -141,6 +146,7 @@ class EmilyDraftButton(DraftIcon):
             position, 
             'drafting/gui/icons/emily_icon.png', 
             'Emily',
+            'emily'
         )
 
 class HercDraftButton(DraftIcon):
@@ -149,6 +155,7 @@ class HercDraftButton(DraftIcon):
             position, 
             'drafting/gui/icons/herc_icon.png', 
             'Herc',
+            'herc'
         )
 
 class IvanDraftButton(DraftIcon):
@@ -157,6 +164,7 @@ class IvanDraftButton(DraftIcon):
             position, 
             'drafting/gui/icons/ivan_icon.png', 
             'Ivan',
+            'ivan'
         )
 
 class JudyDraftButton(DraftIcon):
@@ -165,6 +173,7 @@ class JudyDraftButton(DraftIcon):
             position, 
             'drafting/gui/icons/judy_icon.png', 
             'Judy',
+            'judy'
         )
 
 class KaneDraftButton(DraftIcon):
@@ -173,6 +182,7 @@ class KaneDraftButton(DraftIcon):
             position, 
             'drafting/gui/icons/kane_icon.png', 
             'Kane',
+            'kane'
         )
 
 class LuDraftButton(DraftIcon):
@@ -181,6 +191,7 @@ class LuDraftButton(DraftIcon):
             position, 
             'drafting/gui/icons/lu_icon.png', 
             'Lu',
+            'lu'
         )
 
 class NaviDraftButton(DraftIcon):
@@ -189,6 +200,7 @@ class NaviDraftButton(DraftIcon):
             position, 
             'drafting/gui/icons/navi_icon.png', 
             'Navi',
+            'navi'
         )
 
 class PapaDraftButton(DraftIcon):
@@ -197,6 +209,7 @@ class PapaDraftButton(DraftIcon):
             position, 
             'drafting/gui/icons/papa_icon.png', 
             'Papa',
+            'papa'
         )
 
 class TimDraftButton(DraftIcon):
@@ -205,6 +218,7 @@ class TimDraftButton(DraftIcon):
             position, 
             'drafting/gui/icons/tim_icon.png', 
             'Tim',
+            'tim'
         )
 
 draft_icons: List[Type[DraftIcon]] = [

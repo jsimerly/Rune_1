@@ -62,7 +62,7 @@ class Client:
         return None
 
     def get_server_input(self, message):
-        self.state_manager.current_state.server_input(message)
+        self.state_manager.current_state.server_input(message['data'])
         self.handle_server_input(message)
 
     def handle_server_input(self, message):

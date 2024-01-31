@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Callable
 from mouse_inputs import MouseInput
 from in_game.client_state import InGameState
-from drafting.client_state import DraftingState
+from draft.draft_state import DraftState
 from home_screen.client_state import HomeScreenState
 from client_state_proto import ClientState
 
@@ -15,7 +15,7 @@ class ClientStateManager:
 
     def start_draft(self, data):
         self.current_state.on_exit()
-        self.current_state = DraftingState(draft_data=data)
+        self.current_state = DraftState(draft_data=data)
         self.current_state.on_enter()
 
     def start_game(self):

@@ -72,10 +72,9 @@ class Draft:
         team_id = data['team_id']
         character_str = data['selected_character']
         if self.is_valid_selection(team_id, character_str):
-            pick_type = data['pick_type']
-            if pick_type == 'ban':
+            if data['is_ban']:
                 self.ban(character_str)
-            if pick_type == 'pick':
+            else:
                 self.pick(character_str)
         
 
@@ -90,9 +89,9 @@ class Draft:
             if self.verify_character_available(character_str):
                 return True
 
-            #handle not available
+            print('character not available')
             return False
-        #handle wrong team error
+        print('wrong team error')
         return False
 
 
@@ -107,11 +106,16 @@ class Draft:
         user_1 = self.team_1.user
         user_2 = self.team_2.user
     
-        self.notifiy_user_of_ban(user_1, 'ban')
-        self.notifiy_user_of_ban(user_2, 'ban')
+        self.notifiy_user_of_ban(user_1, ban)
+        self.notifiy_user_of_ban(user_2, ban)
 
     def notifiy_user_of_ban(self, user: User, ban: DraftBan):
-        message = {'foo': 'poop'}
+        message = {
+            'pick_type': 'ban',
+            'team_id': self.active_team.team_id,
+            'character': ban.character.name,
+            'phase': self.phase.value,
+        }
         self.socket.send_message(user, 'draft', message)
         ...
 

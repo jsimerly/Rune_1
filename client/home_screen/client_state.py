@@ -133,7 +133,7 @@ class HomeScreenState(ClientState):
     ''' Networking '''
         
     def server_input(self, message):
-        if message['type'] == 'game_found':
+        if message['game_found']:
             self.game_found = True
             
     def cancel_clicked(self):

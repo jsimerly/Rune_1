@@ -45,10 +45,12 @@ class MatchMaking:
         package_1 = {
                 **serialized_draft_obj,
                 'team': 1,
+                'game_found': True
             }
         package_2 = {
                 **serialized_draft_obj,
                 'team': 2,
+                'game_found': True
             }
     
         

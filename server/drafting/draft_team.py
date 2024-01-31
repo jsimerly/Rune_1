@@ -45,7 +45,7 @@ class DraftPick(AbsDraftSelection):
 class DraftTeam:
     def __init__(self, user: User) -> None:
         self.user: User = user
-        self.team_id = uuid4()
+        self.team_id = str(uuid4())
         self.bans: Set[DraftBan] = set()
         self.picks: Set[DraftPick] = set()
 
