@@ -12,10 +12,9 @@ class DraftTurn:
         self.is_ban=is_ban
 
 class DraftPhase:
-    def __init__(self, team_1: DraftTeam, team_2: DraftTeam, client_team:DraftTeam) -> None:
+    def __init__(self, team_1: DraftTeam, team_2: DraftTeam) -> None:
         self.n_bans = 1
         self.n_picks = 3
-        self.client_team = client_team
 
         self.p1 = DraftTurn(team_1, 1, is_ban=True)
         self.p2 = DraftTurn(team_2, 1, is_ban=True)
@@ -29,17 +28,8 @@ class DraftPhase:
         self.phases = [self.p1, self.p2, self.p3, self.p4, self.p5, self.p6, self.p7, self.p8]
         self.current_phase: DraftTurn = self.p1
         self.phase_index = 0
-        self.is_client_turn = self.client_team == self.current_phase.team
-
+        
         self.is_complete = False
-
-    def update_client_turn(self) -> bool:
-        self.is_client_turn = self.client_team == self.current_phase.team
-    
-    def get_client_next_phase(self) -> DraftTurn:
-        for turn in self.phases[self.phase_index:]:
-            if turn.team == self.client_team:
-                return turn
 
     def next_phase(self):
         self.phase_index += 1
@@ -47,4 +37,3 @@ class DraftPhase:
             self.is_complete = True
             return True
         self.current_phase = self.phases[self.phase_index]
-        self.update_client_turn()

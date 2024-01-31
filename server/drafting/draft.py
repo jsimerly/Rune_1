@@ -6,32 +6,21 @@ from enum import Enum
 import json
 from server_socket import TCPServer
 from .draft_team import DraftTeam, DraftPick, DraftBan
+from drafting.draft_phase import DraftPhase
 
 if TYPE_CHECKING:
     from server.drafting.draft_team import DraftTeam, DraftCharacter, DraftPick, DraftBan, AbsDraftSelection
     from user.user import User
-    
-class DraftPhase(Enum):
-    TEAM_1_BAN_1 = 1
-    TEAM_2_BAN_1 = 2
-    TEAM_1_PICK_1 = 3
-    TEAM_2_PICK_1 = 4
-    TEAM_2_PICK_2 = 5
-    TEAM_1_PICK_2 = 6
-    TEAM_1_PICK_3 = 7
-    TEAM_2_PICK_3 = 8
-    COMPLETED = 9
 
 class Draft:
     def __init__(self, user_1: DraftTeam, user_2: DraftTeam) -> None:
         self.team_1: DraftTeam = DraftTeam(user_1)
         self.team_2: DraftTeam = DraftTeam(user_2)
-        self.active_team = self.team_1
 
         self.draft_id = str(uuid4())
         self.socket = TCPServer()
 
-        self.available: Dict[str, DraftCharacter] = draft_pool_map
+        self.available: Dict[str, DraftCharacter] = draft_pool_map.copy()
         self.total_pool: List[str] = []
         for name in draft_pool_map.keys():
             self.total_pool.append(name)
@@ -39,32 +28,12 @@ class Draft:
         self.banned: Set[DraftBan] = set()
         self.picked: Set[DraftPick] = set()
 
-        self.phase = DraftPhase.TEAM_1_BAN_1
+        self.phase = DraftPhase(self.team_1, self.team_2)
         self.complete = False # somewhat unessesarily unless we start storing drafts in a db
 
-    def next_phase(self):
-        next_value = self.state.value + 1
-        if next_value > len(DraftPhase):
-            self.complete = True
-            return
-        self.state = DraftPhase(next_value)
 
     def is_active_team(self, team_id: DraftTeam):
-        team_1_turns = [
-            DraftPhase.TEAM_1_BAN_1, DraftPhase.TEAM_1_PICK_1, 
-            DraftPhase.TEAM_1_PICK_2,DraftPhase.TEAM_1_PICK_3
-        ]
-        team_2_turns = [
-            DraftPhase.TEAM_2_BAN_1, DraftPhase.TEAM_2_PICK_1, 
-            DraftPhase.TEAM_2_PICK_2,DraftPhase.TEAM_2_PICK_3
-        ]
-
-        if self.phase in team_1_turns:
-            return str(self.team_1.team_id) == team_id
-        
-        if self.phase in team_2_turns:
-            return str(self.team_2.team_id) == team_id
-        return False
+       return self.phase.current_phase.team.team_id == team_id
     
     def handle_from_client(self, user, data):
         print('---- draft data from client ----')
@@ -72,11 +41,14 @@ class Draft:
         team_id = data['team_id']
         character_str = data['selected_character']
         if self.is_valid_selection(team_id, character_str):
-            if data['is_ban']:
+            if data['is_ban'] and self.phase.current_phase.is_ban:
                 self.ban(character_str)
             else:
                 self.pick(character_str)
-        
+
+    @property
+    def active_team(self) -> DraftTeam:
+        return self.phase.current_phase.team
 
     def verify_active_team(self, team_id: str):
         return str(team_id) == str(self.active_team.team_id)
@@ -88,12 +60,9 @@ class Draft:
         if self.verify_active_team(team_id):
             if self.verify_character_available(character_str):
                 return True
-
-            print('character not available')
             return False
         print('wrong team error')
         return False
-
 
     def ban(self, character_str: str):
         character_obj = self.available[character_str]()
@@ -102,6 +71,7 @@ class Draft:
         ban = DraftBan(self.active_team, character_obj)
         self.active_team.ban(ban)
         self.banned.add(ban)
+        self.phase.next_phase()
 
         user_1 = self.team_1.user
         user_2 = self.team_2.user
@@ -114,7 +84,7 @@ class Draft:
             'pick_type': 'ban',
             'team_id': self.active_team.team_id,
             'character': ban.character.name,
-            'phase': self.phase.value,
+            'pick': self.phase.current_phase.pick,
         }
         self.socket.send_message(user, 'draft', message)
         ...

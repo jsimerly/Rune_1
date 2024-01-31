@@ -6,8 +6,8 @@ from draft.draft_characters import *
 
 
 class LockInButton(AbsButton):
-    def __init__(self, position, clickable=True) -> None:
-        self.clickable = clickable
+    def __init__(self, position, state) -> None:
+        self.state = state
         self.size = (300, 50)
         rect = pg.Rect(position, self.size)
         self.color = (240, 244, 250)
@@ -18,6 +18,11 @@ class LockInButton(AbsButton):
         self.outline_start_time = None
 
         super().__init__(rect)
+
+    #using this because python can do binding :(
+    @property
+    def clickable(self):
+        return self.state.phase.is_client_turn
 
     def draw(self, display: pg.Surface, is_ban:bool = False):
         text = 'Ban' if is_ban else 'Pick'
@@ -52,7 +57,7 @@ class DraftIcon(AbsButton):
     def __init__(self, pos:(int,int), draft_character: DraftCharacter):
         rect = pg.Rect(pos, self.size)
         self.pos = pos
-        self.character = draft_character
+        self.character: DraftCharacter = draft_character
         super().__init__(rect)
 
     def draw(self, display: pg.Surface):
@@ -91,72 +96,3 @@ class DraftIcon(AbsButton):
 
     def on_click(self):
         return super().on_click()
-
-
-class AthleaDraftButton(DraftIcon):
-    def __init__(self, position: (int, int)):
-        super().__init__(position, Athlea_DraftCharacter())
-
-class BiziDraftButton(DraftIcon):
-    def __init__(self, position: (int, int)):
-        super().__init__(position, Bizi_DraftCharacter())
-
-class BolindaDraftButton(DraftIcon):
-    def __init__(self, position: (int, int)):
-        super().__init__(position, Bolinda_DraftCharacter())
-
-class CrudDraftButton(DraftIcon):
-    def __init__(self, position: (int, int)):
-        super().__init__(position, Crud_DraftCharacter())
-
-class EmilyDraftButton(DraftIcon):
-    def __init__(self, position: (int, int)):
-        super().__init__(position, Emily_DraftCharacter())
-
-class HercDraftButton(DraftIcon):
-    def __init__(self, position: (int, int)):
-        super().__init__(position, Herc_DraftCharacter())
-
-class IvanDraftButton(DraftIcon):
-    def __init__(self, position: (int, int)):
-        super().__init__(position, Ivan_DraftCharacter())
-
-class JudyDraftButton(DraftIcon):
-    def __init__(self, position: (int, int)):
-        super().__init__(position, Judy_DraftCharacter())
-
-class KaneDraftButton(DraftIcon):
-    def __init__(self, position: (int, int)):
-        super().__init__(position, Kane_DraftCharacter())
-
-class LuDraftButton(DraftIcon):
-    def __init__(self, position: (int, int)):
-        super().__init__(position, Lu_DraftCharacter())
-
-class NaviDraftButton(DraftIcon):
-    def __init__(self, position: (int, int)):
-        super().__init__(position, Navi_DraftCharacter())
-
-class PapaDraftButton(DraftIcon):
-    def __init__(self, position: (int, int)):
-        super().__init__(position, Papa_DraftCharacter())
-
-class TimDraftButton(DraftIcon):
-    def __init__(self, position: (int, int)):
-        super().__init__(position, Tim_DraftCharacter())
-
-draft_icons: List[Type[DraftIcon]] = [
-    AthleaDraftButton,
-    BiziDraftButton,
-    BolindaDraftButton,
-    CrudDraftButton,
-    EmilyDraftButton,
-    HercDraftButton,
-    IvanDraftButton,
-    JudyDraftButton,
-    KaneDraftButton,
-    LuDraftButton,
-    NaviDraftButton,
-    PapaDraftButton,
-    TimDraftButton,
-]

@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, List
 import pygame as pg
 from settings import BGCOLOR
 from mouse_inputs import MouseInput, Click, DragEnd
-from .buttons import draft_icons, LockInButton, DraftIcon
+from .buttons import LockInButton, DraftIcon
 from .selected_boxes import DraftBox
 
 if TYPE_CHECKING:
@@ -16,7 +16,7 @@ class DraftUI:
         self.icons: List[DraftIcon] = []
 
         self.buttons: List[AbsButton] = []
-        self.buttons.append(LockInButton((750, 900), self.state.phase.is_client_turn))
+        self.buttons.append(LockInButton((750, 900), self.state))
 
         self.my_bans: List[DraftBox] = []
         self.opp_bans: List[DraftBox] = []
@@ -29,30 +29,29 @@ class DraftUI:
         self.ui_elements: List[UIObject] = self.my_bans + self.opp_bans + self.my_picks + self.opp_picks
 
     def get_current_box(self) -> DraftBox:
-        if self.state.phase.is_client_turn:
-            if self.state.phase.current_phase.is_ban:
-                return self.my_bans[self.state.phase.current_phase.pick-1]
-            return self.my_picks[self.state.phase.current_phase.pick-1]
-        
-        if self.state.phase.current_phase.is_ban:
-            return self.opp_bans[self.state.phase.current_phase.pick-1]
-        return self.opp_picks[self.state.phase.current_phase.pick-1]
+        #includes if you're actively picking
+        next_turn = self.state.phase.get_client_next_phase()
 
+        if next_turn.is_ban:
+            return self.my_bans[next_turn.pick-1]
+        return self.my_picks[next_turn.pick-1]
+        
     def add_icons(self):   
         left_x = 375
         x_pos = left_x
         y_pos = 550  
 
-        for icon in draft_icons:
+        for character in self.state.character_pool:
             pos = (x_pos, y_pos)
-            x_pos += icon.size[0] + 5
+            x_pos += DraftIcon.size[0] + 5
+            
             if x_pos > 1350:
                 x_pos = left_x
                 y_pos += 155
-            
-            icon_obj = icon(pos)
-            self.icons.append(icon_obj)
-            self.buttons.append(icon_obj)
+            icon = DraftIcon(pos, character)
+   
+            self.icons.append(icon)
+            self.buttons.append(icon)
 
 
     def add_draft_boxes(self):

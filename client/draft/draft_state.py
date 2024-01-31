@@ -53,13 +53,13 @@ class DraftState(ClientState):
                 if self.phase.current_phase.is_ban:
                     character.is_banning = True
 
-
             if isinstance(element_clicked, LockInButton):
                 #check if it's event my turn to notify server
-                if self.phase.is_client_turn:
-                    self.notify_server()
-                else:
-                    print('It is not your turn.')
+                if self.current_selection in self.character_pool:
+                    if self.phase.is_client_turn:
+                        self.notify_server()
+                    else:
+                        print('It is not your turn.')
 
     def notify_server(self):
         package_kwargs = {
@@ -74,7 +74,6 @@ class DraftState(ClientState):
             'user': self.user
         }
 
-        print('send!')
         self.socket.send_message(**package_kwargs)
 
     def server_input(self, message: Dict):
@@ -91,7 +90,7 @@ class DraftState(ClientState):
     def ban(self, team: DraftTeam, character_str: str):
         character_obj = self.pop_character_obj(character_str)
         character_obj.is_banned = True
-
+    
         if self.team_1 == team:
             self.team_1_bans.append(character_obj)
             self.draft_ui.set_ban_box_image( 
@@ -104,6 +103,7 @@ class DraftState(ClientState):
                 my_team=self.phase.is_client_turn,
                 icon_image=character_obj.icon_image,
             )
+
         self.phase.next_phase()
 
     def pick(self, team: DraftTeam, character_str: str):
@@ -128,8 +128,7 @@ class DraftState(ClientState):
             if character_str == character_draft_obj.name:
                 character_obj = self.character_pool.pop(i)
         return character_obj
-                    
-
+                
     
     def render(self, display: pg.Surface):
         self.draft_ui.render(display)
