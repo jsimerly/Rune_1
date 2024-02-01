@@ -1,10 +1,34 @@
 import pygame as pg
 from typing import Type, List
+from abc import ABC, abstractmethod
 
+class ArchetypeInfoBase:
+    icon_size = (100, 100)
+    def __init__(self, icon_path:str, archetype_name: str) -> None:
+        icon_path = icon_path
+        image = pg.image.load(icon_path)
+        self.image = pg.transform.scale(image, self.icon_size)
+        self.name = archetype_name
+        pg.font.init()
+        self.font = pg.font.SysFont(None, 40)
+
+    def draw(self, display: pg.Surface, pos:(int,int)):
+        display.blit(self.image, pos)
+        text_pos = (pos[0], pos[1] + 105)
+        self.draw_text(display=display, pos=text_pos)
+
+    def draw_text(self, display: pg.Surface, pos:(int,int)):
+        text_surface = self.font.render(self.name, True, (255, 255, 255))
+        display.blit(text_surface, pos)
+
+tank_archetype = ArchetypeInfoBase('draft/gui/arch_type_icons/tank_logo.webp', 'Tank')
+damage_archetype = ArchetypeInfoBase('draft/gui/arch_type_icons/damage_logo.webp', 'Damage')
+#should add jungle here
+support_archetype = ArchetypeInfoBase('draft/gui/arch_type_icons/support_logo.webp', 'Support')
 
 class CharacterPreview:
     def __init__(self, position: (int, int),
-        name: str, image_path: str, 
+        name: str, image_path: str, archetype: ArchetypeInfoBase,
         survivability: int, damage: int, utility: int, difficulty: int,
         abilities=[]   
     ) -> None:
@@ -12,6 +36,7 @@ class CharacterPreview:
         image = pg.image.load(image_path)
         self.name= name
         self.image = pg.transform.scale(image, image_size)
+        self.archetype = archetype
         self.position = position
         self.survivability = survivability
         self.damage = damage
@@ -33,6 +58,8 @@ class CharacterPreview:
         self.draw_utility(display=display, pos=(x_pos, y_pos + 60))
         self.draw_difficulty(display=display, pos=(x_pos, y_pos + 90))
 
+        archetype_pos = (x_pos + 425, y_pos)
+        self.archetype.draw(display=display, pos=archetype_pos)
 
     def draw_image(self, display: pg.Surface):
         display.blit(self.image, self.position)
@@ -98,7 +125,8 @@ class AthleaPreview(CharacterPreview):
         super().__init__(
             position, 
             name='Athlea',
-            image_path='drafting/gui/full_image/athlea.png',
+            image_path='draft/gui/full_images/athlea.png',
+            archetype=damage_archetype,
             survivability=5, 
             damage=3, 
             utility=8, 
@@ -111,7 +139,8 @@ class BiziPreview(CharacterPreview):
         super().__init__(
             position, 
             name='Bizi',
-            image_path='drafting/gui/full_image/bizi.png',
+            image_path='draft/gui/full_images/bizi.png',
+            archetype=support_archetype,
             survivability=4, 
             damage=5, 
             utility=8, 
@@ -124,7 +153,8 @@ class BolindaPreview(CharacterPreview):
         super().__init__(
             position, 
             name='Bolinda', 
-            image_path='drafting/gui/full_image/bolinda.png',
+            image_path='draft/gui/full_images/bolinda.png',
+            archetype=damage_archetype,
             survivability=5, 
             damage=8, 
             utility=3, 
@@ -137,7 +167,8 @@ class CrudPreview(CharacterPreview):
         super().__init__(
             position, 
             name='Crud', 
-            image_path='drafting/gui/full_image/crud.png',
+            image_path='draft/gui/full_images/crud.png',
+            archetype=tank_archetype,
             survivability=8, 
             damage=7, 
             utility=3, 
@@ -150,7 +181,8 @@ class EmilyPreview(CharacterPreview):
         super().__init__(
             position,  
             name='Emily',
-            image_path='drafting/gui/full_image/emily.png',
+            image_path='draft/gui/full_images/emily.png',
+            archetype=support_archetype,
             survivability=6, 
             damage=2, 
             utility=10, 
@@ -163,7 +195,8 @@ class HercPreview(CharacterPreview):
         super().__init__(
             position,  
             name='Herc',
-            image_path='drafting/gui/full_image/herc.png',
+            image_path='draft/gui/full_images/herc.png',
+            archetype=tank_archetype,
             survivability=9, 
             damage=6, 
             utility=2, 
@@ -176,7 +209,8 @@ class IvanPreview(CharacterPreview):
         super().__init__(
             position,  
             name='Ivan',
-            image_path='drafting/gui/full_image/ivan.png',
+            image_path='draft/gui/full_images/ivan.png',
+            archetype=damage_archetype,
             survivability=5, 
             damage=8, 
             utility=6, 
@@ -189,7 +223,8 @@ class JudyPreview(CharacterPreview):
         super().__init__(
             position,  
             name='Judy',
-            image_path='drafting/gui/full_image/judy.png',
+            image_path='draft/gui/full_images/judy.png',
+            archetype=damage_archetype,
             survivability=3, 
             damage=8, 
             utility=6, 
@@ -202,7 +237,8 @@ class KanePreview(CharacterPreview):
         super().__init__(
             position,  
             name='Kane',
-            image_path='drafting/gui/full_image/kane.png',
+            image_path='draft/gui/full_images/kane.png',
+            archetype=tank_archetype,
             survivability=10, 
             damage=3, 
             utility=8, 
@@ -215,7 +251,8 @@ class LuPreview(CharacterPreview):
         super().__init__(
             position,  
             name='Lu',
-            image_path='drafting/gui/full_image/lu.png',
+            image_path='draft/gui/full_images/lu.png',
+            archetype=damage_archetype,
             survivability=7, 
             damage=7, 
             utility=7, 
@@ -228,7 +265,8 @@ class NaviPreview(CharacterPreview):
         super().__init__(
             position,  
             name='Navi',
-            image_path='drafting/gui/full_image/navi.png',
+            image_path='draft/gui/full_images/navi.png',
+            archetype=damage_archetype,
             survivability=7, 
             damage=5, 
             utility=8, 
@@ -241,7 +279,8 @@ class PapaPreview(CharacterPreview):
         super().__init__(
             position, 
             name='Papa', 
-            image_path='drafting/gui/full_image/papa.png',
+            image_path='draft/gui/full_images/papa.png',
+            archetype=damage_archetype,
             survivability=5, 
             damage=5, 
             utility=5, 
@@ -254,7 +293,8 @@ class TimPreview(CharacterPreview):
         super().__init__(
             position,  
             name='Tim',
-            image_path='drafting/gui/full_image/tim.png',
+            image_path='draft/gui/full_images/tim.png',
+            archetype=damage_archetype,
             survivability=1, 
             damage=10, 
             utility=3, 
