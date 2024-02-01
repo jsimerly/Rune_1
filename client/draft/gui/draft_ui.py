@@ -6,6 +6,7 @@ from mouse_inputs import MouseInput, Click, DragEnd
 from .buttons import LockInButton, DraftIcon
 from .selected_boxes import DraftBox
 from .preview import CharacterPreview, draft_previews
+from .team_name import UsernameUI
 
 if TYPE_CHECKING:
     from draft.draft_state import DraftState
@@ -30,6 +31,11 @@ class DraftUI:
         self.add_previews()
         
         self.ui_elements: List[UIObject] = self.my_bans + self.opp_bans + self.my_picks + self.opp_picks
+
+        team_1_username = UsernameUI(self.state.team_1.username, (120, 100))
+        team_2_username = UsernameUI(self.state.team_2.username, (1570, 100))
+        self.ui_elements.append(team_1_username)
+        self.ui_elements.append(team_2_username)
 
     def get_current_box(self) -> DraftBox:
         #includes if you're actively picking
@@ -107,7 +113,8 @@ class DraftUI:
                     button.on_click()
                     return button
         return None
-
+    
+        
     def render(self, display: pg.Surface):
         display.fill(BGCOLOR)
         for button in self.buttons:

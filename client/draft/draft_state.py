@@ -18,11 +18,11 @@ class DraftState(ClientState):
         self.socket = TCPClient()
 
         self.draft_id = draft_data['draft_id']
-        team_1_id = draft_data['team_1']['team_id']
-        team_2_id = draft_data['team_2']['team_id']
+        team_1 = draft_data['team_1']
+        team_2 = draft_data['team_2']
 
-        self.team_1 = DraftTeam(team_1_id)
-        self.team_2 = DraftTeam(team_2_id)
+        self.team_1 = DraftTeam(team_1['team_id'], team_1['user']['username'])
+        self.team_2 = DraftTeam(team_2['team_id'], team_2['user']['username'])
         self.client_team = self.team_1 if draft_data['team'] == 1 else self.team_2
 
         self.character_pool: List[DraftCharacter] = [

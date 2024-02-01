@@ -59,6 +59,7 @@ class DraftTeam:
     def serialize(self):
         return {
             'team_id': str(self.team_id),
+            'user': self.user.serialize(),
             'bans': [ban.serialize() for ban in self.bans],
             'picks': [pick.serialize() for pick in self.picks]
         }

@@ -5,8 +5,8 @@ def run():
     game = Client()
     draft_data = {
         'draft_id' : 123,
-        'team_1': {'team_id': 123},
-        'team_2': {'team_id': 123},
+        'team_1': {'team_id': 123, 'user':{'username': 'Jacob'}},
+        'team_2': {'team_id': 123, 'user':{'username': 'Greg'}},
         'team': 1
     }
     game.state_manager.current_state = DraftState(draft_data=draft_data)

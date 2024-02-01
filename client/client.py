@@ -10,6 +10,7 @@ import asyncio
 class Client:
     def __init__(self) -> None:
         pg.init()
+        pg.font.init()
 
         self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pg.SRCALPHA)
         self.screen.fill(BGCOLOR)

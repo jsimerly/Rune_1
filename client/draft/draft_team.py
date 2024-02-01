@@ -16,8 +16,9 @@ class DraftPick:
         self.character =  character
 
 class DraftTeam:
-    def __init__(self, team_id: str) -> None:
+    def __init__(self, team_id: str, username:str) -> None:
         self.team_id = team_id
+        self.username = username
         self.bans: Set[DraftBan] = []
         self.picks: Set[DraftPick] = []
 
