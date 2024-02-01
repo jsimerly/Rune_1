@@ -61,7 +61,6 @@ class Draft:
             if self.verify_character_available(character_str):
                 return True
             return False
-        print('wrong team error')
         return False
 
     def ban(self, character_str: str):
@@ -76,10 +75,10 @@ class Draft:
         user_1 = self.team_1.user
         user_2 = self.team_2.user
     
-        self.notifiy_user_of_ban(user_1, ban)
-        self.notifiy_user_of_ban(user_2, ban)
+        self.notify_user_of_ban(user_1, ban)
+        self.notify_user_of_ban(user_2, ban)
 
-    def notifiy_user_of_ban(self, user: User, ban: DraftBan):
+    def notify_user_of_ban(self, user: User, ban: DraftBan):
         message = {
             'pick_type': 'ban',
             'team_id': self.active_team.team_id,
@@ -90,30 +89,30 @@ class Draft:
         ...
 
 
-    def pick(self, team_id: str, character_str: str):
-        if self.is_valid_selection(team_id, character_str):
-            character_obj = self.available[character_str]()
-            del self.available[character_str]
-            
-            ban = DraftPick(character_obj)
-            self.team_1.pick(ban)
-            self.picked.add(ban)
+    def pick(self, character_str: str):
+        character_obj = self.available[character_str]()
+        del self.available[character_str]
+        print(character_str)
+        pick = DraftPick(self.active_team, character_obj)
+        self.team_1.pick(pick)
+        self.picked.add(pick)
+        self.phase.next_phase()
 
-    def notify_of_ban(self, selection: AbsDraftSelection):
-        package = json.dumps({
-            'type': 'draft',
-            'data': {
-                **selection.serialize(),
-                'phase': self.phase.value,
-            }
-        })
+        user_1 = self.team_1.user
+        user_2 = self.team_2.user
 
-        self.socket.send_message(self.team_1.user, package)
-        self.socket.send_message(self.team_2.user, package) 
-        ...
+        self.notify_user_of_pick(user_1, pick)
+        self.notify_user_of_pick(user_2, pick)
 
-    def notify_of_pick(self, pick: DraftPick):
-        ...
+    def notify_user_of_pick(self, user: User, pick: DraftPick):
+        message = {
+            'pick_type': 'pick',
+            'team_id': self.active_team.team_id,
+            'character': pick.character.name,
+            'pick': self.phase.current_phase.pick,
+        }
+        self.socket.send_message(user, 'draft', message)
+
 
     ''' Serialization '''
     def serialize(self):

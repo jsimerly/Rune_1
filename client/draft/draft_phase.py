@@ -43,8 +43,10 @@ class DraftPhase:
 
     def next_phase(self):
         self.phase_index += 1
-        if self.phase_index > len(self.phases):
+        if self.phase_index >= len(self.phases):
+            self.current_phase=None
             self.is_complete = True
             return True
-        self.current_phase = self.phases[self.phase_index]
-        self.update_client_turn()
+        else:
+            self.current_phase = self.phases[self.phase_index]
+            self.update_client_turn()

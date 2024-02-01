@@ -77,13 +77,23 @@ class DraftState(ClientState):
         self.socket.send_message(**package_kwargs)
 
     def server_input(self, message: Dict):
-         if message['pick_type'] == 'ban':
+        if message['pick_type'] == 'ban':
             char_name = message['character']
             team_id = message['team_id']
             if team_id == self.team_1.team_id:
                 self.ban(self.team_1, char_name)
             elif team_id == self.team_2.team_id:
                 self.ban(self.team_2, char_name)
+            else:
+                print('team_id does not match any of the drafting teams.')
+
+        if message['pick_type'] == 'pick':
+            char_name = message['character']
+            team_id = message['team_id']
+            if team_id == self.team_1.team_id:
+                self.pick(self.team_1, char_name)
+            elif team_id == self.team_2.team_id:
+                self.pick(self.team_2, char_name)
             else:
                 print('team_id does not match any of the drafting teams.')
 

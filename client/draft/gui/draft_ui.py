@@ -31,10 +31,10 @@ class DraftUI:
     def get_current_box(self) -> DraftBox:
         #includes if you're actively picking
         next_turn = self.state.phase.get_client_next_phase()
-
-        if next_turn.is_ban:
-            return self.my_bans[next_turn.pick-1]
-        return self.my_picks[next_turn.pick-1]
+        if next_turn:
+            if next_turn.is_ban:
+                return self.my_bans[next_turn.pick-1]
+            return self.my_picks[next_turn.pick-1]
         
     def add_icons(self):   
         left_x = 375
@@ -84,7 +84,7 @@ class DraftUI:
         else:
             self.opp_bans[index].image = icon_image
 
-    def set_pick_box_image(self, index, my_team: bool, icon_image: pg.Surface):
+    def set_pick_box_image(self, my_team: bool, icon_image: pg.Surface):
         index = self.state.phase.current_phase.pick -1
         if my_team:
             self.my_picks[index].image = icon_image
@@ -108,5 +108,5 @@ class DraftUI:
             element.draw(display)
 
         current_box = self.get_current_box()
-        if self.state.current_selection:
+        if self.state.current_selection and current_box:
             current_box.image = self.state.current_selection.icon_image
