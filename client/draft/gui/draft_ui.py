@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Dict
 import pygame as pg
 from settings import BGCOLOR
 from mouse_inputs import MouseInput, Click, DragEnd
 from .buttons import LockInButton, DraftIcon
 from .selected_boxes import DraftBox
+from .preview import CharacterPreview, draft_previews
 
 if TYPE_CHECKING:
     from draft.draft_state import DraftState
@@ -22,9 +23,11 @@ class DraftUI:
         self.opp_bans: List[DraftBox] = []
         self.my_picks: List[DraftBox] = []
         self.opp_picks: List[DraftBox] = []
+        self.previews_map: Dict[str, CharacterPreview] = {}
 
         self.add_icons()
         self.add_draft_boxes()
+        self.add_previews()
         
         self.ui_elements: List[UIObject] = self.my_bans + self.opp_bans + self.my_picks + self.opp_picks
 
@@ -77,6 +80,12 @@ class DraftUI:
             my_pos = (my_pos[0], my_pos[1] + 155)
             opp_pos = (opp_pos[0], opp_pos[1] + 155)
 
+    def add_previews(self):
+        pos = (400, 100)
+        for CharacterPreview in draft_previews:
+            preview_obj = CharacterPreview(pos)
+            self.previews_map[preview_obj.name] = preview_obj
+
     def set_ban_box_image(self, my_team:bool, icon_image: pg.Surface):
         index = self.state.phase.current_phase.pick-1
         if my_team:
@@ -110,3 +119,8 @@ class DraftUI:
         current_box = self.get_current_box()
         if self.state.current_selection and current_box:
             current_box.image = self.state.current_selection.icon_image
+
+        if self.state.current_selection:
+            if self.state.current_selection.name in self.previews_map:
+                preview = self.previews_map[self.state.current_selection.name]
+                preview.draw(display)
