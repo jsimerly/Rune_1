@@ -19,3 +19,5 @@ class InGameState(ClientState):
     def render(self, display: pg.Surface):
         display.fill(BGCOLOR)
         self.map.draw_tiles(display)
+        self.map.draw_buildings(display)
+        self.map.draw_objectives(display)

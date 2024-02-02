@@ -12,10 +12,22 @@ if TYPE_CHECKING:
 class GameMap:
     def __init__(self, map_layout: MapLayout) -> None:
         self.tiles: Dict[Tuple[int,int], GameTile] = map_layout.generate_map()
+        for tile in self.tiles.values():
+            tile.tile_map = self.tiles
 
     def draw_tiles(self, display: pg.Surface):
         for tile in self.tiles.values():
             tile.draw(display)
+
+    def draw_buildings(self, display: pg.Surface):
+        for tile in self.tiles.values():
+            if tile.building:
+                tile.building.draw(display)
+
+    def draw_objectives(self, display: pg.Surface):
+        for tile in self.tiles.values():
+            if tile.objective:
+                tile.objective.draw(display)
 
     def draw_vision(self):
         pass
