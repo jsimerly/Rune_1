@@ -166,12 +166,7 @@ class DraftState(ClientState):
     def current_selection_available(self):
         print(len(self.character_pool))
         return self.current_selection in self.character_pool
-                
-
-    def update(self):
-        self.team_1_timer.check()
-        self.team_2_timer.check()
-    
+                    
     def render(self, display: pg.Surface):
         self.draft_ui.render(display)
 

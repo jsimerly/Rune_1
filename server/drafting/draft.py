@@ -2,11 +2,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Set, Dict, List, Optional
 from .character_pool import draft_pool_map
 from uuid import uuid4
-from enum import Enum
-import json
 from server_socket import TCPServer
 from .draft_team import DraftTeam, DraftPick, DraftBan
 from drafting.draft_phase import DraftPhase
+from utils import Timer
+import asyncio
+
 
 if TYPE_CHECKING:
     from server.drafting.draft_team import DraftTeam, DraftCharacter, DraftPick, DraftBan, AbsDraftSelection
@@ -27,6 +28,10 @@ class Draft:
         
         self.banned: Set[DraftBan] = set()
         self.picked: Set[DraftPick] = set()
+
+        self.team_1_timer = Timer(31)
+        self.team_1_timer.start()
+        self.team_2_timer = Timer(31)
 
         self.phase = DraftPhase(self.team_1, self.team_2)
         self.complete = False # somewhat unessesarily unless we start storing drafts in a db

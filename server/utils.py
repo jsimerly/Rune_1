@@ -1,6 +1,7 @@
 import time
 from typing import Callable
 import pygame as pg
+import asyncio
 
 def time_it(func):
     def wrapper(*args, **kwargs):
@@ -13,43 +14,36 @@ def time_it(func):
 
 class Timer:
     def __init__(self, default_time:int) -> None:
-        self.default_ticks = default_time * 1000
+        self.default_ticks = default_time
         self.time_left = default_time
         self.active = False
-        self.start_ticks = None
         self.callback = None
+        self.task = None
 
     def start(self, callback: Callable=None):
-        print(self)
         self.callback = callback
         self.start_ticks = pg.time.get_ticks()
         self.active = True
+        self.task = asyncio.create_task(self._run_timer())
 
-    def check(self) -> int:
-        if self.active:
-            current_ticks = pg.time.get_ticks()
-            run_time = current_ticks - self.start_ticks
-            self.time_left = (self.default_ticks - run_time)//1000
+    async def _run_timer(self):
+        while self.active and self.time_left > 0:
+            await asyncio.sleep(1)
+            self.time_left -= 1
 
-            if self.time_left <= 0:
-                self.complete()
-
-            return self.time_left
+        if self.active:  
+            self.complete()
 
     def cancel(self):
-        self.time_left = self.default_ticks//1000
+        self.time_left = self.default_ticks
         self.active = False
-        self.start_ticks = None
         self.callback = None
     
     def complete(self):
+        self.active = False
         if self.callback:
             self.callback()
-
-        self.time_left = self.default_ticks//1000
-        self.active = False
-        self.start_ticks = None
-        self.callback = None
+        self.cancel()
 
 
     
