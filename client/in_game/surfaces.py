@@ -1,15 +1,13 @@
-from ...zclient.singleton import Singleton
 import pygame as pg
 from typing import TYPE_CHECKING, List, Any, Set
 if TYPE_CHECKING:
     from map.game_tile import GameTile
     from character.abs_character import AbstractCharacter
     from components.movement import MovementQueue
-    from ui.ui_object import UIObject
     from building.abs_building import AbstractBuilding
     from objective.abs_objective import AbstactObjective
 
-class GameSurfaces(metaclass=Singleton):
+class GameSurfaces():
     def __init__(self) -> None:
         self.standard_tiles: Set[GameTile] = set()
         self.border_tiles: Set[GameTile] = set()

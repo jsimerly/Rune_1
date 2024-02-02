@@ -3,7 +3,7 @@ from objective.abs_objective import AbstactObjective
 from components.sprite import SpriteComponent
 from components.map_interaction import MapInteractionComponent
 from typing import TYPE_CHECKING, List
-from client.algorithms import hex_radius
+from algorithms import hex_radius
 
 if TYPE_CHECKING:
     from map.game_tile import GameTile

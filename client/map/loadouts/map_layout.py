@@ -1,6 +1,6 @@
 
 from map.tiles import *
-from client.hex import Layout
+from hex import Layout
 from typing import Dict, Tuple, List, TYPE_CHECKING
 from building.main_base.main_base import MainBase
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 from .abstact_component import AbstactComponent
 import pygame as pg
 from typing import TYPE_CHECKING, List, Optional
-from client.in_game.surfaces import GameSurfaces
+# from in_game.surfaces import GameSurfaces
 import time
 if TYPE_CHECKING:
     from map.game_tile import GameTile
