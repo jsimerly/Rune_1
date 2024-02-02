@@ -9,7 +9,6 @@ import traceback
 from typing import TYPE_CHECKING, Tuple, Optional, Dict
 from server_socket import TCPServer
 import asyncio
-from serializer import serialize_team, serialize_user
 from drafting.draft_manager import DraftManager
 
 if TYPE_CHECKING:
