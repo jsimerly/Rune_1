@@ -7,6 +7,7 @@ from .buttons import LockInButton, DraftIcon
 from .selected_boxes import DraftBox
 from .preview import CharacterPreview, draft_previews
 from .team_name import UsernameUI
+from .countdown import Countdown
 
 if TYPE_CHECKING:
     from draft.draft_state import DraftState
@@ -32,10 +33,27 @@ class DraftUI:
         
         self.ui_elements: List[UIObject] = self.my_bans + self.opp_bans + self.my_picks + self.opp_picks
 
-        team_1_username = UsernameUI(self.state.team_1.username, (120, 100))
-        team_2_username = UsernameUI(self.state.team_2.username, (1570, 100))
-        self.ui_elements.append(team_1_username)
-        self.ui_elements.append(team_2_username)
+        if self.state.client_team == self.state.team_1:
+            t1_user_pos = (120, 100)
+            t1_timer_pos = (120, 800)
+            t2_user_pos = (1570, 100)
+            t2_timer_pos = (1570, 800)
+        else:
+            t2_user_pos = (120, 100)
+            t2_timer_pos = (120, 800)
+            t1_user_pos = (1570, 100)
+            t1_timer_pos = (1570, 800)
+
+        team_1_username = UsernameUI(self.state.team_1.username, t1_user_pos)
+        team_2_username = UsernameUI(self.state.team_2.username, t2_user_pos)
+        team_1_countdown = Countdown(self.state.team_1_timer, t1_timer_pos)
+        team_2_countdown = Countdown(self.state.team_2_timer, t2_timer_pos)
+
+        self.ui_elements.extend([
+            team_1_username, team_2_username, team_1_countdown, team_2_countdown
+        ])
+
+
 
     def get_current_box(self) -> DraftBox:
         #includes if you're actively picking

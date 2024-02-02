@@ -11,6 +11,7 @@ from draft.draft_characters import DraftCharacter
 from .gui.draft_ui import DraftUI  
 from draft.draft_characters import character_pool_cls_list
 from .gui.buttons import DraftIcon, LockInButton
+from utils import Timer
 
 class DraftState(ClientState):
     def __init__(self, draft_data: Dict) -> None:
@@ -36,6 +37,10 @@ class DraftState(ClientState):
         self.team_2_picks: List[DraftPick] = [None for _ in range(self.phase.n_picks)]
         self.current_selection: Optional[DraftCharacter] = None
 
+        #really should add these to the DraftTeam class instead
+        self.team_1_timer = Timer(30)
+        self.team_1_timer.start()
+        self.team_2_timer = Timer(30)
         self.draft_ui = DraftUI(state=self)
 
     def mouse_input(self, mouse_input: MouseInput):
@@ -87,6 +92,8 @@ class DraftState(ClientState):
             else:
                 print('team_id does not match any of the drafting teams.')
 
+            self.start_next_timer()
+
         if message['pick_type'] == 'pick':
             char_name = message['character']
             team_id = message['team_id']
@@ -96,6 +103,9 @@ class DraftState(ClientState):
                 self.pick(self.team_2, char_name)
             else:
                 print('team_id does not match any of the drafting teams.')
+
+            self.start_next_timer()
+                
 
     def ban(self, team: DraftTeam, character_str: str):
         character_obj = self.pop_character_obj(character_str)
@@ -133,12 +143,34 @@ class DraftState(ClientState):
             )
         self.phase.next_phase()
 
+    def start_next_timer(self):
+        if self.phase.current_phase:
+            if self.phase.current_phase.team == self.team_1:
+                self.team_1_timer.start()
+                self.team_2_timer.cancel()
+            if self.phase.current_phase.team == self.team_2:
+                self.team_2_timer.start()
+                self.team_1_timer.cancel()
+        
+        if self.phase.is_complete:
+            self.team_1_timer.cancel()
+            self.team_2_timer.cancel()
+        
+
     def pop_character_obj(self, character_str: str) -> DraftCharacter:
         for i, character_draft_obj in enumerate(self.character_pool):
             if character_str == character_draft_obj.name:
                 character_obj = self.character_pool.pop(i)
         return character_obj
+    
+    def current_selection_available(self):
+        print(len(self.character_pool))
+        return self.current_selection in self.character_pool
                 
+
+    def update(self):
+        self.team_1_timer.check()
+        self.team_2_timer.check()
     
     def render(self, display: pg.Surface):
         self.draft_ui.render(display)

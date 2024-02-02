@@ -34,13 +34,11 @@ class MatchMaking:
     
     def start_draft(self, user_1: User, user_2: User) -> Draft:
         print(f'Starting a draft between {user_1.username} vs {user_2.username}')
-        # return serializered game information here including the uuid and opponent.
         draft_obj = self.draft_factory.create(user_1, user_2)
         return draft_obj
     
 
     def notify_players_of_draft(self, draft_obj: Draft):
-        #serializer draft here
         serialized_draft_obj = draft_obj.serialize()
         package_1 = {
                 **serialized_draft_obj,

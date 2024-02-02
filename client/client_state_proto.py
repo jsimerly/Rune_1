@@ -12,6 +12,9 @@ class ClientState(Protocol):
     def on_exit(self) -> Dict:
         ...
 
+    def update(self):
+        ...
+
     def mouse_input(self, mouse_input: MouseInput):
         ...
 

@@ -95,7 +95,8 @@ class Client:
         key_strokes = self.get_key_input(events)
         if key_strokes:
             self.state_manager.current_state.key_inputs(key_strokes)
-
+        
+        self.state_manager.current_state.update()
         self.render()
         self.socket.run_one()
 
