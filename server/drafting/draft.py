@@ -87,7 +87,9 @@ class Draft:
         self.start_next_timer()
         
         if is_complete:
-            self.start_game()
+            timer = Timer(10)
+            timer.start(self.start_game())
+
 
     def start_game(self):
         factory = GameFactory()
@@ -104,7 +106,7 @@ class Draft:
                 **game_obj.serialize_info()
             }
         }
-        self.socket.send_message(user, 'draft', message)
+        self.socket.send_message(user, 'game_start', message)
 
     def ban(self, team_id:str, character_str: str):
         character_obj = self.available[character_str]()

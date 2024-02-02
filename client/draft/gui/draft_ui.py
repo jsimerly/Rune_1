@@ -142,7 +142,11 @@ class DraftUI:
             element.draw(display)
 
         current_box = self.get_current_box()
-        if self.state.current_selection and current_box:
+        if all([
+            self.state.current_selection, 
+            current_box,   
+            self.state.current_selection_available
+        ]):
             current_box.image = self.state.current_selection.icon_image
 
         if self.state.current_selection:

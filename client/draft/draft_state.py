@@ -38,7 +38,6 @@ class DraftState(ClientState):
         self.current_selection: Optional[DraftCharacter] = None
 
         #really should add these to the DraftTeam class instead
-        self.draft_timer = Timer(10)
         self.team_1_timer = Timer(30) #these values should come from server on init
         self.team_1_timer.start()
         self.team_2_timer = Timer(30)
@@ -89,7 +88,7 @@ class DraftState(ClientState):
     def server_input(self, message: Dict):
         if message['draft_type'] == 'game_starting':
             game_info = message['info']
-            print(game_info)
+            print('game starting - draft_state')
 
         if message['draft_type'] == 'time_up':
             self.notify_server_of_pick()
@@ -178,8 +177,8 @@ class DraftState(ClientState):
                 character_obj = self.character_pool.pop(i)
         return character_obj
     
+    @property
     def current_selection_available(self):
-        print(len(self.character_pool))
         return self.current_selection in self.character_pool
                     
     def render(self, display: pg.Surface):

@@ -18,13 +18,11 @@ class ClientStateManager:
         self.current_state = DraftState(draft_data=data)
         self.current_state.on_enter()
 
-    def start_game(self):
-        data = self.current_state.on_exit()
-        self.current_state = InGameState(**data)
+    def start_game(self, data):
+        self.current_state = InGameState(game_data=data)
         self.current_state.on_enter()
 
-    def end_game(self):
-        data = self.current_state.on_exit()
+    def end_game(self, data):
         self.current_state = HomeScreenState(**data)
         self.current_state.on_enter()
 

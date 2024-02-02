@@ -6,5 +6,8 @@ if TYPE_CHECKING:
     import pygame as pg
 
 class InGameState(ClientState):
+    def __init__(self, game_data) -> None:
+        ...
+
     def render(self, display: pg.Surface):
         ...

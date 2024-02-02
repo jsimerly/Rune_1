@@ -70,6 +70,10 @@ class Client:
         if message['type'] == 'game_found':
             data = message['data']        
             self.state_manager.start_draft(data)
+
+        if message['type'] == 'game_start':
+            data = message['data']
+            self.state_manager.start_game(data)
         
     def drag_threshold_reached(self, mouse_pos):
             dx = mouse_pos[0] - self.mouse_down_pos[0]
