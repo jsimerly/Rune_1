@@ -8,7 +8,6 @@ from drafting.draft_phase import DraftPhase
 from utils import Timer
 import asyncio
 
-
 if TYPE_CHECKING:
     from server.drafting.draft_team import DraftTeam, DraftCharacter, DraftPick, DraftBan, AbsDraftSelection
     from user.user import User
@@ -30,7 +29,7 @@ class Draft:
         self.picked: Set[DraftPick] = set()
 
         self.team_1_timer = Timer(31)
-        self.team_1_timer.start()
+        self.team_1_timer.start(self.notify_user_time_up, self.team_1.user)
         self.team_2_timer = Timer(31)
 
         self.phase = DraftPhase(self.team_1, self.team_2)
@@ -67,6 +66,19 @@ class Draft:
                 return True
             return False
         return False
+    
+    def start_next_timer(self):
+        if self.phase.current_phase:
+            if self.phase.current_phase.team == self.team_1:
+                self.team_1_timer.start(self.notify_user_time_up, self.team_1.user)
+                self.team_2_timer.cancel()
+            if self.phase.current_phase.team == self.team_2:
+                self.team_2_timer.start(self.notify_user_time_up, self.team_2.user)
+                self.team_1_timer.cancel()
+        
+        if self.phase.is_complete:
+            self.team_1_timer.cancel()
+            self.team_2_timer.cancel()
 
     def ban(self, character_str: str):
         character_obj = self.available[character_str]()
@@ -76,6 +88,7 @@ class Draft:
         self.active_team.ban(ban)
         self.banned.add(ban)
         self.phase.next_phase()
+        self.start_next_timer()
 
         user_1 = self.team_1.user
         user_2 = self.team_2.user
@@ -85,13 +98,26 @@ class Draft:
 
     def notify_user_of_ban(self, user: User, ban: DraftBan):
         message = {
-            'pick_type': 'ban',
-            'team_id': self.active_team.team_id,
-            'character': ban.character.name,
-            'pick': self.phase.current_phase.pick,
+            'draft_type': 'pick',
+            'info':{            
+                'pick_type': 'ban',
+                'team_id': self.active_team.team_id,
+                'character': ban.character.name,
+                'pick': self.phase.current_phase.pick,
+            }
         }
         self.socket.send_message(user, 'draft', message)
         ...
+
+    def notify_user_time_up(self, user):
+        print('TIMES UP')
+        message = {
+            'draft_type': 'time_up',
+            'info': {
+                'message': 'TIMES UP'
+            }
+        }
+        self.socket.send_message(user, 'draft', message)
 
 
     def pick(self, character_str: str):
@@ -102,6 +128,7 @@ class Draft:
         self.team_1.pick(pick)
         self.picked.add(pick)
         self.phase.next_phase()
+        self.start_next_timer()
 
         user_1 = self.team_1.user
         user_2 = self.team_2.user
@@ -111,11 +138,15 @@ class Draft:
 
     def notify_user_of_pick(self, user: User, pick: DraftPick):
         message = {
-            'pick_type': 'pick',
-            'team_id': self.active_team.team_id,
-            'character': pick.character.name,
-            'pick': self.phase.current_phase.pick,
+            'draft_type': 'pick',
+            'info': {
+                'pick_type': 'pick',
+                'team_id': self.active_team.team_id,
+                'character': pick.character.name,
+                'pick': self.phase.current_phase.pick,
+            }
         }
+
         self.socket.send_message(user, 'draft', message)
 
 

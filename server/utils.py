@@ -2,6 +2,7 @@ import time
 from typing import Callable
 import pygame as pg
 import asyncio
+from user.user import User
 
 def time_it(func):
     def wrapper(*args, **kwargs):
@@ -20,11 +21,13 @@ class Timer:
         self.callback = None
         self.task = None
 
-    def start(self, callback: Callable=None):
+    def start(self, callback: Callable=None, user: User=None):
         self.callback = callback
+        self.user=user
         self.start_ticks = pg.time.get_ticks()
         self.active = True
         self.task = asyncio.create_task(self._run_timer())
+
 
     async def _run_timer(self):
         while self.active and self.time_left > 0:
@@ -42,7 +45,7 @@ class Timer:
     def complete(self):
         self.active = False
         if self.callback:
-            self.callback()
+            self.callback(self.user)
         self.cancel()
 
 

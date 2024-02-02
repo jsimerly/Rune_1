@@ -38,7 +38,7 @@ class DraftState(ClientState):
         self.current_selection: Optional[DraftCharacter] = None
 
         #really should add these to the DraftTeam class instead
-        self.team_1_timer = Timer(30)
+        self.team_1_timer = Timer(30) #these values should come from server on init
         self.team_1_timer.start()
         self.team_2_timer = Timer(30)
         self.draft_ui = DraftUI(state=self)
@@ -62,11 +62,11 @@ class DraftState(ClientState):
                 #check if it's event my turn to notify server
                 if self.current_selection in self.character_pool:
                     if self.phase.is_client_turn:
-                        self.notify_server()
+                        self.notify_server_of_pick()
                     else:
                         print('It is not your turn.')
 
-    def notify_server(self):
+    def notify_server_of_pick(self):
         package_kwargs = {
             'type' : 'draft',
             'serialized_message': {
@@ -82,29 +82,37 @@ class DraftState(ClientState):
         self.socket.send_message(**package_kwargs)
 
     def server_input(self, message: Dict):
-        if message['pick_type'] == 'ban':
-            char_name = message['character']
-            team_id = message['team_id']
-            if team_id == self.team_1.team_id:
-                self.ban(self.team_1, char_name)
-            elif team_id == self.team_2.team_id:
-                self.ban(self.team_2, char_name)
-            else:
-                print('team_id does not match any of the drafting teams.')
+        print('server input')
+        if message['draft_type'] == 'time_up':
+            print('sent back')
+            self.notify_server_of_pick()
 
-            self.start_next_timer()
+        if message['draft_type'] == 'pick':
+            pick_info = message['info']
+            if pick_info['pick_type'] == 'ban':
+                char_name = pick_info['character']
+                team_id = pick_info['team_id']
+                if team_id == self.team_1.team_id:
+                    self.ban(self.team_1, char_name)
+                elif team_id == self.team_2.team_id:
+                    self.ban(self.team_2, char_name)
+                else:
+                    print('team_id does not match any of the drafting teams.')
 
-        if message['pick_type'] == 'pick':
-            char_name = message['character']
-            team_id = message['team_id']
-            if team_id == self.team_1.team_id:
-                self.pick(self.team_1, char_name)
-            elif team_id == self.team_2.team_id:
-                self.pick(self.team_2, char_name)
-            else:
-                print('team_id does not match any of the drafting teams.')
+                self.start_next_timer()
 
-            self.start_next_timer()
+            if pick_info['pick_type'] == 'pick':
+                pick_info = message['info']
+                char_name = pick_info['character']
+                team_id = pick_info['team_id']
+                if team_id == self.team_1.team_id:
+                    self.pick(self.team_1, char_name)
+                elif team_id == self.team_2.team_id:
+                    self.pick(self.team_2, char_name)
+                else:
+                    print('team_id does not match any of the drafting teams.')
+
+                self.start_next_timer()
                 
 
     def ban(self, team: DraftTeam, character_str: str):
