@@ -31,7 +31,7 @@ class DraftPhase:
         
         self.is_complete = False
 
-    def next_phase(self):
+    def next_phase(self) -> bool:
         self.phase_index += 1
         print(f'phase_index: {self.phase_index} / {len(self.phases)}')
         if self.phase_index >= len(self.phases):
@@ -39,4 +39,5 @@ class DraftPhase:
             return True
         else:
             self.current_phase = self.phases[self.phase_index]
+            return False
 

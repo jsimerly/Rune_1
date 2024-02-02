@@ -7,10 +7,12 @@ from .draft_team import DraftTeam, DraftPick, DraftBan
 from drafting.draft_phase import DraftPhase
 from utils import Timer
 import asyncio
+from game.game_factory import GameFactory
 
 if TYPE_CHECKING:
     from server.drafting.draft_team import DraftTeam, DraftCharacter, DraftPick, DraftBan, AbsDraftSelection
     from user.user import User
+    from game.game import Game
 
 class Draft:
     def __init__(self, user_1: DraftTeam, user_2: DraftTeam) -> None:
@@ -46,9 +48,9 @@ class Draft:
         character_str = data['selected_character']
         if self.is_valid_selection(team_id, character_str):
             if data['is_ban'] and self.phase.current_phase.is_ban:
-                self.ban(character_str)
+                self.ban(team_id, character_str)
             else:
-                self.pick(character_str)
+                self.pick(team_id, character_str)
 
     @property
     def active_team(self) -> DraftTeam:
@@ -80,15 +82,40 @@ class Draft:
             self.team_1_timer.cancel()
             self.team_2_timer.cancel()
 
-    def ban(self, character_str: str):
+    def next_phase(self):
+        is_complete = self.phase.next_phase()
+        self.start_next_timer()
+        
+        if is_complete:
+            self.start_game()
+
+    def start_game(self):
+        factory = GameFactory()
+        game_obj = factory.create_game(self.team_1, self.team_2)
+        self.notify_of_game_start(self.team_1.user, game_obj)
+        self.notify_of_game_start(self.team_2.user, game_obj)
+
+        ...
+
+    def notify_of_game_start(self, user, game_obj: Game):
+        message = {
+            'draft_type': 'game_starting',
+            'info': {
+                **game_obj.serialize_info()
+            }
+        }
+        self.socket.send_message(user, 'draft', message)
+
+    def ban(self, team_id:str, character_str: str):
         character_obj = self.available[character_str]()
         del self.available[character_str]
         
         ban = DraftBan(self.active_team, character_obj)
         self.active_team.ban(ban)
+        picking_team = self.team_1 if team_id == self.team_1.team_id else self.team_2
+        picking_team.ban(ban)
         self.banned.add(ban)
-        self.phase.next_phase()
-        self.start_next_timer()
+        self.next_phase()
 
         user_1 = self.team_1.user
         user_2 = self.team_2.user
@@ -110,7 +137,6 @@ class Draft:
         ...
 
     def notify_user_time_up(self, user):
-        print('TIMES UP')
         message = {
             'draft_type': 'time_up',
             'info': {
@@ -120,15 +146,15 @@ class Draft:
         self.socket.send_message(user, 'draft', message)
 
 
-    def pick(self, character_str: str):
+    def pick(self, team_id:str, character_str: str):
         character_obj = self.available[character_str]()
         del self.available[character_str]
-        print(character_str)
         pick = DraftPick(self.active_team, character_obj)
-        self.team_1.pick(pick)
+
+        picking_team = self.team_1 if team_id == self.team_1.team_id else self.team_2
+        picking_team.pick(pick)
         self.picked.add(pick)
-        self.phase.next_phase()
-        self.start_next_timer()
+        self.next_phase()
 
         user_1 = self.team_1.user
         user_2 = self.team_2.user

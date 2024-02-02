@@ -33,11 +33,16 @@ class Timer:
 
         if self.active:  
             self.complete()
+            if self.time_left != self.default_ticks:
+                self.time_left = self.default_ticks
 
     def cancel(self):
-        self.time_left = self.default_ticks
         self.active = False
         self.callback = None
+        self.time_left = self.default_ticks
+        if self.task is not None:
+            self.task.cancel()  # Cancel the running task
+            self.task = None  # Reset the task attribute to None
     
     def complete(self):
         self.active = False

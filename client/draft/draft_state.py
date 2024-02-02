@@ -38,6 +38,7 @@ class DraftState(ClientState):
         self.current_selection: Optional[DraftCharacter] = None
 
         #really should add these to the DraftTeam class instead
+        self.draft_timer = Timer(10)
         self.team_1_timer = Timer(30) #these values should come from server on init
         self.team_1_timer.start()
         self.team_2_timer = Timer(30)
@@ -55,7 +56,8 @@ class DraftState(ClientState):
                 self.current_selection = character
                 character.is_selected = True
 
-                if self.phase.current_phase.is_ban:
+
+                if self.phase.current_phase and self.phase.current_phase.is_ban:
                     character.is_banning = True
 
             if isinstance(element_clicked, LockInButton):
@@ -67,24 +69,29 @@ class DraftState(ClientState):
                         print('It is not your turn.')
 
     def notify_server_of_pick(self):
-        package_kwargs = {
-            'type' : 'draft',
-            'serialized_message': {
-                'draft_id': str(self.draft_id),
-                'team_id': str(self.client_team.team_id),
-                'is_ban': self.phase.current_phase.is_ban,
-                'phase': self.phase.current_phase.pick,
-                'selected_character' : self.current_selection.server_name,
-            },
-            'user': self.user
-        }
+        if self.current_selection:
+            package_kwargs = {
+                'type' : 'draft',
+                'serialized_message': {
+                    'draft_id': str(self.draft_id),
+                    'team_id': str(self.client_team.team_id),
+                    'is_ban': self.phase.current_phase.is_ban,
+                    'phase': self.phase.current_phase.pick,
+                    'selected_character' : self.current_selection.server_name,
+                },
+                'user': self.user
+            }
 
-        self.socket.send_message(**package_kwargs)
+            self.socket.send_message(**package_kwargs)
+        else:
+            print('There is no current selection.')
 
     def server_input(self, message: Dict):
-        print('server input')
+        if message['draft_type'] == 'game_starting':
+            game_info = message['info']
+            print(game_info)
+
         if message['draft_type'] == 'time_up':
-            print('sent back')
             self.notify_server_of_pick()
 
         if message['draft_type'] == 'pick':
