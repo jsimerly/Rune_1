@@ -1,23 +1,23 @@
 from __future__ import annotations
 from client_state_proto import ClientState
 from typing import Protocol, Dict, TYPE_CHECKING
-from map.map import GameMap
+from in_game.map.map import GameMap
 from settings import BGCOLOR
-from map.loadouts.map_1 import map_1
+from in_game.map.loadouts.map_1 import map_1
+from .gui.game_ui import GameUI
+from .ecs.ecs_manager import ECSManager
+
 if TYPE_CHECKING:
     from mouse_inputs import MouseInput
     import pygame as pg
 
 class InGameState(ClientState):
     def __init__(self, game_data) -> None:
-        self.map = GameMap(map_layout=map_1)
+        self.map = GameMap(map_loadout=map_1)
         self.team = 0 #team object
         self.opponent = 0 #opponent team
 
-        ...
+        self.ecs_manager = ECSManager(self.map)
 
     def render(self, display: pg.Surface):
-        display.fill(BGCOLOR)
-        self.map.draw_tiles(display)
-        self.map.draw_buildings(display)
-        self.map.draw_objectives(display)
+        self.ecs_manager.render(display)

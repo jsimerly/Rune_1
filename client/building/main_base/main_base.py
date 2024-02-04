@@ -8,11 +8,11 @@ from components.spawning import SpawningComponent
 from typing import TYPE_CHECKING, List
 import pygame as pg
 
-from map.game_tile import GameTile
+from in_game.map.game_tile import GameTile
 
 if TYPE_CHECKING:
     from team.team import Team
-    from map.game_tile import GameTile
+    from in_game.map.game_tile import GameTile
 
 class MainBaseSprite(SpriteComponent):
     NORMAL_SIZE = (75, 75)

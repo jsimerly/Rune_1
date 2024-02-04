@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Set, List, Dict, Optional
 
 if TYPE_CHECKING:
-    from map.game_tile import GameTile
+    from in_game.map.game_tile import GameTile
 
 
 def hex_reachable(start_tile: GameTile, max_range:int) -> Set[GameTile]:
@@ -44,6 +44,7 @@ def hex_radius(center_tile: GameTile, radius:int) -> List[GameTile]:
                 options.append(tile)
 
     return options
+
 
 def in_radius_end_on(center_tile: GameTile, radius:int) -> List[GameTile]:
     options = []

@@ -306,7 +306,7 @@ class Layout:
         radius -= 1
         #offset is used if I want the center to be 3 hexagons instead of a central single hexagon.
         offset = 2 if tri_center else 1
-        for q in range(-radius, radius + offset):
+        for q in  range(-radius, radius + offset):
             r1 = max(-radius, -q - radius)
             r2 = min(radius, -q + radius) + offset
             for r in range(r1,r2):
