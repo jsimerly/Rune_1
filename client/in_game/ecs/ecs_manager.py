@@ -1,6 +1,8 @@
 from __future__ import annotations
 from .systems.render_systems import DrawSpriteSystem, DrawTileSystem, DrawHexEdgeSystem
 from .systems.render_systems import RenderSystem
+from .systems.occupancy_systems import OccupancySystem
+from .systems.team_system import TeamSystem
 from typing import TYPE_CHECKING, List
 import pygame as pg
 
@@ -8,7 +10,8 @@ if TYPE_CHECKING:
     from map.map import GameMap
 
 class ECSManager:
-    def __init__(self, map: GameMap) -> None:
+    def __init__(self) -> None:
+        ''' Rendering Systems'''
         self.tile_sprite_system = DrawTileSystem()
         self.border_system = DrawHexEdgeSystem()
         self.selected_system = DrawHexEdgeSystem()
@@ -28,13 +31,10 @@ class ECSManager:
             self.character_sprite_system,
             #
         ]
-        ''' '''
 
-        ''' Register Tiles to sprite system'''
-
-        for tile in map.tiles.values():
-            self.tile_sprite_system.add_entity(tile)
-            self.border_system.add_entity(tile)
+        ''''''
+        self.occupancy_system = OccupancySystem()
+        self.team_system = TeamSystem()
 
 
     def render(self, display: pg.Surface):

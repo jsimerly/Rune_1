@@ -18,17 +18,13 @@ class GameMap:
     origin = (1000, SCREEN_HEIGHT//2)
     skew = 0
 
-    def __init__(self, map_loadout: MapLoadout) -> None:
+    def __init__(self, map_loadout: MapLoadout, ecs_manager) -> None:
         self.orientation = map_loadout.orientation
-        self.tiles: Dict[Tuple[int,int], GameTile] = TileFactory.create_map(self, map_loadout)
+        self.tiles: Dict[Tuple[int,int], GameTile] = TileFactory.create_map(self, map_loadout, ecs_manager)
         
-        for tile in self.tiles.values():
-            tile.map = self.tiles
 
     def get_tile(self, coord: Tuple[int, int]):
         return self.tiles.get(coord)
-    
-
     
     ''' Game Tile Management '''
    

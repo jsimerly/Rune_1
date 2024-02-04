@@ -8,4 +8,4 @@ if TYPE_CHECKING:
 
 @dataclass
 class OccupancyComponent(Component):
-    occupants: List[Entity]
+    occupants: set[Entity]

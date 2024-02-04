@@ -13,11 +13,12 @@ if TYPE_CHECKING:
 
 class InGameState(ClientState):
     def __init__(self, game_data) -> None:
-        self.map = GameMap(map_loadout=map_1)
-        self.team = 0 #team object
+        self.ecs_manager = ECSManager()
+        self.map = GameMap(map_loadout=map_1, ecs_manager=self.ecs_manager)
+        self.team = 0 #team object, 
         self.opponent = 0 #opponent team
 
-        self.ecs_manager = ECSManager(self.map)
+
 
     def render(self, display: pg.Surface):
         self.ecs_manager.render(display)

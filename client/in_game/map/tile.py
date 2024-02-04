@@ -5,6 +5,7 @@ from in_game.ecs.entity import Entity
 from in_game.ecs.components.sprite_component import TileSpriteComponent
 from in_game.ecs.components.visual_edge_component import VisualHexEdgeComponent
 from in_game.ecs.components.screen_position_component import ScreenPositionComponent
+from in_game.ecs.components.occupancy_component import OccupancyComponent
 
 if TYPE_CHECKING:
     from map.map import GameMap
@@ -24,7 +25,7 @@ class GameTile(Entity):
         self.s = -q - r
         self.map: GameMap = map
 
-        position = ScreenPositionComponent((self.map.tile_center_to_pixel(self)))
+        position_component = ScreenPositionComponent((self.map.tile_center_to_pixel(self)))
         tile_sprite_component = TileSpriteComponent(
             sprite_image, surface_color, self.verticies, self.map.tile_size,
             self.map.tile_center_to_pixel(self)
@@ -32,8 +33,13 @@ class GameTile(Entity):
         visual_edge_component = VisualHexEdgeComponent(
             self.verticies, transparent=True
         )
-
-        components = [position, tile_sprite_component, visual_edge_component]
+        occupancy_component = OccupancyComponent(set())
+        components = [
+            position_component, 
+            tile_sprite_component, 
+            visual_edge_component,
+            occupancy_component,
+        ]
         super().__init__(components)
 
 
@@ -81,9 +87,12 @@ class GameTile(Entity):
         return (self.q, self.r)
     
     @property
+    def center_pixel(self) -> tuple(int,int):
+        return self.map.tile_center_to_pixel(self)
+
+    @property
     def verticies(self) -> List[Tuple[int,int]]:
-        center = self.map.tile_center_to_pixel(self)
-        return self.map.get_tile_verticies(center)
+        return self.map.get_tile_verticies(self.center_pixel)
     
     def magnitude(self, hex: GameTile) -> int:
         ''' We divide by two because we're using a 3D grid system with a plane through it at x + y + z = 0.

@@ -1,37 +1,96 @@
+from __future__ import annotations
 from typing import List, TYPE_CHECKING, Optional, Union
-from client.in_game.ecs.components.component_base import Component
-from ecs.components.sprite_component import SpriteComponent
-from ecs.entity import Entity
-from ecs.components.occupier_component import OccupierComponent
+
+from in_game.ecs.components.sprite_component import SpriteComponent
+from in_game.ecs.entity import Entity
+from in_game.ecs.components.occupier_component import OccupierComponent
+from in_game.ecs.components.screen_position_component import ScreenPositionComponent
+from in_game.ecs.components.team_component import TeamComponent
+import pygame as pg
+from in_game.map.tile import GameTile
 
 if TYPE_CHECKING:
-    from map.tile import GameTile
+    from in_game.ecs.components.component_base import Component
 
 
 class Building(Entity):
-    required_components = [SpriteComponent]
+    required_components = [SpriteComponent, OccupierComponent, ScreenPositionComponent]
 
     def __init__(self, components: List[Component] = None) -> None:
         super().__init__(components)
 
-class Teleporter(Building):
-    def __init__(self, game_tile: None | GameTile | List[GameTile]) -> None:
-        sprite_component = SpriteComponent('ecs/entities/buildings/images/teleporter.webp')
-        if isinstance(game_tile, GameTile):
-            occupier_component = OccupierComponent([game_tile])
-        if isinstance(game_tile, list):
-            occupier_component = OccupierComponent(game_tile)
+    def get_center_between_tiles(self, tiles: list[GameTile]) -> tuple(int, int):
+        x, y = 0, 0
+        for tile in tiles:
+            x += tile.center_pixel[0]
+            y += tile.center_pixel[1]
 
-        components = [sprite_component, occupier_component]
+        x = x//len(tiles)
+        y = y//len(tiles)
+        return (x,y)
+
+class Teleporter(Building):
+    size = (60, 60)
+    team_1_image = pg.image.load('in_game/entities/buildings/images/teleporter_1.webp')
+    team_2_image = pg.image.load('in_game/entities/buildings/images/teleporter_2.webp')
+    def __init__(self, 
+        game_tile: None | GameTile | set[GameTile],
+        team_id : str,
+        is_team_1: bool,
+    ) -> None:
+        if isinstance(game_tile, GameTile):
+            occupier_component = OccupierComponent(tiles={game_tile})
+            center_pos = game_tile.center_pixel
+
+        if isinstance(game_tile, list):
+            tiles_set = set(game_tile)
+            occupier_component = OccupierComponent(tiles=tiles_set)
+            center_pos = self.get_center_between_tiles(game_tile)
+
+        if is_team_1:
+            image = self.team_1_image
+        else:
+            image=self.team_2_image
+
+        sprite_component = SpriteComponent(image, self.size)
+        position_component = ScreenPositionComponent(center_pos, self.size)
+        team_component = TeamComponent(team_id, is_team_1)
+
+        components = [
+            sprite_component, 
+            occupier_component, 
+            position_component, 
+            team_component
+        ]
         super().__init__(components)
 
 class Mainbase(Building):
-    def __init__(self, game_tile: None | GameTile | List[GameTile]) -> None:
-        sprite_component = SpriteComponent('ecs/entities/buildings/images/teleporter.webp')
+    size = (120, 120)
+    team_1_image = pg.image.load('in_game/entities/buildings/images/base_1.webp')
+    team_2_image = pg.image.load('in_game/entities/buildings/images/base_2.webp')
+    def __init__(self, game_tile: None | GameTile | set[GameTile], team_id:str, is_team_1: bool):
         if isinstance(game_tile, GameTile):
-            occupier_component = OccupierComponent([game_tile])
-        if isinstance(game_tile, list):
-            occupier_component = OccupierComponent(game_tile)
+            occupier_component = OccupierComponent(set(game_tile))
+            center_pos = game_tile.center_pixel
 
-        components = [sprite_component, occupier_component]
+        if isinstance(game_tile, list):
+            tiles_set = set(game_tile)
+            occupier_component = OccupierComponent(tiles=tiles_set)
+            center_pos = self.get_center_between_tiles(game_tile)
+
+        if is_team_1:
+            image = self.team_1_image
+        else:
+            image=self.team_2_image
+
+        sprite_component = SpriteComponent(image, self.size)
+        position_component = ScreenPositionComponent(center_pos, self.size)
+        team_component = TeamComponent(team_id, is_team_1)
+
+        components = [
+            sprite_component, 
+            occupier_component, 
+            position_component, 
+            team_component
+        ]
         super().__init__(components)
