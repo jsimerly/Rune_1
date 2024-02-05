@@ -1,13 +1,13 @@
 
 from client import Client
 from in_game.client_state import InGameState
-
+from in_game.game_factory import GameFactory
 
 
 def run():
     game = Client()
     game_data = {}
-    game_state = InGameState(game_data)
+    game_state = GameFactory.create(game_data)
 
     game.state_manager.current_state = game_state
     while game.is_running:

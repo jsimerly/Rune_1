@@ -7,11 +7,13 @@ import pygame as pg
 if TYPE_CHECKING:
     from ecs.entity import Entity
 
+
 @dataclass
 class RectUIComponent(Component):
     size: tuple(int, int)
     image: pg.Surface | None = None
-    outline: bool = None
+    outline: bool = True
+    outline_color: tuple(int,int,int) = (255, 255, 255)
     outline_thickness: int = 1
 
 @dataclass

@@ -7,7 +7,8 @@ class SpawnerComponent(Component):
     radius: int
 
 @dataclass
-class TriggerSpawningComponent(Component): ...
+class TriggerSpawningComponent(Component):
+    spawning_entity_id: str
 
 @dataclass
 class SpawningComponent(Component): ...

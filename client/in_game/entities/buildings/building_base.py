@@ -56,7 +56,7 @@ class Teleporter(Building):
             image=self.team_2_image
 
         sprite_component = SpriteComponent(image, self.size)
-        position_component = ScreenPositionComponent(center_pos, self.size)
+        position_component = ScreenPositionComponent(center_pos)
         team_component = TeamComponent(team_id, is_team_1)
 
         components = [
@@ -88,7 +88,7 @@ class Mainbase(Building):
             image=self.team_2_image
 
         sprite_component = SpriteComponent(image, self.size)
-        position_component = ScreenPositionComponent(center_pos, self.size)
+        position_component = ScreenPositionComponent(center_pos)
         team_component = TeamComponent(team_id, is_team_1)
 
         components = [

@@ -19,7 +19,8 @@ class System(ABC):
         if self.validate_entity_components(entity):
             self.entities.append(entity)
         else:
-            raise ValueError(f"Entity must have these components: {self._required_components}")
+            print(self.__class__.__name__)
+            raise ValueError(f"{self.__class__.__name__} must have these components: {self._required_components.__name__}")
 
     def validate_entity_components(self, entity: Entity):
         for required_component in self._required_components:

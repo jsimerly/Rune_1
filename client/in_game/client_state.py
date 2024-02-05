@@ -5,7 +5,6 @@ from typing import Protocol, Dict, TYPE_CHECKING
 from in_game.map.map import GameMap
 from settings import BGCOLOR
 from in_game.map.loadouts.map_1 import map_1
-from .gui.game_ui import GameUI
 from in_game.event_bus import EventBus
 from .ecs.ecs_manager import ECSManager
 from in_game.action_state import ActionStateManager
@@ -16,11 +15,15 @@ if TYPE_CHECKING:
 
 
 class InGameState(ClientState):
-    def __init__(self, game_data) -> None:
-        self.event_bus = EventBus()
-        self.action_state = ActionStateManager(self.event_bus)
-        self.ecs_manager = ECSManager(self.event_bus, self.action_state)
-        self.map = GameMap(map_loadout=map_1, ecs_manager=self.ecs_manager, event_bus=self.event_bus)
+    def __init__(self, event_bus: EventBus, action_state: ActionStateManager, ecs_manager: ECSManager, map: GameMap) -> None:
+        self.event_bus = event_bus
+        self.action_state = action_state,
+        self.ecs_manager = ecs_manager
+        self.map = map
+        # self.event_bus = EventBus()
+        # self.action_state = ActionStateManager(self.event_bus)
+        # self.ecs_manager = ECSManager(self.event_bus, self.action_state)
+        # self.map = GameMap(map_loadout=map_1, ecs_manager=self.ecs_manager, event_bus=self.event_bus)
 
     def mouse_input(self, mouse_input: MouseInput):
         self.event_bus.publish('mouse_event', mouse_input)

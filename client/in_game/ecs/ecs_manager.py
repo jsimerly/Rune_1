@@ -1,5 +1,6 @@
 from __future__ import annotations
 from .systems.render_systems import DrawSpriteSystem, DrawTileSystem, DrawHexEdgeSystem, DrawSelectedHexSystem
+from .systems.ui_system import UISystem
 from .systems.render_systems import RenderSystem
 from .systems.occupancy_systems import OccupancySystem
 from .systems.team_system import TeamSystem
@@ -16,7 +17,7 @@ if TYPE_CHECKING:
 class ECSManager:
     def __init__(self, event_bus: EventBus, action_state: ActionStateManager) -> None:
         self.all_entities: dict[str, Entity] = {}
-        
+
         self.event_bus = event_bus
         self.action_state = action_state
         self.click_system = ClickSystem(event_bus=event_bus, action_state=action_state)
@@ -30,7 +31,7 @@ class ECSManager:
         #movement lines
         self.character_sprite_system = DrawSpriteSystem(event_bus=event_bus)
         #ability system
-        self.ui_system = DrawSpriteSystem(event_bus=event_bus)
+        self.ui_system = UISystem(event_bus=event_bus)
 
         self.render_systems: List[RenderSystem] = [
             self.tile_sprite_system,
@@ -41,6 +42,7 @@ class ECSManager:
             #
             self.character_sprite_system,
             #
+            self.ui_system,
         ]
 
         ''''''
@@ -52,6 +54,9 @@ class ECSManager:
 
     def remove_entity(self, entity_id: str):
         del self.all_entities[entity_id]
+
+    def query(self, entity_id: str) -> Entity:
+        return self.all_entities[entity_id]
 
     def render(self, display: pg.Surface):
         for render_system in self.render_systems:

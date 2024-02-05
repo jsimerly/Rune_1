@@ -22,7 +22,7 @@ class BaseRune(Objective):
     size = (60,60)
     def __init__(self, entity_id, game_tile: GameTile, image) -> None:
         sprite_component = SpriteComponent(image, self.size)
-        position_component = ScreenPositionComponent(game_tile.center_pixel, self.size)
+        position_component = ScreenPositionComponent(game_tile.center_pixel)
         occupier_component = OccupierComponent(tiles={game_tile})
 
         components = [
