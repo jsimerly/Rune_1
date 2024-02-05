@@ -5,12 +5,14 @@ from typing import TYPE_CHECKING, List, Type
 if TYPE_CHECKING:
     from components.component_base import Component
     from entity import Entity
+    from event_bus import EventBus
 
 class System(ABC):
     required_components = []
 
-    def __init__(self) -> None:
+    def __init__(self, event_bus: EventBus) -> None:
         self._required_components: List[Type[Component]] = self.required_components
+        self.event_bus: EventBus = event_bus
         self.entities: List[Entity] = []
 
     def add_entity(self, entity: Entity):

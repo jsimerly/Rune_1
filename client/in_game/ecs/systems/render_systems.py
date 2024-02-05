@@ -1,9 +1,11 @@
 from __future__ import annotations
+
+from in_game.ecs.entity import Entity
+from in_game.event_bus import EventBus
 from .system_base import System
 from in_game.ecs.components.sprite_component import TileSpriteComponent, SpriteComponent
-from in_game.ecs.components.visual_edge_component import VisualHexEdgeComponent
+from in_game.ecs.components.visual_edge_component import VisualHexEdgeComponent, SelectedHexEdgeComponent
 from in_game.ecs.components.screen_position_component import ScreenPositionComponent
-from in_game.map.tile import GameTile
 from typing import Optional
 import pygame as pg
 from abc import abstractmethod
@@ -83,9 +85,29 @@ class DrawHexEdgeSystem(RenderSystem):
             else:
                 pg.draw.polygon(display, visual_component.color, visual_component.verticies, visual_component.thickness)
 
+    def update_to_single_entity(self, entity: Entity):
+        self.entities = [entity]
+
+class DrawSelectedHexSystem(RenderSystem):
+    required_components = [SelectedHexEdgeComponent, ScreenPositionComponent]
+
+    def __init__(self, event_bus: EventBus) -> None:
+        super().__init__(event_bus)
+        self.event_bus.subscribe('tile_clicked', self.add_entity)
+
+    def add_entity(self, entity: Entity):
+        self.entities = [entity]
+
+    def draw(self, display: pg.Surface):
+        for entity in self.entities:
+            self.draw_entity(display, entity)
+
+    def draw_entity(self, display:pg.Surface, entity: Entity):
+        visual_component: Optional[SelectedHexEdgeComponent] = entity.get_component(SelectedHexEdgeComponent)
+        if visual_component:
+            pg.draw.polygon(display, visual_component.color, visual_component.verticies, visual_component.thickness)
+
     
-
-
 
 
 

@@ -14,4 +14,13 @@ class VisualHexEdgeComponent(Component):
         self.color = color
         self.transparent=transparent
 
+class SelectedHexEdgeComponent(Component):
+    def __init__(self, 
+        verticies:List[Tuple[int,int]], 
+        thickness:int=4, 
+        color=(255,255,255),
+    ):
+        self.verticies = verticies
+        self.thickness = thickness
+        self.color = color
 

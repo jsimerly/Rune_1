@@ -2,7 +2,7 @@ from __future__ import annotations
 from ...zclient.ui.buttons.button import ButtonManager, Button
 from ...zclient.clickable_obj import Clickable, Draggable, ContinueAction
 from typing import List, Dict, Callable, TYPE_CHECKING, Optional, Tuple
-from client.in_game.action_state import IdleState, ActionState, MouseInput, ActionContext
+from client.in_game.zaction_state import IdleState, ActionState, MouseInput, ActionContext
 import pygame as pg
 from zclient.ui.buttons.button import ButtonManager
 from zclient.ui.buttons.spawn_button import SpawnButton

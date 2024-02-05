@@ -4,6 +4,7 @@ import pygame as pg
 from settings import SCREEN_HEIGHT
 from math import radians, cos, sin
 from .tile_factory import TileFactory
+from mouse_inputs import Click, DragStart, Dragging, DragEnd, MouseInput
 
 if TYPE_CHECKING:
     from map.loadouts.loadout_base import MapLoadout
@@ -11,6 +12,8 @@ if TYPE_CHECKING:
     from map.tile import GameTile
     from team.team import Team
     from building.abs_building import AbstractBuilding
+    from event_bus import EventBus
+    from mouse_inputs import MouseInput
 
 
 class GameMap:
@@ -18,10 +21,23 @@ class GameMap:
     origin = (1000, SCREEN_HEIGHT//2)
     skew = 0
 
-    def __init__(self, map_loadout: MapLoadout, ecs_manager) -> None:
+    def __init__(self, map_loadout: MapLoadout, ecs_manager, event_bus: EventBus) -> None:
+        self.event_bus = event_bus
         self.orientation = map_loadout.orientation
         self.tiles: Dict[Tuple[int,int], GameTile] = TileFactory.create_map(self, map_loadout, ecs_manager)
-        
+        event_bus.subscribe('mouse_event', self.handle_mouse_event)
+
+    def handle_mouse_event(self, mouse_input: MouseInput):
+        tile = self.pixel_to_tile(mouse_input.pixel)
+        if tile:
+            if isinstance(mouse_input, Click):
+                self.event_bus.publish('tile_clicked', tile)
+            if isinstance(mouse_input, DragStart):
+                self.event_bus.publish('tile_drag_started', tile)
+            if isinstance(mouse_input, Dragging):
+                self.event_bus.publish('tile_dragging', tile)
+            if isinstance(mouse_input, DragEnd):
+                self.event_bus.publish('tile_drag_ended', tile)        
 
     def get_tile(self, coord: Tuple[int, int]):
         return self.tiles.get(coord)
@@ -45,7 +61,8 @@ class GameMap:
         r1 = M.b2 * pt_x + M.b3 * pt_y
         s1 = -q1 - r1
         int_coords = self.fractional_to_int(q1, r1, s1)
-        return self.get_tile(int_coords)
+        tile_cords = (int_coords[0], int_coords[1])
+        return self.get_tile(tile_cords)
 
 
     def fractional_to_int(self, q1: float, r1: float, s1: float) -> Tuple[int, int, int]:

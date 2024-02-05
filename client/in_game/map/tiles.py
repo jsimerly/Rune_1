@@ -9,9 +9,9 @@ if TYPE_CHECKING:
 
 grass_image = pg.image.load('in_game/map/images/grass.png')
 class Grass(GameTile):
-    def __init__(self, q: int, r: int, map: GameMap):
+    def __init__(self, q: int, r: int, map: GameMap, entity_id: str):
         super().__init__(
-            q=q, r=r, map=map,
+            q=q, r=r, map=map,entity_id=entity_id,
             sprite_image=grass_image,
             surface_color=(181, 194, 132), 
             is_passable=True, 
@@ -27,9 +27,9 @@ class Grass(GameTile):
 
 tree_image = pg.image.load('in_game/map/images/tree.webp')
 class Tree(GameTile):
-    def __init__(self, q: int, r: int, map: GameMap):
+    def __init__(self, q: int, r: int, map: GameMap, entity_id:str):
         super().__init__(
-            q, r, map=map,
+            q, r, map=map, entity_id=entity_id,
             sprite_image=tree_image,
             surface_color=(55, 117, 59), 
             is_passable=False, 
@@ -42,9 +42,9 @@ class Tree(GameTile):
 
 #Different from trees only because some characters interact directly with trees.
 class Rock(GameTile):
-    def __init__(self, q: int, r: int):
+    def __init__(self, q: int, r: int, map: GameMap, entity_id:str):
         super().__init__(
-            q, r, 
+            q, r, map, entity_id=entity_id,
             sprite_image=grass_image,            
             surface_color=(58,50,50), 
             is_passable=False, 
@@ -56,9 +56,9 @@ class Rock(GameTile):
         )
 
 class Water(GameTile):
-    def __init__(self, q: int, r: int):
+    def __init__(self, q: int, r: int, map: GameMap, entity_id:str):
         super().__init__(
-            q, r, 
+            q, r, map, entity_id=entity_id,
             sprite_image=grass_image,            
             surface_color=(152, 216, 227), 
             is_passable=False, 
@@ -71,9 +71,9 @@ class Water(GameTile):
 
 brush_image = pg.image.load('in_game/map/images/brush.webp')
 class Brush(GameTile):
-    def __init__(self, q: int, r: int, map: GameMap):
+    def __init__(self, q: int, r: int, map: GameMap, entity_id:str):
         super().__init__(
-            q, r, map,
+            q, r, map, entity_id=entity_id,
             sprite_image=brush_image,            
             surface_color=(160, 194, 81), 
             is_passable=True, 
@@ -85,9 +85,9 @@ class Brush(GameTile):
         )
 
 class RoughTerrian(GameTile):
-    def __init__(self, q: int, r: int):
+    def __init__(self, q: int, r: int, map: GameMap, entity_id:str):
         super().__init__(
-            q, r, 
+            q, r, map, entity_id=entity_id,
             sprite_image=grass_image,            
             surface_color=(94, 122, 66),
             is_passable=True, 

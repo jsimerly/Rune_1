@@ -3,7 +3,7 @@ from typing import List, TYPE_CHECKING, Tuple, Optional
 from in_game.ecs.components.component_base import Component
 from in_game.ecs.entity import Entity
 from in_game.ecs.components.sprite_component import TileSpriteComponent
-from in_game.ecs.components.visual_edge_component import VisualHexEdgeComponent
+from in_game.ecs.components.visual_edge_component import VisualHexEdgeComponent, SelectedHexEdgeComponent
 from in_game.ecs.components.screen_position_component import ScreenPositionComponent
 from in_game.ecs.components.occupancy_component import OccupancyComponent
 
@@ -17,7 +17,7 @@ class GameTile(Entity):
     ]
 
     def __init__(
-            self, q: int, r: int, map: GameMap,
+            self,  q: int, r: int, map: GameMap, entity_id:str,
             sprite_image,
             surface_color, is_passable, can_pierce, can_end_on, blocks_vision, hides_occupants, is_slowing,
         ) -> None:       
@@ -33,14 +33,18 @@ class GameTile(Entity):
         visual_edge_component = VisualHexEdgeComponent(
             self.verticies, transparent=True
         )
+        selected_edge_component = SelectedHexEdgeComponent(
+            self.verticies
+        )
         occupancy_component = OccupancyComponent(set())
         components = [
             position_component, 
             tile_sprite_component, 
             visual_edge_component,
+            selected_edge_component,
             occupancy_component,
         ]
-        super().__init__(components)
+        super().__init__(entity_id, components)
 
 
     '''

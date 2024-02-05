@@ -16,8 +16,8 @@ if TYPE_CHECKING:
 class Building(Entity):
     required_components = [SpriteComponent, OccupierComponent, ScreenPositionComponent]
 
-    def __init__(self, components: List[Component] = None) -> None:
-        super().__init__(components)
+    def __init__(self, entity_id: str, components: List[Component] = None) -> None:
+        super().__init__(entity_id, components)
 
     def get_center_between_tiles(self, tiles: list[GameTile]) -> tuple(int, int):
         x, y = 0, 0
@@ -31,9 +31,12 @@ class Building(Entity):
 
 class Teleporter(Building):
     size = (60, 60)
+    name = 'teleporter'
     team_1_image = pg.image.load('in_game/entities/buildings/images/teleporter_1.webp')
     team_2_image = pg.image.load('in_game/entities/buildings/images/teleporter_2.webp')
+
     def __init__(self, 
+        entity_id: str,
         game_tile: None | GameTile | set[GameTile],
         team_id : str,
         is_team_1: bool,
@@ -62,13 +65,14 @@ class Teleporter(Building):
             position_component, 
             team_component
         ]
-        super().__init__(components)
+        super().__init__(entity_id, components)
 
 class Mainbase(Building):
     size = (120, 120)
+    name = 'main_base'
     team_1_image = pg.image.load('in_game/entities/buildings/images/base_1.webp')
     team_2_image = pg.image.load('in_game/entities/buildings/images/base_2.webp')
-    def __init__(self, game_tile: None | GameTile | set[GameTile], team_id:str, is_team_1: bool):
+    def __init__(self, entity_id:str, game_tile: None | GameTile | set[GameTile], team_id:str, is_team_1: bool):
         if isinstance(game_tile, GameTile):
             occupier_component = OccupierComponent(set(game_tile))
             center_pos = game_tile.center_pixel
@@ -93,4 +97,4 @@ class Mainbase(Building):
             position_component, 
             team_component
         ]
-        super().__init__(components)
+        super().__init__(entity_id, components)

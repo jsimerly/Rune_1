@@ -15,12 +15,12 @@ if TYPE_CHECKING:
 class Objective(Entity):
     required_components = [SpriteComponent, OccupierComponent, ScreenPositionComponent]
 
-    def __init__(self, components: List[Component] = None) -> None:
-        super().__init__(components)
+    def __init__(self, entity_id:str, components: List[Component] = None) -> None:
+        super().__init__(entity_id, components)
 
 class BaseRune(Objective):
     size = (60,60)
-    def __init__(self, game_tile: GameTile, image) -> None:
+    def __init__(self, entity_id, game_tile: GameTile, image) -> None:
         sprite_component = SpriteComponent(image, self.size)
         position_component = ScreenPositionComponent(game_tile.center_pixel, self.size)
         occupier_component = OccupierComponent(tiles={game_tile})
@@ -30,17 +30,20 @@ class BaseRune(Objective):
             occupier_component,
             position_component,
         ]
-        super().__init__(components)
+        super().__init__(entity_id, components)
 
 class Rune(BaseRune):
+    name = 'rune'
     size = (80, 80)
-    def __init__(self, game_tile: GameTile) -> None:
-        super().__init__(game_tile, pg.image.load('in_game/entities/objectives/images/rune.webp'))
+    def __init__(self, entity_id, game_tile: GameTile) -> None:
+        super().__init__(entity_id, game_tile, pg.image.load('in_game/entities/objectives/images/rune.webp'))
 
 class LargeRuneShard(BaseRune):
-    def __init__(self, game_tile: GameTile) -> None:
-        super().__init__(game_tile, pg.image.load('in_game/entities/objectives/images/large_runic_shards.webp'))
+    name = 'large_rune_shards'
+    def __init__(self, entity_id, game_tile: GameTile) -> None:
+        super().__init__(entity_id, game_tile, pg.image.load('in_game/entities/objectives/images/large_runic_shards.webp'))
 
 class SmallRuneShard(BaseRune):
-    def __init__(self, game_tile: GameTile) -> None:
-        super().__init__(game_tile, pg.image.load('in_game/entities/objectives/images/small_runic_shards.webp'))
+    name = 'large_rune_shards'
+    def __init__(self, entity_id, game_tile: GameTile) -> None:
+        super().__init__(entity_id, game_tile, pg.image.load('in_game/entities/objectives/images/small_runic_shards.webp'))

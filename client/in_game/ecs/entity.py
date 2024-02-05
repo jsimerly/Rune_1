@@ -8,7 +8,8 @@ if TYPE_CHECKING:
 
 class Entity(ABC):
     required_components = []
-    def __init__(self, components: List[Component] = None) -> None:
+    def __init__(self, entity_id: str, components: List[Component] = None) -> None:
+        self.entity_id = entity_id
         self.components: Dict[Type[Component], Component] =  {}
         for component in components:
             self.components[type(component)] = component
