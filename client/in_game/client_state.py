@@ -21,4 +21,5 @@ class InGameState(ClientState):
 
 
     def render(self, display: pg.Surface):
+        display.fill(BGCOLOR)
         self.ecs_manager.render(display)
