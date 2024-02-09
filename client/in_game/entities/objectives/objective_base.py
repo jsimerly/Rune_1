@@ -5,6 +5,7 @@ from in_game.ecs.components.sprite_component import SpriteComponent
 from in_game.ecs.entity import Entity
 from in_game.ecs.components.occupier_component import OccupierComponent
 from in_game.ecs.components.screen_position_component import ScreenPositionComponent
+from in_game.ecs.components.visual_aura import VisualAuraComponent
 import pygame as pg
 from in_game.map.tile import GameTile
 
@@ -20,28 +21,35 @@ class Objective(Entity):
 
 class BaseRune(Objective):
     size = (60,60)
-    def __init__(self, entity_id, game_tile: GameTile, image, y_offset=0) -> None:
+    def __init__(self, entity_id, game_tile: GameTile, image, y_offset=0, components: list[Component]=[]) -> None:
         sprite_component = SpriteComponent(image, self.size, y_offset)
         position_component = ScreenPositionComponent(game_tile.center_pixel)
         occupier_component = OccupierComponent(tiles={game_tile})
 
-        components = [
+        _components = [
             sprite_component,
             occupier_component,
             position_component,
-        ]
-        super().__init__(entity_id, components)
+        ] + components
+    
+        super().__init__(entity_id, _components)
 
 class Rune(BaseRune):
     name = 'rune'
     size = (80, 80)
+    experience_radius = 3
     def __init__(self, entity_id, game_tile: GameTile) -> None:
         y_offset = int(self.size[1] * .2)
+        
+        visual_aura_component = VisualAuraComponent(self.experience_radius, (0,170,255), 100, .2)
+        components = [visual_aura_component]
+
         super().__init__(
             entity_id, 
             game_tile, 
             pg.image.load('in_game/entities/objectives/images/rune.webp'),
-            y_offset=y_offset
+            y_offset=y_offset,
+            components=components
         )
 
 class LargeRuneShard(BaseRune):

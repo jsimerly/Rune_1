@@ -8,7 +8,7 @@ class VisualHexEdgeComponent(Component):
         transparent=False
     ):
         self.default_thickness = 1
-        self.default_color = (160,160,160)
+        self.default_color = (140,140,140)
         self.default_transparency=transparent
 
         self.verticies = verticies

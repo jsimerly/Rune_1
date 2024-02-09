@@ -7,6 +7,9 @@ from in_game.ecs.components.sprite_component import TileSpriteComponent, SpriteC
 from in_game.ecs.components.visual_edge_component import VisualHexEdgeComponent, SelectedHexEdgeComponent
 from in_game.ecs.components.fog_of_war import FogOfWarComponent
 from in_game.ecs.components.screen_position_component import ScreenPositionComponent
+from in_game.ecs.components.visual_aura import VisualAuraComponent
+from in_game.ecs.components.occupier_component import OccupierComponent
+from algorithms import hex_radius
 from typing import Optional
 import pygame as pg
 from abc import abstractmethod
@@ -45,8 +48,10 @@ class DrawTileSystem(RenderSystem):
 
         if sprite_component.is_visible:
             pg.draw.polygon(display, sprite_component.bg_color, sprite_component.verticies)
-            pos = self.get_top_left_position(sprite_component.image, position_component.position)
-            display.blit(sprite_component.image, pos)
+
+            if sprite_component.image:
+                pos = self.get_top_left_position(sprite_component.image, position_component.position)
+                display.blit(sprite_component.image, pos)
 
         ''' Uncomment to turn coordinates on'''
         # if isinstance(entity, GameTile):
@@ -155,11 +160,53 @@ class DrawFogOfWarSystem(RenderSystem):
     def draw_entity(self, display: pg.Surface, entity: Entity):
         ...
 
+class DrawFogOfWarSystem(RenderSystem):
+    required_components = [FogOfWarComponent, TileSpriteComponent]
+
+    def draw(self, display: pg.Surface):
+        trans_surface = pg.Surface(display.get_size(), pg.SRCALPHA)
+        for entity in self.entities:
+            fog_of_war_comp: FogOfWarComponent = entity.get_component(FogOfWarComponent)
+            if fog_of_war_comp.is_fog_of_war:
+                sprite_component: TileSpriteComponent = entity.get_component(TileSpriteComponent)
+
+                pg.draw.polygon(trans_surface, (0, 0, 0, 100), sprite_component.verticies)
+        display.blit(trans_surface, (0,0))
+
+    def draw_entity(self, display: pg.Surface, entity: Entity):
+        ...
 
 
+class DrawAuraSystem(RenderSystem):
+    required_components = [VisualAuraComponent, OccupierComponent]
 
+    def draw_entity(self, display: pg.Surface, entity: Entity):
+        trans_surface = pg.Surface(display.get_size(), pg.SRCALPHA)
+        visual_aura_comp: VisualAuraComponent = entity.get_component(VisualAuraComponent)
+        occupier_component: OccupierComponent = entity.get_component(OccupierComponent)
+        
+        if len(occupier_component.tiles) > 0:
+            for tile in occupier_component.tiles:
+                tiles_in_aura = hex_radius(tile, visual_aura_comp.radius)
 
-                
+                for aura_tile in tiles_in_aura:
+                    distance_from = tile.distance_to(aura_tile)
+
+                    tapering_intensity = 1 - (distance_from * visual_aura_comp.tapering_intensity)
+                    
+                    alpha = int(tapering_intensity * visual_aura_comp.transparency_value)
+                   
+                    color = (
+                        visual_aura_comp.color[0], 
+                        visual_aura_comp.color[1], 
+                        visual_aura_comp.color[2], 
+                        alpha
+                    )
+                    pg.draw.polygon(trans_surface, color, aura_tile.verticies)
+
+        display.blit(trans_surface, (0,0))
+
+    
 
 
 

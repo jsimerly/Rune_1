@@ -16,6 +16,7 @@ from in_game.ecs.components.spawner_component import SpawnerComponent
 from in_game.ecs.components.vision_component import VisionComponent
 from in_game.ecs.components.occupier_component import OccupierComponent
 from in_game.ecs.components.team_component import TeamComponent
+from in_game.ecs.components.visual_aura import VisualAuraComponent
 import pygame as pg
 
 if TYPE_CHECKING:
@@ -141,12 +142,13 @@ class GameFactory:
  
             if entity.has_component(VisionComponent) and entity.has_component(OccupierComponent):
                 team_comp: TeamComponent = entity.get_component(TeamComponent)
-                print('preteamcomp')
                 if team_comp:
                     if team_comp.team_id != game_data['team_id']:
                         continue
-                print(entity)
                 ecs_manager.vision_system.add_entity(entity)
+
+            if entity.has_component(VisualAuraComponent) and entity.has_component(OccupierComponent):
+                ecs_manager.draw_aura_system.add_entity(entity)
 
         ecs_manager.vision_system.update_vision()
 

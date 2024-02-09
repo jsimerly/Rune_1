@@ -37,14 +37,14 @@ class ClickSystem(System):
         self.event_bus.publish('tile_selected', tile=tile)
         occupancy_component: OccupancyComponent = tile.get_component(OccupancyComponent)
 
-        for occupant in occupancy_component.occupants:
-            if isinstance(occupant, Character):
-                self.event_bus.publish('character_selected', occupant)
-            if isinstance(occupant, Building):
-                self.event_bus.publish('building_selected', occupant)
-                print('building selected')
-            if isinstance(occupant, Objective):
-                self.event_bus.publish('objective_selected', occupant)
+        # for occupant in occupancy_component.occupants:
+        #     if isinstance(occupant, Character):
+        #         self.event_bus.publish('character_selected', occupant)
+        #     if isinstance(occupant, Building):
+        #         self.event_bus.publish('building_selected', occupant)
+        #         print('building selected')
+        #     if isinstance(occupant, Objective):
+        #         self.event_bus.publish('objective_selected', occupant)
             
 
         # self.action_state.movement() 
@@ -66,6 +66,10 @@ class ClickSystem(System):
                     return 
                 
         if self.action_state.is_spawning:
+            found_action = self.check_buttons(pixel)
+            if found_action:
+                return
+            
             if tile:
                 self.event_bus.publish('attempt_spawn_to_tile', tile=tile)
             #return errors

@@ -17,9 +17,28 @@ class TileSpriteComponent(SpriteComponent):
         self.bg_color = bg_color
         self.verticies = verticies
 
-        image_size = (int(size[0]*1.5), int(size[1]*1.5))
-        image = pg.transform.scale(raw_image, image_size)
-        self.image: pg.Surface = image
+        if raw_image:
+            image_size = (int(size[0]*1.5), int(size[1]*1.5))
+            image = pg.transform.scale(raw_image, image_size)
+            self.image: pg.Surface = image
+        else:
+            self.image = None
         self.is_visible = True
-
+class VisualTileAffectComponent(Component):
+    def __init__(self,
+        raw_image: pg.Surface, 
+        color: tuple[int,int,int], 
+        is_transparent: bool,
+        size: tuple[int,int,int]
+    ) -> None:
+        self.color = color
+        self.is_transparent=is_transparent
+        if raw_image:
+            image_size = (int(size[0]*1.5), int(size[1]*1.5))
+            image = pg.transform.scale(raw_image, image_size)
+            self.image: pg.Surface = image
+        else:
+            self.image = None
+        
+        
 

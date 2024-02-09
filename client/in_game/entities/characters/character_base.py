@@ -6,6 +6,7 @@ from in_game.ecs.components.sprite_component import SpriteComponent
 from in_game.ecs.entity import Entity
 from in_game.ecs.components.occupier_component import OccupierComponent
 from in_game.ecs.components.screen_position_component import ScreenPositionComponent
+from in_game.ecs.components.vision_component import VisionComponent
 from in_game.ecs.components.team_component import TeamComponent
 from in_game.ecs.components.name_component import NameComponent
 import pygame as pg
@@ -30,7 +31,8 @@ class Character(Entity):
         sprite_components = SpriteComponent(sprite, self.size, y_offset=y_offset)
         screen_position_component = ScreenPositionComponent(None)
         team_component = TeamComponent(team_id, is_team_1)
-        occupier_component = OccupierComponent(None)
+        occupier_component = OccupierComponent()
+        vision_component = VisionComponent(vision_radius=4)
 
         components = [
             name_component,
@@ -38,6 +40,7 @@ class Character(Entity):
             screen_position_component,
             team_component,
             occupier_component,
+            vision_component
         ]
         super().__init__(entity_id=entity_id, components=components)
 

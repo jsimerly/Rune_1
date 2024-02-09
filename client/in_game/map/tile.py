@@ -107,7 +107,7 @@ class GameTile(Entity):
         But, because we're only using diagnols, as opposed to every block in a discrete 3D grid, that means we're
         double counting using Manhattan distances. '''
 
-        return int((abs(hex.q) + abs(hex.r) + abs(hex.s))/2)
+        return int((abs(hex[0]) + abs(hex[1]) + abs(hex[2]))/2)
     
     def distance_to(self, other: GameTile) -> int:
         vector = (self.q - other.q, self.r - other.r, self.s - other.s)

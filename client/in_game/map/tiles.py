@@ -12,7 +12,7 @@ class Grass(GameTile):
     def __init__(self, q: int, r: int, map: GameMap, entity_id: str):
         super().__init__(
             q=q, r=r, map=map,entity_id=entity_id,
-            sprite_image=grass_image,
+            sprite_image=None,
             surface_color=(181, 194, 132), 
             is_passable=True, 
             can_pierce=True,

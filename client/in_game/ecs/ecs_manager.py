@@ -1,5 +1,5 @@
 from __future__ import annotations
-from .systems.render_systems import DrawSpriteSystem, DrawTileSystem, DrawHexEdgeSystem, DrawSelectedHexSystem, DrawFogOfWarSystem
+from .systems.render_systems import DrawSpriteSystem, DrawTileSystem, DrawHexEdgeSystem, DrawSelectedHexSystem, DrawFogOfWarSystem, DrawAuraSystem
 from .systems.ui_system import UISystem
 from .systems.render_systems import RenderSystem
 from .systems.occupancy_systems import OccupancySystem
@@ -28,6 +28,7 @@ class ECSManager:
         self.tile_sprite_system = DrawTileSystem(event_bus=event_bus)
         self.border_system = DrawHexEdgeSystem(event_bus=event_bus)
         self.selected_system = DrawSelectedHexSystem(event_bus=event_bus, action_state=action_state)
+        self.draw_aura_system = DrawAuraSystem(event_bus=event_bus)
         self.building_sprite_system = DrawSpriteSystem(event_bus=event_bus)
         self.objective_sprite_system = DrawSpriteSystem(event_bus=event_bus)
         #movement lines
@@ -40,6 +41,7 @@ class ECSManager:
             self.tile_sprite_system,
             self.border_system,
             self.selected_system,
+            self.draw_aura_system,
             self.building_sprite_system,
             self.objective_sprite_system,
             #
