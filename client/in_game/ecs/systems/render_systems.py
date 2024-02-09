@@ -114,7 +114,7 @@ class DrawSpriteSystem(RenderSystem):
             health_component: HealthComponent = entity.get_component(HealthComponent)
             y_pos = pos[1] - 8
             line_width = 8
-            health_color = (5, 150, 0)
+            health_color = (48, 184, 66)
 
             image_size = sprite_component.image.get_size()
             left_pos = (pos[0] + 20, y_pos)

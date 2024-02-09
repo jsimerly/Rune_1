@@ -16,7 +16,7 @@ class Emily(Character):
         ghost_sprite.set_alpha(self.ghost_alpha)
 
         resource_component = ResourceComponent(
-            'Mana', (181, 90, 204), 
+            'Mana', (148, 126, 217), 
             max=5, 
             min=0,
             end_of_turn_refresh=5,
