@@ -196,12 +196,7 @@ class DrawAuraSystem(RenderSystem):
                     
                     alpha = int(tapering_intensity * visual_aura_comp.transparency_value)
                    
-                    color = (
-                        visual_aura_comp.color[0], 
-                        visual_aura_comp.color[1], 
-                        visual_aura_comp.color[2], 
-                        alpha
-                    )
+                    color = visual_aura_comp.color[:3] + (alpha,)
                     pg.draw.polygon(trans_surface, color, aura_tile.verticies)
 
         display.blit(trans_surface, (0,0))

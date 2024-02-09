@@ -39,9 +39,10 @@ class ECSManager:
 
         self.render_systems: List[RenderSystem] = [
             self.tile_sprite_system,
+            self.draw_aura_system,
             self.border_system,
             self.selected_system,
-            self.draw_aura_system,
+            
             self.building_sprite_system,
             self.objective_sprite_system,
             #

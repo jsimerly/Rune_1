@@ -13,7 +13,7 @@ from in_game.ecs.components.visual_edge_component import VisualHexEdgeComponent
 
 class SpawningSystem(System):
     required_components = [OccupierComponent, SpawnerComponent]
-    spawning_color = (121, 166, 186)
+    spawning_color = (220, 220, 255)
     spawning_thickness = 3
 
     def __init__(self, event_bus: EventBus) -> None:

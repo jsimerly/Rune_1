@@ -36,7 +36,7 @@ class BaseRune(Objective):
 
 class Rune(BaseRune):
     name = 'rune'
-    size = (80, 80)
+    size = (90, 90)
     experience_radius = 3
     def __init__(self, entity_id, game_tile: GameTile) -> None:
         y_offset = int(self.size[1] * .2)

@@ -23,7 +23,7 @@ class Character(Entity):
         TeamComponent,
         NameComponent,
     ]
-    size = (75, 75)
+    size = (95, 95)
 
     def __init__(self, entity_id:str, name:str, sprite: pg.Surface, team_id: str, is_team_1:bool) -> None:
         name_component = NameComponent(name)

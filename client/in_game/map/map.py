@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 class GameMap:
-    tile_size = (36, 36) # adjust this based on settintgs
+    tile_size = (40, 40) # adjust this based on settintgs
     origin = (1000, SCREEN_HEIGHT//2)
     skew = 0
 

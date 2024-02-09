@@ -32,7 +32,7 @@ class Building(Entity):
         return (x,y)
 
 class Teleporter(Building):
-    size = (60, 60)
+    size = (80, 80)
     name = 'teleporter'
     team_1_image = pg.image.load('in_game/entities/buildings/images/teleporter_1.webp')
     team_2_image = pg.image.load('in_game/entities/buildings/images/teleporter_2.webp')
@@ -75,7 +75,7 @@ class Teleporter(Building):
         super().__init__(entity_id, components)
 
 class Mainbase(Building):
-    size = (120, 120)
+    size = (140, 140)
     name = 'main_base'
     team_1_image = pg.image.load('in_game/entities/buildings/images/base_1.webp')
     team_2_image = pg.image.load('in_game/entities/buildings/images/base_2.webp')

@@ -7,6 +7,7 @@ from in_game.ecs.components.visual_edge_component import VisualHexEdgeComponent,
 from in_game.ecs.components.screen_position_component import ScreenPositionComponent
 from in_game.ecs.components.occupancy_component import OccupancyComponent
 from in_game.ecs.components.fog_of_war import FogOfWarComponent
+from in_game.ecs.components.map_interaction_component import TileMapInteractionComponent
 
 if TYPE_CHECKING:
     from map.map import GameMap
@@ -39,6 +40,14 @@ class GameTile(Entity):
         )
         occupancy_component = OccupancyComponent(set())
         fog_of_war_component = FogOfWarComponent()
+        tile_map_interaction_component = TileMapInteractionComponent(
+            is_passable=is_passable,
+            can_pierce=can_pierce,
+            can_end_on=can_end_on,
+            blocks_los=blocks_vision,
+            hides_occupants=hides_occupants,
+            is_slowing=is_slowing,
+        )
         components = [
             position_component, 
             tile_sprite_component, 
@@ -46,6 +55,7 @@ class GameTile(Entity):
             selected_edge_component,
             occupancy_component,
             fog_of_war_component,
+            tile_map_interaction_component
         ]
         super().__init__(entity_id, components)
 
@@ -143,7 +153,10 @@ class GameTile(Entity):
         )
         return self.fractional_to_tile(fractional_hex_coord)
 
-    def fractional_to_tile(self, q, r, s) -> Optional[GameTile]:
+    def fractional_to_tile(self, hex_coord: tuple[float, float, float]) -> Optional[GameTile]:
+
+        q, r, s = hex_coord[0], hex_coord[1], hex_coord[2]
+
         q = int(round(q))
         r = int(round(r))
         s = int(round(s))
@@ -158,7 +171,7 @@ class GameTile(Entity):
             r = -q -s
         else:
             s = -q -r
-        return self.get_map_tile(q, r)
+        return self.get_map_tile((q, r))
     
     def line_to(self, target_tile: GameTile) -> List[GameTile]:
         N = self.distance_to(target_tile)
