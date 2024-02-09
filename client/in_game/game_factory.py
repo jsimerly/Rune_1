@@ -17,6 +17,7 @@ from in_game.ecs.components.vision_component import VisionComponent
 from in_game.ecs.components.occupier_component import OccupierComponent
 from in_game.ecs.components.team_component import TeamComponent
 from in_game.ecs.components.visual_aura import VisualAuraComponent
+from in_game.ecs.components.movement_component import MovementComponent
 import pygame as pg
 
 if TYPE_CHECKING:
@@ -149,6 +150,9 @@ class GameFactory:
 
             if entity.has_component(VisualAuraComponent) and entity.has_component(OccupierComponent):
                 ecs_manager.draw_aura_system.add_entity(entity)
+            
+            if entity.has_component(MovementComponent):
+                ecs_manager.draw_movement_system.add_entity(entity)
 
         ecs_manager.vision_system.update_vision()
 

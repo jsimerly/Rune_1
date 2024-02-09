@@ -1,6 +1,7 @@
 from __future__ import annotations
-from .systems.render_systems import DrawSpriteSystem, DrawTileSystem, DrawHexEdgeSystem, DrawSelectedHexSystem, DrawFogOfWarSystem, DrawAuraSystem
+from .systems.render_systems import DrawSpriteSystem, DrawTileSystem, DrawHexEdgeSystem, DrawSelectedHexSystem, DrawFogOfWarSystem, DrawAuraSystem, DrawMovementSystem
 from .systems.ui_system import UISystem
+from .systems.movement_system import MovementSystem
 from .systems.render_systems import RenderSystem
 from .systems.occupancy_systems import OccupancySystem
 from .systems.team_system import TeamSystem
@@ -31,7 +32,7 @@ class ECSManager:
         self.draw_aura_system = DrawAuraSystem(event_bus=event_bus)
         self.building_sprite_system = DrawSpriteSystem(event_bus=event_bus)
         self.objective_sprite_system = DrawSpriteSystem(event_bus=event_bus)
-        #movement lines
+        self.draw_movement_system = DrawMovementSystem(event_bus=event_bus)
         self.character_sprite_system = DrawSpriteSystem(event_bus=event_bus)
         self.draw_fog_of_war_system = DrawFogOfWarSystem(event_bus=event_bus)
         #ability system
@@ -45,8 +46,8 @@ class ECSManager:
             
             self.building_sprite_system,
             self.objective_sprite_system,
-            #
             self.draw_fog_of_war_system,
+            self.draw_movement_system,
             self.character_sprite_system,
             
             self.ui_system,
@@ -57,6 +58,7 @@ class ECSManager:
         self.team_system = TeamSystem(event_bus=event_bus)
         self.spawning_system = SpawningSystem(event_bus=event_bus)
         self.vision_system = VisionSystem(event_bus=event_bus)
+        self.movement_system = MovementSystem(event_bus=event_bus)
 
     def add_entity(self, entity_id:str , entity: Entity):
         self.all_entities[entity_id] = entity

@@ -11,6 +11,7 @@ from in_game.ecs.components.visual_aura import VisualAuraComponent
 from in_game.ecs.components.occupier_component import OccupierComponent
 from in_game.ecs.components.resource_component import ResourceComponent
 from in_game.ecs.components.health_component import HealthComponent
+from in_game.ecs.components.movement_component import MovementComponent
 from in_game.map.tile import GameTile
 from algorithms import hex_radius
 from typing import Optional
@@ -72,6 +73,7 @@ class DrawSpriteSystem(RenderSystem):
     def __init__(self, event_bus: EventBus) -> None:
         super().__init__(event_bus)
         event_bus.subscribe('spawn_to_tile', self.entity_to_tile)
+        event_bus.subscribe('entity_moved_to_tile', self.move_entity_to_tile)
 
     def draw_entity(self, display:pg.Surface, entity: Entity):
         sprite_component: Optional[SpriteComponent] = entity.get_component(SpriteComponent)
@@ -136,6 +138,26 @@ class DrawSpriteSystem(RenderSystem):
         sprite_comp.is_visible = True
         position_comp.position = center_pixel
 
+    def move_entity_to_tile(self, entity:Entity, from_tile: GameTile, to_tile: GameTile):
+        self.entity_to_tile(to_tile, entity)
+
+class DrawMovementSystem(RenderSystem):
+    required_components = [MovementComponent]
+
+    def __init__(self, event_bus: EventBus) -> None:
+        super().__init__(event_bus)
+
+    def draw_entity(self, display: pg.Surface, entity: Entity):
+        movement_comp: MovementComponent = entity.get_component(MovementComponent)
+        
+        if len(movement_comp.movement_queue) > 0:
+            line_points = [tile.center_pixel for tile in movement_comp.movement_queue]
+            pg.draw.lines(display, movement_comp.movement_line_color, False, line_points,  movement_comp.line_width)
+
+            previous_tile = movement_comp.movement_queue[0]
+            pos = self.get_top_left_position(movement_comp.ghost_image, previous_tile.center_pixel)
+            display.blit(movement_comp.ghost_image, pos)            
+
 class DrawHexEdgeSystem(RenderSystem):
     required_components = [VisualHexEdgeComponent, ScreenPositionComponent]
 
@@ -178,13 +200,12 @@ class DrawSelectedHexSystem(RenderSystem):
         super().__init__(event_bus)
         self.action_state: ActionState = action_state
         self.event_bus.subscribe('tile_selected', self.add_entity)
-        
 
     def add_entity(self, tile: GameTile):
         self.entities = [tile]
 
     def draw(self, display: pg.Surface):
-        if self.action_state.is_idle:
+        if not self.action_state.is_spawning:
             for entity in self.entities:
                 self.draw_entity(display, entity)
 

@@ -36,19 +36,15 @@ class ClickSystem(System):
     def handle_selected_clicked(self, tile: GameTile):
         self.event_bus.publish('tile_selected', tile=tile)
         occupancy_component: OccupancyComponent = tile.get_component(OccupancyComponent)
-
-        # for occupant in occupancy_component.occupants:
-        #     if isinstance(occupant, Character):
-        #         self.event_bus.publish('character_selected', occupant)
-        #     if isinstance(occupant, Building):
-        #         self.event_bus.publish('building_selected', occupant)
-        #         print('building selected')
-        #     if isinstance(occupant, Objective):
-        #         self.event_bus.publish('objective_selected', occupant)
-            
-
-        # self.action_state.movement() 
-        # start handling click whats happening based on where they're clcking and what they're clicking
+ 
+        for occupant in occupancy_component.occupants:
+            if isinstance(occupant, Character):
+                self.event_bus.publish('character_selected', character=occupant)
+            if isinstance(occupant, Building):
+                self.event_bus.publish('building_selected', building=occupant)
+            if isinstance(occupant, Objective):
+                self.event_bus.publish('objective_selected', objective=occupant)
+    
 
     def handle_mouse_input(self, mouse_input: MouseInput):
         pixel = mouse_input.pixel
@@ -74,6 +70,16 @@ class ClickSystem(System):
                 self.event_bus.publish('attempt_spawn_to_tile', tile=tile)
             #return errors
             # self.action_state.idle()
+        
+        if self.action_state.is_character_selected:
+            if isinstance(mouse_input, Click):
+                self.event_bus.publish('attempt_move_to_tile', tile=tile)
+                ...
+
+            if isinstance(mouse_input, DragStart):
+                ...
+                
+    
 
     def check_buttons(self, pixel) -> bool:
         for button in self.ui_buttons:

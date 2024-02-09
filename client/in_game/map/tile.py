@@ -77,7 +77,13 @@ class GameTile(Entity):
     def __add__(self, other) -> Optional[GameTile]:
         if isinstance(other, GameTile):
             new_tile_coords = (self.q + other.q, self.r + other.r, self.s + other.s)
-            return self.get_map_tile(new_tile_coords)
+            get_coords = (new_tile_coords[0], new_tile_coords[1])
+            return self.get_map_tile(get_coords)
+        
+        if isinstance(other, tuple):
+            new_tile_coords = (self.q + other[0], self.r + other[1], self.s + other[2])
+            get_coords = (new_tile_coords[0], new_tile_coords[1])
+            return self.get_map_tile(get_coords)
         
         return NotImplemented
     
