@@ -5,6 +5,7 @@ from in_game.event_bus import EventBus
 from .system_base import System
 from in_game.ecs.components.sprite_component import TileSpriteComponent, SpriteComponent
 from in_game.ecs.components.visual_edge_component import VisualHexEdgeComponent, SelectedHexEdgeComponent
+from in_game.ecs.components.fog_of_war import FogOfWarComponent
 from in_game.ecs.components.screen_position_component import ScreenPositionComponent
 from typing import Optional
 import pygame as pg
@@ -69,6 +70,7 @@ class DrawSpriteSystem(RenderSystem):
         position_component: ScreenPositionComponent = entity.get_component(ScreenPositionComponent)
         if sprite_component.is_visible and position_component.position:
             pos = self.get_top_left_position(sprite_component.image, position_component.position)
+            pos = (pos[0], pos[1] - sprite_component.y_offset)
             display.blit(sprite_component.image, pos)
 
     def entity_to_tile(self, tile: GameTile, entity: Entity):
@@ -76,15 +78,8 @@ class DrawSpriteSystem(RenderSystem):
         sprite_comp: SpriteComponent = entity.get_component(SpriteComponent)
         position_comp: ScreenPositionComponent = entity.get_component(ScreenPositionComponent)
 
-        pos = (
-            center_pixel[0],
-            center_pixel[1] - 20 #this is assuming radius of tile is 36
-        )
-
         sprite_comp.is_visible = True
-        position_comp.position = pos
-
-
+        position_comp.position = center_pixel
 
 class DrawHexEdgeSystem(RenderSystem):
     required_components = [VisualHexEdgeComponent, ScreenPositionComponent]
@@ -144,6 +139,28 @@ class DrawSelectedHexSystem(RenderSystem):
             pg.draw.polygon(display, visual_component.color, visual_component.verticies, visual_component.thickness)
 
     
+class DrawFogOfWarSystem(RenderSystem):
+    required_components = [TileSpriteComponent, FogOfWarComponent, ScreenPositionComponent]
+
+    def draw(self, display: pg.Surface):
+        trans_surface = pg.Surface(display.get_size(), pg.SRCALPHA)
+        for entity in self.entities:
+            fog_of_war_comp: FogOfWarComponent = entity.get_component(FogOfWarComponent)
+            if fog_of_war_comp.is_fog_of_war:
+                sprite_component: TileSpriteComponent = entity.get_component(TileSpriteComponent)
+
+                pg.draw.polygon(trans_surface, (0, 0, 0, 100), sprite_component.verticies)
+        display.blit(trans_surface, (0,0))
+
+    def draw_entity(self, display: pg.Surface, entity: Entity):
+        ...
+
+
+
+
+
+                
+
 
 
 

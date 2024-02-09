@@ -4,10 +4,11 @@ import pygame as pg
 
 class SpriteComponent(Component):
     def __init__(self, 
-        raw_image: pg.Surface, size:Tuple[int,int]
+        raw_image: pg.Surface, size:Tuple[int,int], y_offset: int=0
     ):
         image = pg.transform.scale(raw_image, size)
         self.image: pg.Surface = image
+        self.y_offset = y_offset
         self.is_visible = True
 
 class TileSpriteComponent(SpriteComponent):

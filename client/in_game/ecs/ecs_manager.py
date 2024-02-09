@@ -1,11 +1,12 @@
 from __future__ import annotations
-from .systems.render_systems import DrawSpriteSystem, DrawTileSystem, DrawHexEdgeSystem, DrawSelectedHexSystem
+from .systems.render_systems import DrawSpriteSystem, DrawTileSystem, DrawHexEdgeSystem, DrawSelectedHexSystem, DrawFogOfWarSystem
 from .systems.ui_system import UISystem
 from .systems.render_systems import RenderSystem
 from .systems.occupancy_systems import OccupancySystem
 from .systems.team_system import TeamSystem
 from .systems.click_systems import ClickSystem
 from .systems.spawning_system import SpawningSystem
+from .systems.vision_system import VisionSystem
 from typing import TYPE_CHECKING, List
 import pygame as pg
 
@@ -31,6 +32,7 @@ class ECSManager:
         self.objective_sprite_system = DrawSpriteSystem(event_bus=event_bus)
         #movement lines
         self.character_sprite_system = DrawSpriteSystem(event_bus=event_bus)
+        self.draw_fog_of_war_system = DrawFogOfWarSystem(event_bus=event_bus)
         #ability system
         self.ui_system = UISystem(event_bus=event_bus)
 
@@ -41,8 +43,9 @@ class ECSManager:
             self.building_sprite_system,
             self.objective_sprite_system,
             #
+            self.draw_fog_of_war_system,
             self.character_sprite_system,
-            #
+            
             self.ui_system,
         ]
 
@@ -50,6 +53,7 @@ class ECSManager:
         self.occupancy_system = OccupancySystem(event_bus=event_bus)
         self.team_system = TeamSystem(event_bus=event_bus)
         self.spawning_system = SpawningSystem(event_bus=event_bus)
+        self.vision_system = VisionSystem(event_bus=event_bus)
 
     def add_entity(self, entity_id:str , entity: Entity):
         self.all_entities[entity_id] = entity

@@ -7,6 +7,7 @@ from in_game.ecs.components.occupier_component import OccupierComponent
 from in_game.ecs.components.screen_position_component import ScreenPositionComponent
 from in_game.ecs.components.team_component import TeamComponent
 from in_game.ecs.components.spawner_component import SpawnerComponent
+from in_game.ecs.components.vision_component import VisionComponent
 import pygame as pg
 from in_game.map.tile import GameTile
 
@@ -56,10 +57,12 @@ class Teleporter(Building):
         else:
             image=self.team_2_image
 
-        sprite_component = SpriteComponent(image, self.size)
+        y_offset = int(self.size[1] * .2)
+        sprite_component = SpriteComponent(image, self.size, y_offset)
         position_component = ScreenPositionComponent(center_pos)
         team_component = TeamComponent(team_id, is_team_1)
         spawner_component = SpawnerComponent(radius=3)
+        vision_component = VisionComponent(vision_radius=4)
 
         components = [
             sprite_component, 
@@ -67,6 +70,7 @@ class Teleporter(Building):
             position_component, 
             team_component,
             spawner_component,
+            vision_component,
         ]
         super().__init__(entity_id, components)
 
@@ -90,16 +94,19 @@ class Mainbase(Building):
         else:
             image=self.team_2_image
 
-        sprite_component = SpriteComponent(image, self.size)
+        y_offset = int(self.size[1] * .1)
+        sprite_component = SpriteComponent(image, self.size, y_offset)
         position_component = ScreenPositionComponent(center_pos)
         team_component = TeamComponent(team_id, is_team_1)
         spawner_component = SpawnerComponent(radius=3)
+        vision_component = VisionComponent(vision_radius=4)
 
         components = [
             sprite_component, 
             occupier_component, 
             position_component, 
             team_component,
-            spawner_component
+            spawner_component,
+            vision_component
         ]
         super().__init__(entity_id, components)

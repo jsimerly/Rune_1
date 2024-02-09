@@ -6,6 +6,7 @@ from in_game.ecs.components.sprite_component import TileSpriteComponent
 from in_game.ecs.components.visual_edge_component import VisualHexEdgeComponent, SelectedHexEdgeComponent
 from in_game.ecs.components.screen_position_component import ScreenPositionComponent
 from in_game.ecs.components.occupancy_component import OccupancyComponent
+from in_game.ecs.components.fog_of_war import FogOfWarComponent
 
 if TYPE_CHECKING:
     from map.map import GameMap
@@ -37,12 +38,14 @@ class GameTile(Entity):
             self.verticies
         )
         occupancy_component = OccupancyComponent(set())
+        fog_of_war_component = FogOfWarComponent()
         components = [
             position_component, 
             tile_sprite_component, 
             visual_edge_component,
             selected_edge_component,
             occupancy_component,
+            fog_of_war_component,
         ]
         super().__init__(entity_id, components)
 

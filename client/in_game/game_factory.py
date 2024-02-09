@@ -13,6 +13,9 @@ from in_game.entities.ui_objects.spawn_icon_map import spawn_icon_map
 from in_game.entities.characters.character_map import character_map
 from in_game.entities.characters.character_base import Character
 from in_game.ecs.components.spawner_component import SpawnerComponent
+from in_game.ecs.components.vision_component import VisionComponent
+from in_game.ecs.components.occupier_component import OccupierComponent
+from in_game.ecs.components.team_component import TeamComponent
 import pygame as pg
 
 if TYPE_CHECKING:
@@ -26,7 +29,7 @@ if TYPE_CHECKING:
 class GameFactory:
     @staticmethod
     def create(game_data) -> InGameState:
-
+        game_data = {'team_id': 1}
         map_loadout = map_1 # this wil leventually come from the data
         event_bus = EventBus()
         action_state = ActionStateManager(event_bus)
@@ -39,6 +42,7 @@ class GameFactory:
             ecs_manager.tile_sprite_system.add_entity(tile)
             ecs_manager.border_system.add_entity(tile)
             ecs_manager.occupancy_system.add_entity(tile)
+            ecs_manager.draw_fog_of_war_system.add_entity(tile)
             ecs_manager.add_entity(entity_id, tile)
 
         ''' ----------- Creating the Game -------------- '''
@@ -98,6 +102,7 @@ class GameFactory:
                     building = BuildingClass(entity_id, on_tile, team_id, is_team_1)
                     ecs_manager.building_sprite_system.add_entity(building)
                     ecs_manager.occupancy_system.add_occupant(on_tile, building)
+                    ecs_manager.add_entity(entity_id, building)
 
                 if building.has_component(SpawnerComponent):
                     ecs_manager.spawning_system.add_entity(building)
@@ -131,7 +136,22 @@ class GameFactory:
             ecs_manager.ui_system.add_entity(spawning_button)
             ecs_manager.click_system.add_ui_button(spawning_button)
 
+        ''' Set Up'''
+        for entity in ecs_manager.all_entities.values():
+ 
+            if entity.has_component(VisionComponent) and entity.has_component(OccupierComponent):
+                team_comp: TeamComponent = entity.get_component(TeamComponent)
+                print('preteamcomp')
+                if team_comp:
+                    if team_comp.team_id != game_data['team_id']:
+                        continue
+                print(entity)
+                ecs_manager.vision_system.add_entity(entity)
+
+        ecs_manager.vision_system.update_vision()
+
         ''' Create the InGame '''
+
         game_state = InGameState(event_bus, action_state, ecs_manager, map)
         return game_state
 

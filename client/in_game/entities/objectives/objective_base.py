@@ -20,8 +20,8 @@ class Objective(Entity):
 
 class BaseRune(Objective):
     size = (60,60)
-    def __init__(self, entity_id, game_tile: GameTile, image) -> None:
-        sprite_component = SpriteComponent(image, self.size)
+    def __init__(self, entity_id, game_tile: GameTile, image, y_offset=0) -> None:
+        sprite_component = SpriteComponent(image, self.size, y_offset)
         position_component = ScreenPositionComponent(game_tile.center_pixel)
         occupier_component = OccupierComponent(tiles={game_tile})
 
@@ -36,7 +36,13 @@ class Rune(BaseRune):
     name = 'rune'
     size = (80, 80)
     def __init__(self, entity_id, game_tile: GameTile) -> None:
-        super().__init__(entity_id, game_tile, pg.image.load('in_game/entities/objectives/images/rune.webp'))
+        y_offset = int(self.size[1] * .2)
+        super().__init__(
+            entity_id, 
+            game_tile, 
+            pg.image.load('in_game/entities/objectives/images/rune.webp'),
+            y_offset=y_offset
+        )
 
 class LargeRuneShard(BaseRune):
     name = 'large_rune_shards'

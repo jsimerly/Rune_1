@@ -26,7 +26,8 @@ class Character(Entity):
 
     def __init__(self, entity_id:str, name:str, sprite: pg.Surface, team_id: str, is_team_1:bool) -> None:
         name_component = NameComponent(name)
-        sprite_components = SpriteComponent(sprite, self.size)
+        y_offset = int(self.size[1] * .3)
+        sprite_components = SpriteComponent(sprite, self.size, y_offset=y_offset)
         screen_position_component = ScreenPositionComponent(None)
         team_component = TeamComponent(team_id, is_team_1)
         occupier_component = OccupierComponent(None)
