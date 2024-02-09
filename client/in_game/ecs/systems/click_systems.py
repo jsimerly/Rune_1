@@ -72,12 +72,17 @@ class ClickSystem(System):
             # self.action_state.idle()
         
         if self.action_state.is_character_selected:
-            if isinstance(mouse_input, Click):
-                self.event_bus.publish('attempt_move_to_tile', tile=tile)
-                ...
+            if tile:
+                if isinstance(mouse_input, Click):
+                    self.event_bus.publish('attempt_move_to_tile', tile=tile)
 
-            if isinstance(mouse_input, DragStart):
-                ...
+                if isinstance(mouse_input, Dragging):
+                    print(pixel)
+                    self.event_bus.publish('attempt_drag_to_tile', tile=tile)
+
+            else:
+                self.action_state.idle()
+                
                 
     
 

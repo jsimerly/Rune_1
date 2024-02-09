@@ -17,6 +17,7 @@ class MovementSystem(System):
         super().__init__(event_bus)
         self.event_bus.subscribe('character_selected', self.character_selected)
         self.event_bus.subscribe('attempt_move_to_tile', self.check_legal_move)
+        self.event_bus.subscribe('attempt_drag_to_tile', self.check_legal_drag)
         self.event_bus.subscribe('idle_enter', self.clear)
 
         self.current_entity: Entity | None = None
@@ -39,10 +40,13 @@ class MovementSystem(System):
             if tile in possible_tiles:
                 occupier_comp: OccupierComponent = self.current_entity.get_component(OccupierComponent)
                 movement_comp: MovementComponent = self.current_entity.get_component(MovementComponent)
+                resource_comp: ResourceComponent = self.current_entity.get_component(ResourceComponent)
 
                 first_tile = next(iter(occupier_comp.tiles))
                 path = astar(first_tile, tile)
                 movement_comp.movement_queue = path
+                resource_comp.amount -= len(path)-1 * movement_comp.movement_cost
+
                 self.event_bus.publish(
                     'entity_moved_to_tile', 
                     entity=self.current_entity,
@@ -50,6 +54,44 @@ class MovementSystem(System):
                     to_tile=tile 
                 )
 
+    def check_legal_drag(self, tile: GameTile) -> bool:
+        if self.current_entity.has_component(ResourceComponent):
+            resource_comp: ResourceComponent = self.current_entity.get_component(ResourceComponent)
+            movement_comp: MovementComponent = self.current_entity.get_component(MovementComponent)
+            tile_map_interaction_comp: TileMapInteractionComponent = tile.get_component(TileMapInteractionComponent)
+
+            moves_left = resource_comp.amount // movement_comp.movement_cost
+            if moves_left > 0 and tile_map_interaction_comp.is_passable: 
+                if len(movement_comp.movement_queue) == 0:
+                    occupier_comp: OccupierComponent = self.current_entity.get_component(OccupierComponent)
+                    first_tile = next(iter(occupier_comp.tiles))
+                    movement_comp.movement_queue.append(first_tile)
+
+                if len(movement_comp.movement_queue) >= 2:
+                    if tile == movement_comp.movement_queue[-2]:
+                        from_tile = movement_comp.movement_queue.pop()
+                        resource_comp.amount += movement_comp.movement_cost
+                        self.event_bus.publish(
+                            'entity_dragged_to_tile', 
+                            entity=self.current_entity,
+                            from_tile = from_tile,
+                            to_tile = movement_comp.movement_queue[-1], 
+                        )
+                
+                if len(movement_comp.movement_queue) >= 1:
+                    if tile != movement_comp.movement_queue[-1]:
+                        movement_comp.movement_queue.append(tile)
+                        resource_comp.amount -= movement_comp.movement_cost
+                        self.event_bus.publish(
+                            'entity_dragged_to_tile', 
+                            entity=self.current_entity,
+                            from_tile = movement_comp.movement_queue[-2],
+                            to_tile=tile 
+                        )
+
+
+
+                
     def find_possible_tiles(self, entity: Entity) -> set[GameTile]:
         occupancy_comp: OccupierComponent = entity.get_component(OccupierComponent)
         movement_comp: MovementComponent = entity.get_component(MovementComponent)
@@ -63,10 +105,6 @@ class MovementSystem(System):
         return possible_tiles
 
 
-    def move_to_entity_to_tile(self, tile_path):
-        #astar to the best path
-        astar()
-        ...
 
 class Node:
     def __init__(self, parent=None, tile:GameTile=None) -> None:

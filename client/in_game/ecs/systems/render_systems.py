@@ -74,6 +74,7 @@ class DrawSpriteSystem(RenderSystem):
         super().__init__(event_bus)
         event_bus.subscribe('spawn_to_tile', self.entity_to_tile)
         event_bus.subscribe('entity_moved_to_tile', self.move_entity_to_tile)
+        event_bus.subscribe('entity_dragged_to_tile', self.move_entity_to_tile)
 
     def draw_entity(self, display:pg.Surface, entity: Entity):
         sprite_component: Optional[SpriteComponent] = entity.get_component(SpriteComponent)
@@ -149,14 +150,16 @@ class DrawMovementSystem(RenderSystem):
 
     def draw_entity(self, display: pg.Surface, entity: Entity):
         movement_comp: MovementComponent = entity.get_component(MovementComponent)
-        
+
         if len(movement_comp.movement_queue) > 0:
             line_points = [tile.center_pixel for tile in movement_comp.movement_queue]
-            pg.draw.lines(display, movement_comp.movement_line_color, False, line_points,  movement_comp.line_width)
 
-            previous_tile = movement_comp.movement_queue[0]
-            pos = self.get_top_left_position(movement_comp.ghost_image, previous_tile.center_pixel)
-            display.blit(movement_comp.ghost_image, pos)            
+            if len(line_points) >= 2:
+                pg.draw.lines(display, movement_comp.movement_line_color, False, line_points,  movement_comp.line_width)
+
+                previous_tile = movement_comp.movement_queue[0]
+                pos = self.get_top_left_position(movement_comp.ghost_image, previous_tile.center_pixel)
+                display.blit(movement_comp.ghost_image, pos)            
 
 class DrawHexEdgeSystem(RenderSystem):
     required_components = [VisualHexEdgeComponent, ScreenPositionComponent]
