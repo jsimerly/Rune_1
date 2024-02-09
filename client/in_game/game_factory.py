@@ -124,8 +124,8 @@ class GameFactory:
 
         ''' Creating UI '''
         
-        x_pos = 100
-        y_pos = 100
+        x_pos = 40
+        y_pos = 40
         for character_id in drafted_characters:
             character = ecs_manager.all_entities[character_id]
             image = spawn_icon_map[character_id]

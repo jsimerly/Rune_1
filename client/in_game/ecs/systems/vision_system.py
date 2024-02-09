@@ -11,13 +11,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from map.tile import GameTile
 
-
 class VisionSystem(System):
     required_components = [VisionComponent, OccupierComponent]
 
     def __init__(self, event_bus: EventBus) -> None:
         super().__init__(event_bus)
-        
 
     def update_vision(self):
         for entity in self.entities:

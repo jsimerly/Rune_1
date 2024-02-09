@@ -9,6 +9,7 @@ from in_game.ecs.components.fog_of_war import FogOfWarComponent
 from in_game.ecs.components.screen_position_component import ScreenPositionComponent
 from in_game.ecs.components.visual_aura import VisualAuraComponent
 from in_game.ecs.components.occupier_component import OccupierComponent
+from in_game.map.tile import GameTile
 from algorithms import hex_radius
 from typing import Optional
 import pygame as pg

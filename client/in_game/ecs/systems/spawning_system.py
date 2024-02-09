@@ -7,9 +7,9 @@ from in_game.ecs.components.occupancy_component import OccupancyComponent
 from in_game.ecs.components.team_component import TeamComponent
 from in_game.ecs.entity import Entity
 from typing import TYPE_CHECKING
-from algorithms import in_radius_end_on
 from in_game.map.tile import GameTile
 from in_game.ecs.components.visual_edge_component import VisualHexEdgeComponent
+from in_game.ecs.components.map_interaction_component import TileMapInteractionComponent
 
 class SpawningSystem(System):
     required_components = [OccupierComponent, SpawnerComponent]
@@ -56,9 +56,27 @@ class SpawningSystem(System):
             tiles = occupier_component.tiles
 
             for tile in tiles:
-                reachable = in_radius_end_on(tile, spawning_radius)
+                reachable = self.in_radius_end_on(tile, spawning_radius)
                 reachable_tiles.update(reachable)
+
         return reachable_tiles
+    
+    def in_radius_end_on(self, center_tile: GameTile, radius:int) -> list[GameTile]:
+        options = []
+        for q in range(-radius, radius + 1):
+            r1 = max(-radius, -q - radius)
+            r2 = min(radius, -q + radius) + 1
+            for r in range(r1, r2):
+                tile_cords = (center_tile.q + q, center_tile.r + r)
+                if tile_cords in center_tile.map.tiles:
+                    tile = center_tile.map.tiles[tile_cords]
+                    tile_map_inter_comp: TileMapInteractionComponent = tile.get_component(TileMapInteractionComponent)
+                    if tile_map_inter_comp.can_end_on:
+                        print(tile)
+                        print(tile_map_inter_comp)
+                        options.append(tile)
+
+        return options
 
     def check_for_legal_spawn(self, tile: GameTile):    
         if tile in self.find_reachable_tiles(self.spawning_entity):
