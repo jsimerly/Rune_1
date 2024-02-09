@@ -4,7 +4,7 @@ from in_game.map.tile import GameTile
 import pygame as pg
 
 @dataclass
-class ResourceComponent:
+class ResourceComponent(Component):
     name: str
     color: tuple[int, int, int]
     max: int

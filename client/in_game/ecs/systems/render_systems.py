@@ -10,6 +10,7 @@ from in_game.ecs.components.screen_position_component import ScreenPositionCompo
 from in_game.ecs.components.visual_aura import VisualAuraComponent
 from in_game.ecs.components.occupier_component import OccupierComponent
 from in_game.ecs.components.resource_component import ResourceComponent
+from in_game.ecs.components.health_component import HealthComponent
 from in_game.map.tile import GameTile
 from algorithms import hex_radius
 from typing import Optional
@@ -85,22 +86,47 @@ class DrawSpriteSystem(RenderSystem):
                     display, entity, sprite_component, pos
                 )
 
+            if entity.has_component(HealthComponent):
+                self.draw_health_component(
+                    display, entity, sprite_component, pos
+                )
+
             #has health component
                 
     def draw_resource_component(self, display: pg.Surface, entity: Entity,          sprite_component: SpriteComponent, pos: tuple[int,int]):
-        
+        y_pos = pos[1] - 3
+        line_width = 4
+
         resource_component: ResourceComponent = entity.get_component(ResourceComponent)
         image_size = sprite_component.image.get_size()
-        left_pos = (pos[0] + 20, pos[1]- 3)
-        right_pos = (pos[0] + image_size[0] - 20, pos[1] - 3)
-        pg.draw.line(display, (210, 212, 212), left_pos, right_pos, 4)
+        left_pos = (pos[0] + 20, y_pos)
+        right_pos = (pos[0] + image_size[0] - 20, y_pos)
+        pg.draw.line(display, (210, 212, 212), left_pos, right_pos, line_width)
 
         perc_of_resource =  resource_component.amount / resource_component.max
         bar_len = right_pos[0] - left_pos[0]
         line_length = int(perc_of_resource*bar_len)
         x_pos = left_pos[0] + line_length
-        resource_pos = (x_pos, pos[1] - 3) 
-        pg.draw.line(display, resource_component.color, left_pos, resource_pos, 4)
+        resource_pos = (x_pos, y_pos) 
+        pg.draw.line(display, resource_component.color, left_pos, resource_pos, line_width)
+
+    def draw_health_component(self, display: pg.Surface, entity: Entity,          sprite_component: SpriteComponent, pos: tuple[int,int]):
+            health_component: HealthComponent = entity.get_component(HealthComponent)
+            y_pos = pos[1] - 8
+            line_width = 8
+            health_color = (5, 150, 0)
+
+            image_size = sprite_component.image.get_size()
+            left_pos = (pos[0] + 20, y_pos)
+            right_pos = (pos[0] + image_size[0] - 20, y_pos)
+            pg.draw.line(display, (210, 212, 212), left_pos, right_pos, line_width)
+
+            perc_of_resource =  health_component.current / health_component.max
+            bar_len = right_pos[0] - left_pos[0]
+            line_length = int(perc_of_resource*bar_len)
+            x_pos = left_pos[0] + line_length
+            resource_pos = (x_pos, y_pos) 
+            pg.draw.line(display, health_color, left_pos, resource_pos, line_width)
 
     def entity_to_tile(self, tile: GameTile, entity: Entity):
         center_pixel = tile.center_pixel

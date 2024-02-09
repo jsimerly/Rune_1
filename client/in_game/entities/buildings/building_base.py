@@ -8,6 +8,7 @@ from in_game.ecs.components.screen_position_component import ScreenPositionCompo
 from in_game.ecs.components.team_component import TeamComponent
 from in_game.ecs.components.spawner_component import SpawnerComponent
 from in_game.ecs.components.vision_component import VisionComponent
+from in_game.ecs.components.health_component import HealthComponent
 import pygame as pg
 from in_game.map.tile import GameTile
 
@@ -34,6 +35,7 @@ class Building(Entity):
 class Teleporter(Building):
     size = (80, 80)
     name = 'teleporter'
+    health = 1000
     team_1_image = pg.image.load('in_game/entities/buildings/images/teleporter_1.webp')
     team_2_image = pg.image.load('in_game/entities/buildings/images/teleporter_2.webp')
 
@@ -63,6 +65,8 @@ class Teleporter(Building):
         team_component = TeamComponent(team_id, is_team_1)
         spawner_component = SpawnerComponent(radius=3)
         vision_component = VisionComponent(vision_radius=4)
+        health_component = HealthComponent(self.health, self.health)
+        
 
         components = [
             sprite_component, 
@@ -71,12 +75,14 @@ class Teleporter(Building):
             team_component,
             spawner_component,
             vision_component,
+            health_component,
         ]
         super().__init__(entity_id, components)
 
 class Mainbase(Building):
     size = (140, 140)
     name = 'main_base'
+    health = 1500
     team_1_image = pg.image.load('in_game/entities/buildings/images/base_1.webp')
     team_2_image = pg.image.load('in_game/entities/buildings/images/base_2.webp')
     def __init__(self, entity_id:str, game_tile: None | GameTile | set[GameTile], team_id:str, is_team_1: bool):
@@ -100,6 +106,7 @@ class Mainbase(Building):
         team_component = TeamComponent(team_id, is_team_1)
         spawner_component = SpawnerComponent(radius=3)
         vision_component = VisionComponent(vision_radius=4)
+        health_component = HealthComponent(self.health, self.health)
 
         components = [
             sprite_component, 
@@ -107,6 +114,7 @@ class Mainbase(Building):
             position_component, 
             team_component,
             spawner_component,
-            vision_component
+            vision_component,
+            health_component,
         ]
         super().__init__(entity_id, components)

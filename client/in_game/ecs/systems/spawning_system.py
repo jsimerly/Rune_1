@@ -72,8 +72,6 @@ class SpawningSystem(System):
                     tile = center_tile.map.tiles[tile_cords]
                     tile_map_inter_comp: TileMapInteractionComponent = tile.get_component(TileMapInteractionComponent)
                     if tile_map_inter_comp.can_end_on:
-                        print(tile)
-                        print(tile_map_inter_comp)
                         options.append(tile)
 
         return options

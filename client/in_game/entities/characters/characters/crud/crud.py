@@ -2,6 +2,7 @@ import pygame as pg
 from in_game.entities.characters.character_base import Character
 from in_game.ecs.components.resource_component import ResourceComponent
 from in_game.ecs.components.movement_component import MovementComponent
+from in_game.ecs.components.health_component import HealthComponent
 
 
 class Crud(Character):
@@ -28,8 +29,15 @@ class Crud(Character):
             movement_line_color=self.color,
             ghost_image=ghost_sprite
         )
+        health_component = HealthComponent(
+            max= 1000, current=1000
+        )
 
-        components = [resource_component, movement_component]
+        components = [
+            resource_component, 
+            movement_component, 
+            health_component,
+        ]
         super().__init__(entity_id, name, sprite, team_id, is_team_1, components=components)
 
 
