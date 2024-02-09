@@ -1,4 +1,5 @@
 from __future__ import annotations
+from in_game.event_bus import EventBus
 
 from in_game.ecs.entity import Entity
 from .system_base import System
@@ -10,9 +11,16 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from entity import Entity
+    from map.tile import GameTile
 
 class OccupancySystem(System):
     required_components = [OccupancyComponent]
+    def __init__(self, event_bus: EventBus) -> None:
+        super().__init__(event_bus)
+        self.event_bus.subscribe('spawn_to-tile', self.spawn_to_tile)
+
+    def spawn_to_tile(self, tile: GameTile, entity: Entity):
+        self.add_occupant(tile, entity)
 
     def add_occupant(self, entity_to_be_occupied: Entity, occupant: Entity):
         if occupant.has_component(OccupierComponent):
@@ -28,6 +36,7 @@ class OccupancySystem(System):
 
             occupier_component.tiles.remove(entity_to_remove)
             occupancy_component.occupants.remove(occupant)
+
 
               
 

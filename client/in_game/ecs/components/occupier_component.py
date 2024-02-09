@@ -8,4 +8,4 @@ if TYPE_CHECKING:
     from map.tile import GameTile
 @dataclass  
 class OccupierComponent(Component):
-    tiles: Set[Entity]
+    tiles: Set[GameTile] | None

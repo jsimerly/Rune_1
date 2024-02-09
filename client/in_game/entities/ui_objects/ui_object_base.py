@@ -6,6 +6,8 @@ from in_game.ecs.components.spawner_component import TriggerSpawningComponent
 from in_game.ecs.entity import Entity
 from abc import abstractmethod
 import pygame as pg
+from in_game.entities.characters.character_base import Character
+from in_game.event_bus import EventBus
 
 
 class UIObject(Entity):
@@ -21,14 +23,16 @@ class RectUIObject(UIObject):
 class ButtonObject(RectUIObject):
     required_components = [ClickableComponent]
 
+    def on_click(self):
+        ...
+
 
 class SpawningButton(ButtonObject):
     size = (100, 100)
     outline_color = (255, 255, 255)
     outline_thickness = 2
-    required_components = [TriggerSpawningComponent]
 
-    def __init__(self, entity_id, image, position, spawning_entity_id:str) -> None:
+    def __init__(self, entity_id, event_bus: EventBus, image, position, spawning_entity: Character) -> None:
         clickable_component = ClickableComponent()
         image = pg.transform.scale(image, self.size)
         rect_ui_component = RectUIComponent(
@@ -38,13 +42,17 @@ class SpawningButton(ButtonObject):
             outline_thickness=self.outline_thickness
         )
         screen_position_component = ScreenPositionComponent(position)
-        trigger_spawn_component = TriggerSpawningComponent(spawning_entity_id)
 
         components = [
             clickable_component, 
             rect_ui_component, 
             screen_position_component,
-            trigger_spawn_component,
         ]
         super().__init__(entity_id, components)
+
+        self.entity_spawned = spawning_entity
+        self.event_bus = event_bus
+
+    def on_click(self):
+        self.event_bus.publish('spawn_button_clicked', entity=self.entity_spawned)
 

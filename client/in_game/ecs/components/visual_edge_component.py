@@ -5,14 +5,16 @@ import pygame as pg
 class VisualHexEdgeComponent(Component):
     def __init__(self, 
         verticies:List[Tuple[int,int]], 
-        thickness:int=1, 
-        color=(160,160,160),
-        transparent=False,
+        transparent=False
     ):
+        self.default_thickness = 1
+        self.default_color = (160,160,160)
+        self.default_transparency=transparent
+
         self.verticies = verticies
-        self.thickness = thickness
-        self.color = color
-        self.transparent=transparent
+        self.thickness = self.default_thickness
+        self.color = self.default_color
+        self.transparent= self.default_transparency
 
 class SelectedHexEdgeComponent(Component):
     def __init__(self, 

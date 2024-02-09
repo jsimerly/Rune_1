@@ -13,7 +13,9 @@ from abc import abstractmethod
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
+    from map.tile import GameTile
     from entity import Entity
+    from action_state import ActionState
 
 class RenderSystem(System):
     def draw(self, display: pg.Surface):
@@ -58,15 +60,38 @@ class DrawTileSystem(RenderSystem):
 class DrawSpriteSystem(RenderSystem):
     required_components = [SpriteComponent, ScreenPositionComponent]
 
+    def __init__(self, event_bus: EventBus) -> None:
+        super().__init__(event_bus)
+        event_bus.subscribe('spawn_to_tile', self.entity_to_tile)
+
     def draw_entity(self, display:pg.Surface, entity: Entity):
         sprite_component: Optional[SpriteComponent] = entity.get_component(SpriteComponent)
         position_component: ScreenPositionComponent = entity.get_component(ScreenPositionComponent)
-        if  sprite_component.is_visible:
+        if sprite_component.is_visible and position_component.position:
             pos = self.get_top_left_position(sprite_component.image, position_component.position)
             display.blit(sprite_component.image, pos)
 
+    def entity_to_tile(self, tile: GameTile, entity: Entity):
+        center_pixel = tile.center_pixel
+        sprite_comp: SpriteComponent = entity.get_component(SpriteComponent)
+        position_comp: ScreenPositionComponent = entity.get_component(ScreenPositionComponent)
+
+        pos = (
+            center_pixel[0],
+            center_pixel[1] - 20 #this is assuming radius of tile is 36
+        )
+
+        sprite_comp.is_visible = True
+        position_comp.position = pos
+
+
+
 class DrawHexEdgeSystem(RenderSystem):
     required_components = [VisualHexEdgeComponent, ScreenPositionComponent]
+
+    def __init__(self, event_bus: EventBus) -> None:
+        super().__init__(event_bus)
+        self.event_bus.subscribe('idle_enter', self.reset_all_edges)
 
     def draw(self, display: pg.Surface):
         trans_surface = pg.Surface(display.get_size(), pg.SRCALPHA)
@@ -88,22 +113,33 @@ class DrawHexEdgeSystem(RenderSystem):
     def update_to_single_entity(self, entity: Entity):
         self.entities = [entity]
 
+    def reset_all_edges(self):
+        for entity in self.entities:
+            visual_component: Optional[VisualHexEdgeComponent] = entity.get_component(VisualHexEdgeComponent)
+            if visual_component:
+                visual_component.color = visual_component.default_color
+                visual_component.thickness = visual_component.default_thickness
+                visual_component.transparent = visual_component.default_transparency
+
 class DrawSelectedHexSystem(RenderSystem):
     required_components = [SelectedHexEdgeComponent, ScreenPositionComponent]
 
-    def __init__(self, event_bus: EventBus) -> None:
+    def __init__(self, event_bus: EventBus, action_state: ActionState) -> None:
         super().__init__(event_bus)
-        self.event_bus.subscribe('tile_clicked', self.add_entity)
+        self.action_state: ActionState = action_state
+        self.event_bus.subscribe('tile_selected', self.add_entity)
+        
 
-    def add_entity(self, entity: Entity):
-        self.entities = [entity]
+    def add_entity(self, tile: GameTile):
+        self.entities = [tile]
 
     def draw(self, display: pg.Surface):
-        for entity in self.entities:
-            self.draw_entity(display, entity)
+        if self.action_state.is_idle:
+            for entity in self.entities:
+                self.draw_entity(display, entity)
 
-    def draw_entity(self, display:pg.Surface, entity: Entity):
-        visual_component: Optional[SelectedHexEdgeComponent] = entity.get_component(SelectedHexEdgeComponent)
+    def draw_entity(self, display:pg.Surface, tile: GameTile):
+        visual_component: Optional[SelectedHexEdgeComponent] = tile.get_component(SelectedHexEdgeComponent)
         if visual_component:
             pg.draw.polygon(display, visual_component.color, visual_component.verticies, visual_component.thickness)
 

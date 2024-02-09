@@ -6,6 +6,7 @@ from in_game.ecs.entity import Entity
 from in_game.ecs.components.occupier_component import OccupierComponent
 from in_game.ecs.components.screen_position_component import ScreenPositionComponent
 from in_game.ecs.components.team_component import TeamComponent
+from in_game.ecs.components.spawner_component import SpawnerComponent
 import pygame as pg
 from in_game.map.tile import GameTile
 
@@ -58,12 +59,14 @@ class Teleporter(Building):
         sprite_component = SpriteComponent(image, self.size)
         position_component = ScreenPositionComponent(center_pos)
         team_component = TeamComponent(team_id, is_team_1)
+        spawner_component = SpawnerComponent(radius=3)
 
         components = [
             sprite_component, 
             occupier_component, 
             position_component, 
-            team_component
+            team_component,
+            spawner_component,
         ]
         super().__init__(entity_id, components)
 
@@ -90,11 +93,13 @@ class Mainbase(Building):
         sprite_component = SpriteComponent(image, self.size)
         position_component = ScreenPositionComponent(center_pos)
         team_component = TeamComponent(team_id, is_team_1)
+        spawner_component = SpawnerComponent(radius=3)
 
         components = [
             sprite_component, 
             occupier_component, 
             position_component, 
-            team_component
+            team_component,
+            spawner_component
         ]
         super().__init__(entity_id, components)

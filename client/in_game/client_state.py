@@ -20,13 +20,9 @@ class InGameState(ClientState):
         self.action_state = action_state,
         self.ecs_manager = ecs_manager
         self.map = map
-        # self.event_bus = EventBus()
-        # self.action_state = ActionStateManager(self.event_bus)
-        # self.ecs_manager = ECSManager(self.event_bus, self.action_state)
-        # self.map = GameMap(map_loadout=map_1, ecs_manager=self.ecs_manager, event_bus=self.event_bus)
 
     def mouse_input(self, mouse_input: MouseInput):
-        self.event_bus.publish('mouse_event', mouse_input)
+        self.event_bus.publish('mouse_input', mouse_input=mouse_input)
 
     def server_input(self, message: Dict):
         ...

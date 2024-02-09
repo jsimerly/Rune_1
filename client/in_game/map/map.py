@@ -21,23 +21,10 @@ class GameMap:
     origin = (1000, SCREEN_HEIGHT//2)
     skew = 0
 
-    def __init__(self, map_loadout: MapLoadout, ecs_manager, event_bus: EventBus) -> None:
+    def __init__(self, map_loadout: MapLoadout, event_bus: EventBus) -> None:
         self.event_bus = event_bus
         self.orientation = map_loadout.orientation
-        self.tiles: Dict[Tuple[int,int], GameTile] = TileFactory.create_map(self, map_loadout, ecs_manager)
-        event_bus.subscribe('mouse_event', self.handle_mouse_event)
-
-    def handle_mouse_event(self, mouse_input: MouseInput):
-        tile = self.pixel_to_tile(mouse_input.pixel)
-        if tile:
-            if isinstance(mouse_input, Click):
-                self.event_bus.publish('tile_clicked', tile)
-            if isinstance(mouse_input, DragStart):
-                self.event_bus.publish('tile_drag_started', tile)
-            if isinstance(mouse_input, Dragging):
-                self.event_bus.publish('tile_dragging', tile)
-            if isinstance(mouse_input, DragEnd):
-                self.event_bus.publish('tile_drag_ended', tile)        
+        self.tiles: Dict[Tuple[int,int], GameTile] = dict()
 
     def get_tile(self, coord: Tuple[int, int]):
         return self.tiles.get(coord)

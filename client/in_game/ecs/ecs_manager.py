@@ -5,6 +5,7 @@ from .systems.render_systems import RenderSystem
 from .systems.occupancy_systems import OccupancySystem
 from .systems.team_system import TeamSystem
 from .systems.click_systems import ClickSystem
+from .systems.spawning_system import SpawningSystem
 from typing import TYPE_CHECKING, List
 import pygame as pg
 
@@ -15,17 +16,17 @@ if TYPE_CHECKING:
     from in_game.ecs.entity import Entity
 
 class ECSManager:
-    def __init__(self, event_bus: EventBus, action_state: ActionStateManager) -> None:
+    def __init__(self, event_bus: EventBus, action_state: ActionStateManager, game_map: GameMap) -> None:
         self.all_entities: dict[str, Entity] = {}
-
+        self.game_map = game_map
         self.event_bus = event_bus
         self.action_state = action_state
-        self.click_system = ClickSystem(event_bus=event_bus, action_state=action_state)
+        self.click_system = ClickSystem(event_bus=event_bus, action_state=action_state, game_map=self.game_map)
 
         ''' Rendering Systems'''
         self.tile_sprite_system = DrawTileSystem(event_bus=event_bus)
         self.border_system = DrawHexEdgeSystem(event_bus=event_bus)
-        self.selected_system = DrawSelectedHexSystem(event_bus=event_bus)
+        self.selected_system = DrawSelectedHexSystem(event_bus=event_bus, action_state=action_state)
         self.building_sprite_system = DrawSpriteSystem(event_bus=event_bus)
         self.objective_sprite_system = DrawSpriteSystem(event_bus=event_bus)
         #movement lines
@@ -48,6 +49,7 @@ class ECSManager:
         ''''''
         self.occupancy_system = OccupancySystem(event_bus=event_bus)
         self.team_system = TeamSystem(event_bus=event_bus)
+        self.spawning_system = SpawningSystem(event_bus=event_bus)
 
     def add_entity(self, entity_id:str , entity: Entity):
         self.all_entities[entity_id] = entity

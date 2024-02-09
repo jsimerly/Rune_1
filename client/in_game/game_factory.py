@@ -10,6 +10,10 @@ from in_game.map.loadouts.map_1 import map_1
 from in_game.map.map import GameMap
 from in_game.client_state import InGameState
 from in_game.entities.ui_objects.spawn_icon_map import spawn_icon_map
+from in_game.entities.characters.character_map import character_map
+from in_game.entities.characters.character_base import Character
+from in_game.ecs.components.spawner_component import SpawnerComponent
+import pygame as pg
 
 if TYPE_CHECKING:
     from entities.buildings.building_base import Building
@@ -26,8 +30,9 @@ class GameFactory:
         map_loadout = map_1 # this wil leventually come from the data
         event_bus = EventBus()
         action_state = ActionStateManager(event_bus)
-        ecs_manager = ECSManager(event_bus, action_state)
-        map = GameMap(map_loadout, ecs_manager, event_bus)
+        map = GameMap(map_loadout, event_bus)
+        ecs_manager = ECSManager(event_bus, action_state, game_map=map)
+
         ...
 
         def add_tile_to_ecs(entity_id, tile: GameTile):
@@ -39,10 +44,18 @@ class GameFactory:
         ''' ----------- Creating the Game -------------- '''
 
         ''' Creating the Characters '''
-
-        characters_ids = {
-            'crud', 'emily', 'tim'
-        }
+        drafted_characters = ['crud', 'emily', 'tim'] # this will come from the server
+        #team 1
+        team_id = 1
+        for character_id in drafted_characters:
+            CharacterClass = character_map[character_id]
+            character = CharacterClass(
+                entity_id=character_id,
+                team_id=team_id,
+                is_team_1=True
+            )
+            ecs_manager.add_entity(character_id, character)
+            ecs_manager.character_sprite_system.add_entity(character)
 
         ''' Creating Tiles'''
         hexes = map_loadout.shape(**map_loadout.shape_params)
@@ -86,6 +99,9 @@ class GameFactory:
                     ecs_manager.building_sprite_system.add_entity(building)
                     ecs_manager.occupancy_system.add_occupant(on_tile, building)
 
+                if building.has_component(SpawnerComponent):
+                    ecs_manager.spawning_system.add_entity(building)
+
         for ObjectiveClass, data_list in map_loadout.objectives.items():
             for i, data in enumerate(data_list):
                 hex: tuple(int, int) = data['hex']
@@ -97,19 +113,23 @@ class GameFactory:
                 ecs_manager.add_entity(entity_id, objective)
                 ecs_manager.occupancy_system.add_occupant(on_tile, objective)
 
+                if objective.has_component(SpawnerComponent):
+                    ecs_manager.spawning_system.add_entity(building)
+
         ''' Creating UI '''
         
         x_pos = 100
         y_pos = 100
-        for character_id in characters_ids:
+        for character_id in drafted_characters:
+            character = ecs_manager.all_entities[character_id]
             image = spawn_icon_map[character_id]
             pos = (x_pos, y_pos)
-            entity_id = f'spawn_button_{character_id}'
-            spawning_button = SpawningButton(entity_id, image, pos, character_id)
-            ecs_manager.ui_system.add_entity(spawning_button)
-            print('yes')
+            entity_id = f'{character_id}_spawning_button'
+            spawning_button = SpawningButton(entity_id, event_bus, image, pos, character)
             y_pos += SpawningButton.size[1] + 5
 
+            ecs_manager.ui_system.add_entity(spawning_button)
+            ecs_manager.click_system.add_ui_button(spawning_button)
 
         ''' Create the InGame '''
         game_state = InGameState(event_bus, action_state, ecs_manager, map)

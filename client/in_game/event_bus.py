@@ -10,9 +10,9 @@ class EventBus:
             self.listeners[event_type] = []
         self.listeners[event_type].append(callback)
 
-    def publish(self, event_type: str, data):
+    def publish(self, event_type: str, **kwargs):
         if event_type in self.listeners:
             for callback in self.listeners[event_type]:
-                callback(data)
+                callback(**kwargs)
 
 
