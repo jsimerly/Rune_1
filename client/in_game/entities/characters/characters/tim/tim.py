@@ -17,8 +17,8 @@ class Tim(Character):
 
         resource_component = ResourceComponent(
             'Mana', (100, 171, 237), 
-            max_resources=5, 
-            min_resources=0,
+            max=5, 
+            min=0,
             end_of_turn_refresh=5,
         )
         movement_component = MovementComponent(

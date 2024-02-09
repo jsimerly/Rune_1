@@ -9,6 +9,7 @@ from in_game.ecs.components.fog_of_war import FogOfWarComponent
 from in_game.ecs.components.screen_position_component import ScreenPositionComponent
 from in_game.ecs.components.visual_aura import VisualAuraComponent
 from in_game.ecs.components.occupier_component import OccupierComponent
+from in_game.ecs.components.resource_component import ResourceComponent
 from in_game.map.tile import GameTile
 from algorithms import hex_radius
 from typing import Optional
@@ -78,6 +79,28 @@ class DrawSpriteSystem(RenderSystem):
             pos = self.get_top_left_position(sprite_component.image, position_component.position)
             pos = (pos[0], pos[1] - sprite_component.y_offset)
             display.blit(sprite_component.image, pos)
+
+            if entity.has_component(ResourceComponent):
+                self.draw_resource_component(
+                    display, entity, sprite_component, pos
+                )
+
+            #has health component
+                
+    def draw_resource_component(self, display: pg.Surface, entity: Entity,          sprite_component: SpriteComponent, pos: tuple[int,int]):
+        
+        resource_component: ResourceComponent = entity.get_component(ResourceComponent)
+        image_size = sprite_component.image.get_size()
+        left_pos = (pos[0] + 20, pos[1]- 3)
+        right_pos = (pos[0] + image_size[0] - 20, pos[1] - 3)
+        pg.draw.line(display, (210, 212, 212), left_pos, right_pos, 4)
+
+        perc_of_resource =  resource_component.amount / resource_component.max
+        bar_len = right_pos[0] - left_pos[0]
+        line_length = int(perc_of_resource*bar_len)
+        x_pos = left_pos[0] + line_length
+        resource_pos = (x_pos, pos[1] - 3) 
+        pg.draw.line(display, resource_component.color, left_pos, resource_pos, 4)
 
     def entity_to_tile(self, tile: GameTile, entity: Entity):
         center_pixel = tile.center_pixel

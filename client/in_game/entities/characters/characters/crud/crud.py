@@ -17,9 +17,9 @@ class Crud(Character):
         ghost_sprite.set_alpha(self.ghost_alpha)
 
         resource_component = ResourceComponent(
-            'Rage', (94, 16, 10), 
-            max_resources=10, 
-            min_resources=0,
+            'Rage', (191, 25, 10), 
+            max=10, 
+            min=0,
             end_of_turn_refresh=5,
             bonus_type='rage'
         )
