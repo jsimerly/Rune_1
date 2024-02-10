@@ -19,6 +19,7 @@ class MovementSystem(System):
         self.event_bus.subscribe('attempt_move_to_tile', self.check_legal_move)
         self.event_bus.subscribe('attempt_drag_to_tile', self.check_legal_drag)
         self.event_bus.subscribe('spawn_to_tile', self.reset_movement_of_entity)
+        self.event_bus.subscribe('movement_ended', self.drag_end_legal)
         self.event_bus.subscribe('idle_enter', self.clear)
 
         self.current_entity: Entity | None = None
@@ -106,6 +107,23 @@ class MovementSystem(System):
 
                         possible_tiles = self.find_possible_tiles(self.current_entity)
                         self.event_bus.publish('tile_in_movement_range', tiles=possible_tiles)
+
+    def drag_end_legal(self, tile: GameTile):
+        ''' We're checking if this is a legal end on tile. If not moving back in the queue until we find one of run of out tiles. We have to do this because when dragging we're only checking for legal passable tiles.'''
+        movement_comp: MovementComponent = self.current_entity.get_component(MovementComponent)
+        new_move_queue = movement_comp.movement_queue.copy()
+
+        for tile in movement_comp.movement_queue[::-1]:
+            tile_map_inter_comp: TileMapInteractionComponent = tile.get_component(TileMapInteractionComponent)
+            if tile_map_inter_comp.can_end_on:
+                break
+            
+            new_move_queue.pop()
+        movement_comp.movement_queue = new_move_queue
+
+
+        
+
 
                 
     def find_possible_tiles(self, entity: Entity) -> set[GameTile]:
