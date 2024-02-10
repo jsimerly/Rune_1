@@ -41,7 +41,6 @@ class OccupancySystem(System):
 
             occupier_component.tiles.add(entity_to_be_occupied)
             occupancy_component.occupants.add(occupant)
-            print(occupier_component.tiles)
 
     def remove_occupants(self, entity_to_remove: Entity, occupants: list[Entity] | set[Entity]):
         for occupant in occupants:

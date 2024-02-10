@@ -153,12 +153,12 @@ class DrawMovementSystem(RenderSystem):
 
         if len(movement_comp.movement_queue) > 0:
             line_points = [tile.center_pixel for tile in movement_comp.movement_queue]
+            line_points = [movement_comp.start_tile.center_pixel] + line_points
 
             if len(line_points) >= 2:
                 pg.draw.lines(display, movement_comp.movement_line_color, False, line_points,  movement_comp.line_width)
 
-                previous_tile = movement_comp.movement_queue[0]
-                pos = self.get_top_left_position(movement_comp.ghost_image, previous_tile.center_pixel)
+                pos = self.get_top_left_position(movement_comp.ghost_image, movement_comp.start_tile.center_pixel)
                 display.blit(movement_comp.ghost_image, pos)            
 
 class DrawHexEdgeSystem(RenderSystem):

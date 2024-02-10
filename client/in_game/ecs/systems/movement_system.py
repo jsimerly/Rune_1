@@ -27,7 +27,7 @@ class MovementSystem(System):
     def clear(self, **kwargs):
         self.current_entity = None
 
-    def reset_movement_of_entity(self, entity: Entity, **kwargs):
+    def reset_movement_of_entity(self, entity: Entity, tile: GameTile):
         if entity.has_component(MovementComponent):
             movement_comp: MovementComponent = entity.get_component(MovementComponent)
 
@@ -38,6 +38,7 @@ class MovementSystem(System):
                     resource_comp.amount += len_queue * movement_comp.movement_cost
             
             movement_comp.movement_queue = []
+            movement_comp.start_tile = tile
 
     def character_selected(self, character: Character):
         self.current_entity= character    
@@ -58,7 +59,7 @@ class MovementSystem(System):
                 first_tile = next(iter(occupier_comp.tiles))
                 path = astar(first_tile, tile)
                 movement_comp.movement_queue = path
-                resource_comp.amount -= len(path)-1 * movement_comp.movement_cost
+                resource_comp.amount -= len(path) * movement_comp.movement_cost
 
                 self.event_bus.publish(
                     'entity_moved_to_tile', 
@@ -75,10 +76,6 @@ class MovementSystem(System):
 
             moves_left = resource_comp.amount // movement_comp.movement_cost
             if moves_left > 0 and tile_map_interaction_comp.is_passable: 
-                if len(movement_comp.movement_queue) == 0:
-                    occupier_comp: OccupierComponent = self.current_entity.get_component(OccupierComponent)
-                    first_tile = next(iter(occupier_comp.tiles))
-                    movement_comp.movement_queue.append(first_tile)
 
                 if len(movement_comp.movement_queue) >= 2:
                     if tile == movement_comp.movement_queue[-2]:
@@ -120,10 +117,6 @@ class MovementSystem(System):
             
             new_move_queue.pop()
         movement_comp.movement_queue = new_move_queue
-
-
-        
-
 
                 
     def find_possible_tiles(self, entity: Entity) -> set[GameTile]:
@@ -211,7 +204,7 @@ def astar(start_Tile: GameTile, target_tile: GameTile) -> list[GameTile] | None:
             while current:
                 path.append(current.tile)
                 current = current.parent
-
+            path.pop() #remove the last value, which is the start_tile
             return path[::-1] #reverse the order for the movement queue
         
         #find the next tile options from current node

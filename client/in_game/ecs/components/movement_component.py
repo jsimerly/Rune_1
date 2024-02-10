@@ -8,5 +8,6 @@ class MovementComponent(Component):
     movement_cost: int
     ghost_image: pg.Surface
     movement_line_color: tuple[int,int,int] 
+    start_tile: GameTile = None
     movement_queue: list[GameTile] = field(default_factory=list)
     line_width: int = 3
