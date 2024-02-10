@@ -31,7 +31,7 @@ class MovementSystem(System):
         if entity.has_component(MovementComponent):
             movement_comp: MovementComponent = entity.get_component(MovementComponent)
 
-            len_queue = len(movement_comp.movement_queue) - 1
+            len_queue = len(movement_comp.movement_queue)
             if len_queue > 0:
                 if entity.has_component(ResourceComponent):
                     resource_comp: ResourceComponent = entity.get_component(ResourceComponent)
@@ -74,36 +74,70 @@ class MovementSystem(System):
             movement_comp: MovementComponent = self.current_entity.get_component(MovementComponent)
             tile_map_interaction_comp: TileMapInteractionComponent = tile.get_component(TileMapInteractionComponent)
 
-            moves_left = resource_comp.amount // movement_comp.movement_cost
-            if moves_left > 0 and tile_map_interaction_comp.is_passable: 
-
-                if len(movement_comp.movement_queue) >= 2:
+            #check if we need to remove from queue
+            if len(movement_comp.movement_queue) >= 2:
+                    #checking if tile if we need to remove from queue
                     if tile == movement_comp.movement_queue[-2]:
                         from_tile = movement_comp.movement_queue.pop()
                         resource_comp.amount += movement_comp.movement_cost
+
+                        if len(movement_comp.movement_queue) == 0:
+                            to_tile = movement_comp.start_tile
+                        else:
+                            to_tile = movement_comp.movement_queue[-1]
+
                         self.event_bus.publish(
                             'entity_dragged_to_tile', 
                             entity=self.current_entity,
                             from_tile = from_tile,
-                            to_tile = movement_comp.movement_queue[-1], 
+                            to_tile = to_tile, 
                         )
 
                         possible_tiles = self.find_possible_tiles(self.current_entity)
                         self.event_bus.publish('tile_in_movement_range', tiles=possible_tiles)
                 
-                if len(movement_comp.movement_queue) >= 1:
-                    if tile != movement_comp.movement_queue[-1] and movement_comp.movement_queue[-1] in tile.get_all_neighbors():
-                        movement_comp.movement_queue.append(tile)
-                        resource_comp.amount -= movement_comp.movement_cost
-                        self.event_bus.publish(
-                            'entity_dragged_to_tile', 
-                            entity=self.current_entity,
-                            from_tile = movement_comp.movement_queue[-2],
-                            to_tile=tile 
-                        )
+            if len(movement_comp.movement_queue) == 1:
+                if tile == movement_comp.start_tile:
+                    from_tile = movement_comp.movement_queue.pop()
+                    self.event_bus.publish(
+                        'entity_dragged_to_tile', 
+                        entity=self.current_entity,
+                        from_tile = from_tile,
+                        to_tile = movement_comp.start_tile, 
+                    )
 
-                        possible_tiles = self.find_possible_tiles(self.current_entity)
-                        self.event_bus.publish('tile_in_movement_range', tiles=possible_tiles)
+                    possible_tiles = self.find_possible_tiles(self.current_entity)
+                    self.event_bus.publish('tile_in_movement_range', tiles=possible_tiles)
+
+            moves_left = resource_comp.amount // movement_comp.movement_cost
+            if moves_left > 0 and tile_map_interaction_comp.is_passable: 
+                
+                # checking if we need to add to queue
+                if len(movement_comp.movement_queue) > 0:
+                    last_tile = movement_comp.movement_queue[-1]
+                    if tile == last_tile:
+                        return
+                    
+                    if tile not in last_tile.get_all_neighbors():
+                        return
+                    from_tile = last_tile
+                    
+                if len(movement_comp.movement_queue) == 0:
+                    if tile not in movement_comp.start_tile.get_all_neighbors():
+                        return
+                    from_tile = movement_comp.start_tile
+
+                movement_comp.movement_queue.append(tile)
+                resource_comp.amount -= movement_comp.movement_cost
+                self.event_bus.publish(
+                    'entity_dragged_to_tile', 
+                    entity=self.current_entity,
+                    from_tile = from_tile,
+                    to_tile=tile 
+                )
+
+                possible_tiles = self.find_possible_tiles(self.current_entity)
+                self.event_bus.publish('tile_in_movement_range', tiles=possible_tiles)
 
     def drag_end_legal(self, tile: GameTile):
         ''' We're checking if this is a legal end on tile. If not moving back in the queue until we find one of run of out tiles. We have to do this because when dragging we're only checking for legal passable tiles.'''

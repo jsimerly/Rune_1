@@ -8,6 +8,6 @@ class MovementComponent(Component):
     movement_cost: int
     ghost_image: pg.Surface
     movement_line_color: tuple[int,int,int] 
-    start_tile: GameTile = None
+    start_tile: GameTile = None #this will need to be reset after every turn with update from server
     movement_queue: list[GameTile] = field(default_factory=list)
     line_width: int = 3
