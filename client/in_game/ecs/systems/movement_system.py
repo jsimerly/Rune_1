@@ -41,11 +41,10 @@ class MovementSystem(System):
     def character_selected(self, character: Character):
         self.current_entity= character    
         possible_tiles = self.find_possible_tiles(character)
+
+        possible_tiles = self.find_possible_tiles(self.current_entity)
+        self.event_bus.publish('tile_in_movement_range', tiles=possible_tiles)
         
-        for tile in possible_tiles:
-            edge_visual_comp: VisualHexEdgeComponent = tile.get_component(VisualHexEdgeComponent)
-            edge_visual_comp.thickness = 2
-            edge_visual_comp.color = (255,255,255)
 
     def check_legal_move(self, tile: GameTile):
         if self.current_entity.has_component(ResourceComponent):
@@ -90,10 +89,12 @@ class MovementSystem(System):
                             from_tile = from_tile,
                             to_tile = movement_comp.movement_queue[-1], 
                         )
+
+                        possible_tiles = self.find_possible_tiles(self.current_entity)
+                        self.event_bus.publish('tile_in_movement_range', tiles=possible_tiles)
                 
                 if len(movement_comp.movement_queue) >= 1:
-  
-                    if tile != movement_comp.movement_queue[-1] and tile and movement_comp.movement_queue[-1] in tile.get_all_neighbors():
+                    if tile != movement_comp.movement_queue[-1] and movement_comp.movement_queue[-1] in tile.get_all_neighbors():
                         movement_comp.movement_queue.append(tile)
                         resource_comp.amount -= movement_comp.movement_cost
                         self.event_bus.publish(
@@ -102,6 +103,9 @@ class MovementSystem(System):
                             from_tile = movement_comp.movement_queue[-2],
                             to_tile=tile 
                         )
+
+                        possible_tiles = self.find_possible_tiles(self.current_entity)
+                        self.event_bus.publish('tile_in_movement_range', tiles=possible_tiles)
 
                 
     def find_possible_tiles(self, entity: Entity) -> set[GameTile]:
@@ -115,8 +119,6 @@ class MovementSystem(System):
             _possible_tiles = find_reachable_tiles(start_tile, max_range)
             possible_tiles.update(_possible_tiles)
         return possible_tiles
-
-
 
 class Node:
     def __init__(self, parent=None, tile:GameTile=None) -> None:

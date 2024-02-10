@@ -167,6 +167,7 @@ class DrawHexEdgeSystem(RenderSystem):
     def __init__(self, event_bus: EventBus) -> None:
         super().__init__(event_bus)
         self.event_bus.subscribe('idle_enter', self.reset_all_edges)
+        self.event_bus.subscribe('tile_in_movement_range', self.update_tiles_in_movement_range)
 
     def draw(self, display: pg.Surface):
         trans_surface = pg.Surface(display.get_size(), pg.SRCALPHA)
@@ -187,6 +188,13 @@ class DrawHexEdgeSystem(RenderSystem):
 
     def update_to_single_entity(self, entity: Entity):
         self.entities = [entity]
+
+    def update_tiles_in_movement_range(self, tiles: set[GameTile]):
+        self.reset_all_edges()
+        for tile in tiles:
+            visual_edge_comp: VisualHexEdgeComponent = tile.get_component(VisualHexEdgeComponent)
+            visual_edge_comp.thickness = 2
+            visual_edge_comp.color = (255, 255, 255)
 
     def reset_all_edges(self):
         for entity in self.entities:

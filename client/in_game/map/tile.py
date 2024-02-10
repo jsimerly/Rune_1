@@ -105,6 +105,12 @@ class GameTile(Entity):
     def __hash__(self) -> Tuple[int, int]:
         return hash(self.axial)
     
+    def __str__(self) -> str:
+        return f'{self.__class__.__name__}: {self.q}, {self.r}'
+    
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}Tile Obj: {self.q}, {self.r}'
+    
     @property
     def axial(self):
         return (self.q, self.r)

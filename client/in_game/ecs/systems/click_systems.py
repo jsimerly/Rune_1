@@ -45,7 +45,6 @@ class ClickSystem(System):
             if isinstance(occupant, Objective):
                 self.event_bus.publish('objective_selected', objective=occupant)
     
-
     def handle_mouse_input(self, mouse_input: MouseInput):
         pixel = mouse_input.pixel
         tile = self.game_map.pixel_to_tile(pixel)
@@ -75,16 +74,19 @@ class ClickSystem(System):
             if tile:
                 if isinstance(mouse_input, Click):
                     self.event_bus.publish('attempt_move_to_tile', tile=tile)
+                    self.handle_selected_clicked(tile)
 
                 if isinstance(mouse_input, Dragging):
-                    print(pixel)
                     self.event_bus.publish('attempt_drag_to_tile', tile=tile)
+
+                if isinstance(mouse_input, DragEnd):
+                    self.event_bus.publish('movement_ended', tile=tile)
+                    self.handle_selected_clicked(tile)
 
             else:
                 self.action_state.idle()
                 
-                
-    
+            
 
     def check_buttons(self, pixel) -> bool:
         for button in self.ui_buttons:
