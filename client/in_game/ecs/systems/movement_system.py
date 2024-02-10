@@ -52,13 +52,16 @@ class MovementSystem(System):
         if self.current_entity.has_component(ResourceComponent):
             possible_tiles = self.find_possible_tiles(self.current_entity)
             if tile in possible_tiles:
-                occupier_comp: OccupierComponent = self.current_entity.get_component(OccupierComponent)
                 movement_comp: MovementComponent = self.current_entity.get_component(MovementComponent)
                 resource_comp: ResourceComponent = self.current_entity.get_component(ResourceComponent)
 
-                first_tile = next(iter(occupier_comp.tiles))
+                if len(movement_comp.movement_queue) > 0:
+                    first_tile = movement_comp.movement_queue[-1]
+                else:
+                    first_tile = movement_comp.start_tile
+
                 path = astar(first_tile, tile)
-                movement_comp.movement_queue = path
+                movement_comp.movement_queue += path
                 resource_comp.amount -= len(path) * movement_comp.movement_cost
 
                 self.event_bus.publish(
