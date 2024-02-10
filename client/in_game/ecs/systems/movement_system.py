@@ -18,12 +18,25 @@ class MovementSystem(System):
         self.event_bus.subscribe('character_selected', self.character_selected)
         self.event_bus.subscribe('attempt_move_to_tile', self.check_legal_move)
         self.event_bus.subscribe('attempt_drag_to_tile', self.check_legal_drag)
+        self.event_bus.subscribe('spawn_to_tile', self.reset_movement_of_entity)
         self.event_bus.subscribe('idle_enter', self.clear)
 
         self.current_entity: Entity | None = None
 
     def clear(self, **kwargs):
         self.current_entity = None
+
+    def reset_movement_of_entity(self, entity: Entity, **kwargs):
+        if entity.has_component(MovementComponent):
+            movement_comp: MovementComponent = entity.get_component(MovementComponent)
+
+            len_queue = len(movement_comp.movement_queue) - 1
+            if len_queue > 0:
+                if entity.has_component(ResourceComponent):
+                    resource_comp: ResourceComponent = entity.get_component(ResourceComponent)
+                    resource_comp.amount += len_queue * movement_comp.movement_cost
+            
+            movement_comp.movement_queue = []
 
     def character_selected(self, character: Character):
         self.current_entity= character    
@@ -79,7 +92,8 @@ class MovementSystem(System):
                         )
                 
                 if len(movement_comp.movement_queue) >= 1:
-                    if tile != movement_comp.movement_queue[-1]:
+  
+                    if tile != movement_comp.movement_queue[-1] and tile and movement_comp.movement_queue[-1] in tile.get_all_neighbors():
                         movement_comp.movement_queue.append(tile)
                         resource_comp.amount -= movement_comp.movement_cost
                         self.event_bus.publish(
@@ -88,8 +102,6 @@ class MovementSystem(System):
                             from_tile = movement_comp.movement_queue[-2],
                             to_tile=tile 
                         )
-
-
 
                 
     def find_possible_tiles(self, entity: Entity) -> set[GameTile]:

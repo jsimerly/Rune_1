@@ -38,6 +38,10 @@ class VisionSystem(System):
 
 
     def is_tile_in_los(self, center_tile: GameTile, target_tile:GameTile):
+        target_tile_map_interaction_comp: TileMapInteractionComponent = target_tile.get_component(TileMapInteractionComponent)
+        if target_tile_map_interaction_comp.blocks_los:
+            return False
+        
         tiles_in_los = center_tile.line_to(target_tile)
         for tile in tiles_in_los:
             map_interaction_comp: TileMapInteractionComponent = tile.get_component(TileMapInteractionComponent)

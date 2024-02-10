@@ -21,6 +21,12 @@ class OccupancySystem(System):
         self.event_bus.subscribe('entity_moved_to_tile', self.move_entity_to_tile)
 
     def spawn_to_tile(self, tile: GameTile, entity: Entity):
+        occupier_comp: OccupierComponent = entity.get_component(OccupierComponent)
+        for remove_tile in occupier_comp.tiles:
+            occupancy_comp: OccupancyComponent = remove_tile.get_component(OccupancyComponent)
+            occupancy_comp.occupants.remove(entity)
+
+        occupier_comp.tiles = set()
         self.add_occupant(tile, entity)
 
     def move_entity_to_tile(self, entity: Entity, from_tile: GameTile, to_tile: GameTile):
@@ -35,13 +41,23 @@ class OccupancySystem(System):
             occupier_component.tiles.add(entity_to_be_occupied)
             occupancy_component.occupants.add(occupant)
 
+    def remove_occupants(self, entity_to_remove: Entity, occupants: list[Entity] | set[Entity]):
+        for occupant in occupants:
+            occupancy_comp: OccupancyComponent = occupant.get_component(OccupancyComponent)
+            if occupancy_comp:
+                occupancy_comp.occupants.remove(entity_to_remove)
+
+            occupier_component: OccupierComponent = entity_to_remove.get_component(OccupierComponent)
+
+            occupier_component.tiles.remove(occupant)
+
     def remove_occupant(self, entity_to_remove: Entity, occupant: Entity):
             occupancy_component: OccupancyComponent = occupant.get_component(OccupancyComponent)
             occupier_component: OccupierComponent = entity_to_remove.get_component(OccupierComponent)
 
             occupier_component.tiles.remove(occupant)
             occupancy_component.occupants.remove(entity_to_remove)
-
+    
 
               
 
