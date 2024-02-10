@@ -12,12 +12,14 @@ from in_game.client_state import InGameState
 from in_game.entities.ui_objects.spawn_icon_map import spawn_icon_map
 from in_game.entities.characters.character_map import character_map
 from in_game.entities.characters.character_base import Character
+from in_game.entities.movement_ghost.movement_ghost import MovementGhost
 from in_game.ecs.components.spawner_component import SpawnerComponent
 from in_game.ecs.components.vision_component import VisionComponent
 from in_game.ecs.components.occupier_component import OccupierComponent
 from in_game.ecs.components.team_component import TeamComponent
 from in_game.ecs.components.visual_aura import VisualAuraComponent
 from in_game.ecs.components.movement_component import MovementComponent
+from in_game.ecs.components.reference_entity_component import ReferenceEntityComponent
 import pygame as pg
 
 if TYPE_CHECKING:
@@ -55,14 +57,20 @@ class GameFactory:
         team_id = 1
         for character_id in drafted_characters:
             CharacterClass = character_map[character_id]
+            movement_ghost_id = f'movement_ghost_{character_id}'
+
             character = CharacterClass(
                 entity_id=character_id,
+                ghost_id=movement_ghost_id,
                 team_id=team_id,
                 is_team_1=True
             )
             ecs_manager.add_entity(character_id, character)
             ecs_manager.character_sprite_system.add_entity(character)
-
+            
+            movement_ghost_entity = MovementGhost(movement_ghost_id, character.ghost_sprite, character_id)
+            ecs_manager.character_sprite_system.add_entity(movement_ghost_entity)
+            ecs_manager.add_entity(movement_ghost_id, movement_ghost_entity)
         ''' Creating Tiles'''
         hexes = map_loadout.shape(**map_loadout.shape_params)
 
@@ -153,6 +161,7 @@ class GameFactory:
             
             if entity.has_component(MovementComponent):
                 ecs_manager.draw_movement_system.add_entity(entity)
+
 
         ecs_manager.vision_system.update_vision()
 

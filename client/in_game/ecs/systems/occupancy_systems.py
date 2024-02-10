@@ -20,6 +20,7 @@ class OccupancySystem(System):
         self.event_bus.subscribe('spawn_to_tile', self.spawn_to_tile)
         self.event_bus.subscribe('entity_moved_to_tile', self.move_entity_to_tile)
         self.event_bus.subscribe('entity_dragged_to_tile', self.move_entity_to_tile)
+        self.event_bus.subscribe('remove_entity_from_tile', self.remove_occupant)
 
     def spawn_to_tile(self, tile: GameTile, entity: Entity):
         occupier_comp: OccupierComponent = entity.get_component(OccupierComponent)
@@ -31,7 +32,8 @@ class OccupancySystem(System):
         self.add_occupant(tile, entity)
 
     def move_entity_to_tile(self, entity: Entity, from_tile: GameTile, to_tile: GameTile):
-         self.remove_occupant(entity, from_tile)
+         if from_tile:
+            self.remove_occupant(entity, from_tile)
          self.add_occupant(to_tile, entity)
 
     def add_occupant(self, entity_to_be_occupied: Entity, occupant: Entity):
@@ -58,6 +60,7 @@ class OccupancySystem(System):
 
             occupier_component.tiles.remove(occupant)
             occupancy_component.occupants.remove(entity_to_remove)
+
     
 
               

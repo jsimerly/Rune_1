@@ -41,6 +41,7 @@ class ClickSystem(System):
         for occupant in occupancy_component.occupants:
             if isinstance(occupant, Character):
                 self.event_bus.publish('character_selected', character=occupant)
+            
             if isinstance(occupant, Building):
                 self.event_bus.publish('building_selected', building=occupant)
             if isinstance(occupant, Objective):
@@ -52,14 +53,13 @@ class ClickSystem(System):
 
         if self.action_state.is_idle:
             if isinstance(mouse_input, Click) or isinstance(mouse_input, DragEnd):
-                
-                if tile:
-                    self.handle_selected_clicked(tile)
-                    return
-                
                 found_action = self.check_buttons(pixel)
                 if found_action:
                     return 
+                
+                if tile:
+                    self.handle_selected_clicked(tile)
+                    return       
                 
         if self.action_state.is_spawning:
             found_action = self.check_buttons(pixel)

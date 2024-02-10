@@ -14,7 +14,7 @@ class ActionStateManager:
         self.event_bus.subscribe('spawning_started', self.spawning)
         self.event_bus.subscribe('spawn_to_tile', self.idle)
         self.event_bus.subscribe('character_selected', self.character_selected)
-        self.event_bus.subscribe('entity_moved_to_tile', self.idle)
+        # self.event_bus.subscribe('entity_moved_to_tile', self.idle)
 
     @property
     def is_idle(self):

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 @dataclass
 class ScreenPositionComponent(Component):
-    position: tuple[int, int] | None
+    position: tuple[int, int] | None = None
     # def __init__(self, position: Tuple[int,int]):
     #     # if size: #get the top left of the component for drawing
     #     #     x_pos = position[0] - size[0]//2

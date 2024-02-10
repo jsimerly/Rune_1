@@ -8,12 +8,8 @@ class Emily(Character):
     image_path = 'in_game/entities/characters/characters/emily/images/emily.png'
     color = (230, 237, 100)
 
-    def __init__(self, entity_id: str, team_id: str, is_team_1: bool) -> None:
+    def __init__(self, entity_id: str, ghost_id:str, team_id: str, is_team_1: bool) -> None:
         name = self.name
-        sprite = pg.image.load(self.image_path)
-        ghost_sprite = pg.image.load(self.image_path)
-        ghost_sprite = pg.transform.scale(ghost_sprite, self.ghost_size)
-        ghost_sprite.set_alpha(self.ghost_alpha)
 
         resource_component = ResourceComponent(
             'Mana', (148, 126, 217), 
@@ -22,13 +18,12 @@ class Emily(Character):
             end_of_turn_refresh=5,
         )
         movement_component = MovementComponent(
-            movement_cost=1,
-            movement_line_color=self.color,
-            ghost_image=ghost_sprite
+            cost=1,
+            line_color=self.color,
         )
         health_component = HealthComponent(
             max= 1000, current=1000
         )
 
         components = [resource_component, movement_component,  health_component]
-        super().__init__(entity_id, name, sprite, team_id, is_team_1, components=components)
+        super().__init__(entity_id, ghost_id, name, team_id, is_team_1, components=components)

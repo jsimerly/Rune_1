@@ -10,12 +10,8 @@ class Crud(Character):
     image_path = 'in_game/entities/characters/characters/crud/images/crud.png'
     color = (145, 23, 1)
 
-    def __init__(self, entity_id: str, team_id: str, is_team_1: bool) -> None:
+    def __init__(self, entity_id: str, ghost_id:str, team_id: str, is_team_1: bool) -> None:
         name = self.name
-        sprite = pg.image.load(self.image_path)
-        ghost_sprite = pg.image.load(self.image_path)
-        ghost_sprite = pg.transform.scale(ghost_sprite, self.ghost_size)
-        ghost_sprite.set_alpha(self.ghost_alpha)
 
         resource_component = ResourceComponent(
             'Rage', (191, 25, 10), 
@@ -25,9 +21,8 @@ class Crud(Character):
             bonus_type='rage'
         )
         movement_component = MovementComponent(
-            movement_cost=1,
-            movement_line_color=self.color,
-            ghost_image=ghost_sprite
+            cost=1,
+            line_color=self.color,
         )
         health_component = HealthComponent(
             max= 1000, current=1000
@@ -38,6 +33,6 @@ class Crud(Character):
             movement_component, 
             health_component,
         ]
-        super().__init__(entity_id, name, sprite, team_id, is_team_1, components=components)
+        super().__init__(entity_id, ghost_id, name, team_id, is_team_1, components=components)
 
 

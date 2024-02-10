@@ -75,6 +75,7 @@ class DrawSpriteSystem(RenderSystem):
         event_bus.subscribe('spawn_to_tile', self.entity_to_tile)
         event_bus.subscribe('entity_moved_to_tile', self.move_entity_to_tile)
         event_bus.subscribe('entity_dragged_to_tile', self.move_entity_to_tile)
+        event_bus.subscribe('remove_entity_from_tile', self.remove_entity_from_tile)
 
     def draw_entity(self, display:pg.Surface, entity: Entity):
         sprite_component: Optional[SpriteComponent] = entity.get_component(SpriteComponent)
@@ -139,6 +140,10 @@ class DrawSpriteSystem(RenderSystem):
         sprite_comp.is_visible = True
         position_comp.position = center_pixel
 
+    def remove_entity_from_tile(self, entity: Entity, tile:GameTile):
+        position_comp: ScreenPositionComponent = entity.get_component(ScreenPositionComponent)
+        position_comp.position = None
+
     def move_entity_to_tile(self, entity:Entity, from_tile: GameTile, to_tile: GameTile):
         self.entity_to_tile(to_tile, entity)
 
@@ -151,15 +156,13 @@ class DrawMovementSystem(RenderSystem):
     def draw_entity(self, display: pg.Surface, entity: Entity):
         movement_comp: MovementComponent = entity.get_component(MovementComponent)
 
-        if len(movement_comp.movement_queue) > 0:
-            line_points = [tile.center_pixel for tile in movement_comp.movement_queue]
+        if len(movement_comp.queue) > 0:
+            line_points = [tile.center_pixel for tile in movement_comp.queue]
             line_points = [movement_comp.start_tile.center_pixel] + line_points
 
             if len(line_points) >= 2:
-                pg.draw.lines(display, movement_comp.movement_line_color, False, line_points,  movement_comp.line_width)
-
-                pos = self.get_top_left_position(movement_comp.ghost_image, movement_comp.start_tile.center_pixel)
-                display.blit(movement_comp.ghost_image, pos)            
+                pg.draw.lines(display, movement_comp.line_color, False, line_points,  movement_comp.line_width)
+       
 
 class DrawHexEdgeSystem(RenderSystem):
     required_components = [VisualHexEdgeComponent, ScreenPositionComponent]

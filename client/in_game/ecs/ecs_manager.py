@@ -58,7 +58,7 @@ class ECSManager:
         self.team_system = TeamSystem(event_bus=event_bus)
         self.spawning_system = SpawningSystem(event_bus=event_bus)
         self.vision_system = VisionSystem(event_bus=event_bus)
-        self.movement_system = MovementSystem(event_bus=event_bus)
+        self.movement_system = MovementSystem(event_bus=event_bus, all_entities=self.all_entities)
 
     def add_entity(self, entity_id:str , entity: Entity):
         self.all_entities[entity_id] = entity
