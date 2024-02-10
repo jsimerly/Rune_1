@@ -26,6 +26,7 @@ class ClickSystem(System):
         self.game_map = game_map
         self.ui_buttons: set[ButtonObject] = set()
         self.event_bus.subscribe('mouse_input', self.handle_mouse_input)
+        self.event_bus.subscribe('tile_clicked_outside_of_move_range', self.outside_of_move_range)
 
     def add_ui_button(self, button: ButtonObject):
         self.ui_buttons.add(button)
@@ -76,17 +77,22 @@ class ClickSystem(System):
                     self.event_bus.publish('attempt_move_to_tile', tile=tile)
                     self.handle_selected_clicked(tile)
 
-                if isinstance(mouse_input, Dragging):
+                elif isinstance(mouse_input, Dragging):
                     self.event_bus.publish('attempt_drag_to_tile', tile=tile)
 
-                if isinstance(mouse_input, DragEnd):
+                elif isinstance(mouse_input, DragEnd):
                     self.event_bus.publish('movement_ended', tile=tile)
                     self.handle_selected_clicked(tile)
-
+                
             else:
+                # check for ui for abliities
                 self.action_state.idle()
                 
-            
+    def outside_of_move_range(self, tile: GameTile):
+        print('yo')
+        self.action_state.idle()
+        self.handle_selected_clicked(tile)
+
 
     def check_buttons(self, pixel) -> bool:
         for button in self.ui_buttons:

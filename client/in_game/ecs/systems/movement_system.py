@@ -70,6 +70,8 @@ class MovementSystem(System):
                     from_tile = first_tile,
                     to_tile=tile 
                 )
+            else:
+                self.event_bus.publish('tile_clicked_outside_of_move_range', tile=tile)
 
     def check_legal_drag(self, tile: GameTile) -> bool:
         if self.current_entity.has_component(ResourceComponent):
@@ -102,13 +104,14 @@ class MovementSystem(System):
             if len(movement_comp.movement_queue) == 1:
                 if tile == movement_comp.start_tile:
                     from_tile = movement_comp.movement_queue.pop()
+                    resource_comp.amount += movement_comp.movement_cost
                     self.event_bus.publish(
                         'entity_dragged_to_tile', 
                         entity=self.current_entity,
                         from_tile = from_tile,
                         to_tile = movement_comp.start_tile, 
                     )
-
+                    
                     possible_tiles = self.find_possible_tiles(self.current_entity)
                     self.event_bus.publish('tile_in_movement_range', tiles=possible_tiles)
 
