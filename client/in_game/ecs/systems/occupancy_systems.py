@@ -54,12 +54,11 @@ class OccupancySystem(System):
 
             occupier_component.tiles.remove(occupant)
 
-    def remove_occupant(self, entity_to_remove: Entity, occupant: Entity):
-            occupancy_component: OccupancyComponent = occupant.get_component(OccupancyComponent)
-            occupier_component: OccupierComponent = entity_to_remove.get_component(OccupierComponent)
-
-            occupier_component.tiles.remove(occupant)
-            occupancy_component.occupants.remove(entity_to_remove)
+    def remove_occupant(self, entity: Entity, tile: Entity):
+            occupancy_component: OccupancyComponent = tile.get_component(OccupancyComponent)
+            occupier_component: OccupierComponent = entity.get_component(OccupierComponent)
+            occupier_component.tiles.remove(tile)
+            occupancy_component.occupants.remove(entity)
 
     
 

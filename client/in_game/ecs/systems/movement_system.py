@@ -168,6 +168,11 @@ class MovementSystem(System):
     def drag_end_legal(self, tile: GameTile):
         ''' We're checking if this is a legal end on tile. If not moving back in the queue until we find one of run of out tiles. We have to do this because when dragging we're only checking for legal passable tiles.'''
         movement_comp: MovementComponent = self.current_entity.get_component(MovementComponent)
+
+        if len(movement_comp.queue) == 0:
+            self.remove_ghost_entity(self.current_entity, tile)
+            return
+            
         new_move_queue = movement_comp.queue.copy()
 
         for tile in movement_comp.queue[::-1]:
@@ -177,6 +182,8 @@ class MovementSystem(System):
             
             new_move_queue.pop()
         movement_comp.queue = new_move_queue
+
+        self.set_ghost_entity(self.current_entity, movement_comp.start_tile)
 
                 
     def find_possible_tiles(self, entity: Entity) -> set[GameTile]:
