@@ -9,6 +9,7 @@ from in_game.ecs.components.team_component import TeamComponent
 from in_game.ecs.components.spawner_component import SpawnerComponent
 from in_game.ecs.components.vision_component import VisionComponent
 from in_game.ecs.components.health_component import HealthComponent
+from in_game.ecs.components.map_interaction_component import MapInteractionComponent
 import pygame as pg
 from in_game.map.tile import GameTile
 
@@ -20,7 +21,17 @@ class Building(Entity):
     required_components = [SpriteComponent, OccupierComponent, ScreenPositionComponent]
 
     def __init__(self, entity_id: str, components: List[Component] = None) -> None:
-        super().__init__(entity_id, components)
+        map_interaction_component = MapInteractionComponent(
+            blocks_los=False,
+            is_passable=False,
+            can_end_on=False,
+            can_pierce=False,
+            hides_occupants=False,
+            is_slowing=False,
+        )
+        _components = components + [map_interaction_component]
+
+        super().__init__(entity_id, _components)
 
     def get_center_between_tiles(self, tiles: list[GameTile]) -> tuple(int, int):
         x, y = 0, 0

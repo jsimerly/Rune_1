@@ -5,6 +5,7 @@ from in_game.ecs.components.sprite_component import SpriteComponent
 from in_game.ecs.entity import Entity
 from in_game.ecs.components.occupier_component import OccupierComponent
 from in_game.ecs.components.screen_position_component import ScreenPositionComponent
+from in_game.ecs.components.map_interaction_component import MapInteractionComponent
 from in_game.ecs.components.visual_aura import VisualAuraComponent
 import pygame as pg
 from in_game.map.tile import GameTile
@@ -42,7 +43,15 @@ class Rune(BaseRune):
         y_offset = int(self.size[1] * .2)
         
         visual_aura_component = VisualAuraComponent(self.experience_radius, (0,170,255), 100, .2)
-        components = [visual_aura_component]
+        map_interaction_component = MapInteractionComponent(
+            blocks_los=False,
+            is_passable=False,
+            can_end_on=False,
+            can_pierce=True,
+            hides_occupants=False,
+            is_slowing=False,
+        )
+        components = [visual_aura_component, map_interaction_component]
 
         super().__init__(
             entity_id, 

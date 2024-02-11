@@ -13,6 +13,7 @@ from in_game.ecs.components.movement_component import MovementComponent
 from in_game.ecs.components.resource_component import ResourceComponent
 from in_game.ecs.components.level_component import LevelComponent
 from in_game.ecs.components.reference_entity_component import ReferenceEntityComponent
+from in_game.ecs.components.map_interaction_component import MapInteractionComponent
 import pygame as pg
 
 if TYPE_CHECKING:
@@ -49,6 +50,14 @@ class Character(Entity):
         vision_component = VisionComponent(vision_radius=4)
         reference_entity_id = ReferenceEntityComponent(ghost_id)
         level_component = LevelComponent()
+        map_interaction_component = MapInteractionComponent(
+            blocks_los=False,
+            is_passable=True,
+            can_end_on=False,
+            can_pierce=True,
+            hides_occupants=False,
+            is_slowing=False,
+        )
 
         _components = [
             name_component,
@@ -59,6 +68,7 @@ class Character(Entity):
             vision_component,
             reference_entity_id,
             level_component,
+            map_interaction_component
         ] + components
         super().__init__(entity_id=entity_id, components=_components)
 

@@ -5,7 +5,8 @@ from in_game.ecs.components.movement_component import MovementComponent
 from in_game.ecs.components.resource_component import ResourceComponent
 from in_game.ecs.components.occupier_component import OccupierComponent
 from in_game.ecs.components.visual_edge_component import VisualHexEdgeComponent
-from in_game.ecs.components.map_interaction_component import TileMapInteractionComponent
+from in_game.ecs.components.map_interaction_component import TileMapInteractionComponent, MapInteractionComponent
+from in_game.ecs.components.occupancy_component import OccupancyComponent
 from in_game.ecs.components.reference_entity_component import ReferenceEntityComponent
 from in_game.entities.characters.character_base import Character
 from in_game.entities.movement_ghost.movement_ghost import MovementGhost
@@ -74,8 +75,9 @@ class MovementSystem(System):
             
             movement_comp.queue = []
             movement_comp.start_tile = tile
+            self.remove_ghost_entity(entity, movement_comp.start_tile)
 
-    def clear_movement_of_entity(self, entity: Entity):
+    def clear_movement_of_entity(self, entity: Entity): 
         if entity.has_component(MovementComponent):
             movement_comp: MovementComponent = entity.get_component(MovementComponent)
 
@@ -106,10 +108,16 @@ class MovementSystem(System):
         
 
     def check_legal_move(self, tile: GameTile):
+        movement_comp: MovementComponent = self.current_entity.get_component(MovementComponent)
+        if tile == movement_comp.start_tile:
+            ghost = self.find_ghost_entity(self.current_entity)
+            self.event_bus.publish('ghost_selected', ghost=ghost)
+            return
+
         if self.current_entity.has_component(ResourceComponent):
             possible_tiles = self.find_possible_tiles(self.current_entity)
             if tile in possible_tiles:
-                movement_comp: MovementComponent = self.current_entity.get_component(MovementComponent)
+
                 resource_comp: ResourceComponent = self.current_entity.get_component(ResourceComponent)
 
                 if len(movement_comp.queue) > 0:
@@ -215,8 +223,8 @@ class MovementSystem(System):
         new_move_queue = movement_comp.queue.copy()
 
         for tile in movement_comp.queue[::-1]:
-            tile_map_inter_comp: TileMapInteractionComponent = tile.get_component(TileMapInteractionComponent)
-            if tile_map_inter_comp.can_end_on:
+            can_end_on = self.check_end_on(self.current_entity, tile)
+            if can_end_on:
                 break
             
             new_move_queue.pop()
@@ -224,6 +232,23 @@ class MovementSystem(System):
 
         self.set_ghost_entity(self.current_entity, movement_comp.start_tile)
 
+    def check_end_on(self, entity: Entity, tile: GameTile) -> bool:
+        tile_map_inter_comp: TileMapInteractionComponent = tile.get_component(TileMapInteractionComponent)
+        if not tile_map_inter_comp.default_can_end_on:
+            return False
+        
+        occupancy_comp: OccupancyComponent = tile.get_component(OccupancyComponent)
+        for occupant in occupancy_comp.occupants:
+            if entity == occupant:
+                print("same")
+                continue
+            occupant_map_inter_comp: MapInteractionComponent = occupant.get_component(MapInteractionComponent)
+            if occupant_map_inter_comp:
+                if not occupant_map_inter_comp.can_end_on:
+                    return False
+                
+        return True
+        
                 
     def find_possible_tiles(self, entity: Entity) -> set[GameTile]:
         occupancy_comp: OccupierComponent = entity.get_component(OccupierComponent)

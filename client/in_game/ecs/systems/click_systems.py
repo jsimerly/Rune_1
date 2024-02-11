@@ -96,7 +96,6 @@ class ClickSystem(System):
                 self.action_state.idle()
                 
     def outside_of_move_range(self, tile: GameTile):
-        print('yo')
         self.action_state.idle()
         self.handle_selected_clicked(tile)
 
