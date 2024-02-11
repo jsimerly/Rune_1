@@ -8,6 +8,7 @@ from in_game.ecs.components.visual_edge_component import VisualHexEdgeComponent
 from in_game.ecs.components.map_interaction_component import TileMapInteractionComponent
 from in_game.ecs.components.reference_entity_component import ReferenceEntityComponent
 from in_game.entities.characters.character_base import Character
+from in_game.entities.movement_ghost.movement_ghost import MovementGhost
 from in_game.map.tile import GameTile
 from in_game.ecs.entity import Entity
 
@@ -22,12 +23,28 @@ class MovementSystem(System):
         self.event_bus.subscribe('spawn_to_tile', self.reset_movement_of_entity)
         self.event_bus.subscribe('movement_ended', self.drag_end_legal)
         self.event_bus.subscribe('idle_enter', self.clear)
+        self.event_bus.subscribe('ghost_selected', self.ghost_selected)
 
         self.current_entity: Entity | None = None
         self.all_entities = all_entities
 
     def clear(self, **kwargs):
         self.current_entity = None
+
+    def ghost_selected(self, ghost: MovementGhost):
+        character = self.find_character_from_ghost(ghost)
+
+        movement_comp: MovementComponent = character.get_component(MovementComponent)
+        current_tile = movement_comp.queue[-1]
+        start_tile = movement_comp.start_tile
+        self.event_bus.publish(
+            'entity_moved_to_tile', 
+            entity=character,
+            from_tile = current_tile,
+            to_tile=start_tile
+        )
+        self.clear_movement_of_entity(character)
+        self.event_bus.publish('character_selected', character=character)
 
     def set_ghost_entity(self, entity: Entity, tile: GameTile):
         ghost_entity = self.find_ghost_entity(entity)
@@ -57,6 +74,28 @@ class MovementSystem(System):
             
             movement_comp.queue = []
             movement_comp.start_tile = tile
+
+    def clear_movement_of_entity(self, entity: Entity):
+        if entity.has_component(MovementComponent):
+            movement_comp: MovementComponent = entity.get_component(MovementComponent)
+
+            len_queue = len(movement_comp.queue)
+            if len_queue > 0:
+                if entity.has_component(ResourceComponent):
+                    resource_comp: ResourceComponent = entity.get_component(ResourceComponent)
+                    print(len_queue)
+                    resource_comp.amount += len_queue * movement_comp.cost
+                    print(resource_comp.amount)
+            
+            movement_comp.queue = []
+        self.remove_ghost_entity(entity, movement_comp.start_tile)
+
+
+
+    def find_character_from_ghost(self, entity: MovementGhost) -> Character:
+        character_reference: ReferenceEntityComponent = entity.get_component(ReferenceEntityComponent)
+        character_entity = self.all_entities[character_reference.entity_id]
+        return character_entity
 
     def character_selected(self, character: Character):
         self.current_entity= character    

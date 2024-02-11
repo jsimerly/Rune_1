@@ -6,6 +6,7 @@ from in_game.ecs.components.occupancy_component import OccupancyComponent
 from in_game.entities.buildings.building_base import Building
 from in_game.entities.objectives.objective_base import Objective
 from in_game.entities.characters.character_base import Character
+from in_game.entities.movement_ghost.movement_ghost import MovementGhost
 from in_game.ecs.components.screen_position_component import ScreenPositionComponent
 from in_game.ecs.components.ui_components import RectUIComponent
 from mouse_inputs import MouseInput, Click, DragStart, Dragging, DragEnd
@@ -40,12 +41,18 @@ class ClickSystem(System):
  
         for occupant in occupancy_component.occupants:
             if isinstance(occupant, Character):
-                self.event_bus.publish('character_selected', character=occupant)
-            
-            if isinstance(occupant, Building):
-                self.event_bus.publish('building_selected', building=occupant)
-            if isinstance(occupant, Objective):
-                self.event_bus.publish('objective_selected', objective=occupant)
+                self.event_bus.publish('character_selected', character=occupant)   
+                break         
+
+        else:
+            for occupant in occupancy_component.occupants:
+                if isinstance(occupant, MovementGhost):
+                    self.event_bus.publish('ghost_selected', ghost=occupant)
+                    break
+                if isinstance(occupant, Building):
+                    self.event_bus.publish('building_selected', building=occupant)
+                if isinstance(occupant, Objective):
+                    self.event_bus.publish('objective_selected', objective=occupant)
     
     def handle_mouse_input(self, mouse_input: MouseInput):
         pixel = mouse_input.pixel
