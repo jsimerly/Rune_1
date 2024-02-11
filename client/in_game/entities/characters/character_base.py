@@ -11,6 +11,7 @@ from in_game.ecs.components.team_component import TeamComponent
 from in_game.ecs.components.name_component import NameComponent
 from in_game.ecs.components.movement_component import MovementComponent
 from in_game.ecs.components.resource_component import ResourceComponent
+from in_game.ecs.components.level_component import LevelComponent
 from in_game.ecs.components.reference_entity_component import ReferenceEntityComponent
 import pygame as pg
 
@@ -47,6 +48,7 @@ class Character(Entity):
         occupier_component = OccupierComponent()
         vision_component = VisionComponent(vision_radius=4)
         reference_entity_id = ReferenceEntityComponent(ghost_id)
+        level_component = LevelComponent()
 
         _components = [
             name_component,
@@ -55,7 +57,8 @@ class Character(Entity):
             team_component,
             occupier_component,
             vision_component,
-            reference_entity_id
+            reference_entity_id,
+            level_component,
         ] + components
         super().__init__(entity_id=entity_id, components=_components)
 

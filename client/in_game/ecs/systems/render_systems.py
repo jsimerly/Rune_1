@@ -12,6 +12,7 @@ from in_game.ecs.components.occupier_component import OccupierComponent
 from in_game.ecs.components.resource_component import ResourceComponent
 from in_game.ecs.components.health_component import HealthComponent
 from in_game.ecs.components.movement_component import MovementComponent
+from in_game.ecs.components.level_component import LevelComponent
 from in_game.map.tile import GameTile
 from algorithms import hex_radius
 from typing import Optional
@@ -76,6 +77,8 @@ class DrawSpriteSystem(RenderSystem):
         event_bus.subscribe('entity_moved_to_tile', self.move_entity_to_tile)
         event_bus.subscribe('entity_dragged_to_tile', self.move_entity_to_tile)
         event_bus.subscribe('remove_entity_from_tile', self.remove_entity_from_tile)
+        pg.font.init()
+        self.level_font = pg.font.SysFont(None, 24)
 
     def draw_entity(self, display:pg.Surface, entity: Entity):
         sprite_component: Optional[SpriteComponent] = entity.get_component(SpriteComponent)
@@ -92,6 +95,11 @@ class DrawSpriteSystem(RenderSystem):
 
             if entity.has_component(HealthComponent):
                 self.draw_health_component(
+                    display, entity, sprite_component, pos
+                )
+
+            if entity.has_component(LevelComponent):
+                self.draw_level_component(
                     display, entity, sprite_component, pos
                 )
 
@@ -114,7 +122,7 @@ class DrawSpriteSystem(RenderSystem):
         resource_pos = (x_pos, y_pos) 
         pg.draw.line(display, resource_component.color, left_pos, resource_pos, line_width)
 
-    def draw_health_component(self, display: pg.Surface, entity: Entity,          sprite_component: SpriteComponent, pos: tuple[int,int]):
+    def draw_health_component(self, display: pg.Surface, entity: Entity,        sprite_component: SpriteComponent, pos: tuple[int,int]):
             health_component: HealthComponent = entity.get_component(HealthComponent)
             y_pos = pos[1] - 8
             line_width = 8
@@ -131,6 +139,18 @@ class DrawSpriteSystem(RenderSystem):
             x_pos = left_pos[0] + line_length
             resource_pos = (x_pos, y_pos) 
             pg.draw.line(display, health_color, left_pos, resource_pos, line_width)
+
+    def draw_level_component(self, display: pg.Surface, entity: Entity, sprite_component: SpriteComponent, pos: tuple[int,int]):
+        level_component: LevelComponent = entity.get_component(LevelComponent)
+        if level_component:
+            image_size = sprite_component.image.get_size()
+            x_pos = pos[0] + image_size[0] - 14
+            y_pos = pos[1] - 12
+
+            text_surface = self.level_font.render(str(level_component.level), True, (255, 255, 255))
+            pos = (x_pos, y_pos)
+            display.blit(text_surface, pos)
+
 
     def entity_to_tile(self, tile: GameTile, entity: Entity):
         center_pixel = tile.center_pixel
